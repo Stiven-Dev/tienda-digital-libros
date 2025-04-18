@@ -70,16 +70,17 @@ public class VentanaPrincipal extends JFrame {
    void agregarLibroCarrito () {
       DefaultTableModel      tablaLibros      = pantallaPrincipal.getPanelLibros().getTableModel();
       HashMap<Long, Integer> carritoDeCompras = pantallaPrincipal.getPanelCarrito().getCarritoDeComprasTemporal();
-      final int              columnaAgregar   = 10;
+      final int              columnaISBN      = PanelCarrito.NOMBRE_COLUMNAS.ISBN.getIndex();
+      final int              columnaAgregar   = PanelCarrito.NOMBRE_COLUMNAS.AGREGAR.getIndex();
       for (int fila = 0; fila < tablaLibros.getRowCount(); fila++) {
-         Boolean valorAgregar = (Boolean) tablaLibros.getValueAt(fila, columnaAgregar);
+         boolean valorAgregar = (boolean) tablaLibros.getValueAt(fila, columnaAgregar);
          if (valorAgregar) {
-            Long ISBN = Long.parseLong(tablaLibros.getValueAt(fila, 0).toString());
+            long ISBN = (long) tablaLibros.getValueAt(fila, columnaISBN);
             if (!carritoDeCompras.containsKey(ISBN)) {
                carritoDeCompras.put(ISBN, 1);
                pantallaPrincipal.getPanelCarrito().agregarArticulo(ISBN);
             } else {
-               pantallaPrincipal.getPanelCarrito().incrementarCantidad(ISBN);
+               pantallaPrincipal.getPanelCarrito().aumentarCantidad(ISBN);
             }
             tablaLibros.setValueAt(false, fila, columnaAgregar);
          }

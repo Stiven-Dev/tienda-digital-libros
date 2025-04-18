@@ -1,6 +1,7 @@
 package co.edu.uptc.gui;
 
 import co.edu.uptc.entity.Libro;
+import co.edu.uptc.gui.Evento.EVENTO;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -9,17 +10,16 @@ import java.awt.*;
 import java.util.HashMap;
 
 public class PanelCarrito extends JPanel {
-   private final  Evento                 evento;
-   private static int                    identificadorCarrito;
-   private final  VentanaPrincipal       ventanaPrincipal;
-   private final  HashMap<Long, Integer> carritoDeCompras;
-   private final  Font                   fuenteCabecera     = new Font("Arial", Font.BOLD, 15);
-   private final  Font                   fuenteCelda        = new Font("Lucida Sans Unicode", Font.PLAIN, 15);
-   private final  Font                   fuenteBoton        = new Font("Lucida Sans Unicode", Font.BOLD, 20);
-   private final  JButton                botonPagarEfectivo = new JButton("Pagar en Efectivo");
-   private final  JButton                botonPagarTarjeta  = new JButton("Pagar con Tarjeta");
-   public         DefaultTableModel      model;
-   private        JLabel                 labelTotal;
+   private final Evento                 evento;
+   private final VentanaPrincipal       ventanaPrincipal;
+   private final HashMap<Long, Integer> carritoDeCompras;
+   private final Font                   fuenteCabecera = new Font("Arial", Font.BOLD, 15);
+   private final Font                   fuenteCelda    = new Font("Lucida Sans Unicode", Font.PLAIN, 15);
+   private final Font                   fuenteBoton    = new Font("Lucida Sans Unicode", Font.BOLD, 20);
+   private       HashMap<Long, Libro>   librosLocales;
+   public        DefaultTableModel      model;
+   private       double                 subTotal;
+   private       JLabel                 labelTotal;
 
    public PanelCarrito (VentanaPrincipal ventanaPrincipal, Evento evento) {
       this.evento           = evento;
@@ -66,7 +66,7 @@ public class PanelCarrito extends JPanel {
    private void inicializarPanelCarrito () {
       setLayout(new BorderLayout());
       model = getDefaultTableModel();
-      modificacionesCarrito(model);
+      modificacionesCarrito();
       JTable tableCarrito = new JTable(model);
       tableCarrito.getTableHeader().setFont(fuenteCabecera);
       tableCarrito.setFont(fuenteCelda);
@@ -83,8 +83,10 @@ public class PanelCarrito extends JPanel {
 
    private void inicializarPanelFooter () {
       //Footer (incluye el label de precio total)
-      botonPagarEfectivo.setActionCommand(Evento.EVENTO.PAGAR_EFECTIVO.name());
-      botonPagarTarjeta.setActionCommand(Evento.EVENTO.PAGAR_TARJETA.name());
+      JButton botonPagarEfectivo = new JButton("Pagar En Efectivo");
+      JButton botonPagarTarjeta  = new JButton("Pagar Con Tarjeta");
+      botonPagarEfectivo.setActionCommand(EVENTO.PAGAR_EFECTIVO.name());
+      botonPagarTarjeta.setActionCommand(EVENTO.PAGAR_TARJETA.name());
       botonPagarTarjeta.addActionListener(evento);
       botonPagarEfectivo.addActionListener(evento);
       labelTotal = new JLabel("Total: $0.00");
@@ -110,14 +112,14 @@ public class PanelCarrito extends JPanel {
       add(footer, BorderLayout.SOUTH);
    }
 
-   private void modificacionesCarrito (DefaultTableModel model) {
+   private void modificacionesCarrito () {
       model.addTableModelListener(event -> {
          int fila    = event.getFirstRow();
          int columna = event.getColumn();
          switch (columna) {
-            case 7 -> sumarAlCarrito(model, fila);
-            case 8 -> quitarAlCarrito(model, fila);
-            case 9 -> descartarDelCarrito(model, fila);
+            case 7 -> sumarAlCarrito(fila);
+            case 8 -> quitarAlCarrito(fila);
+            case 9 -> descartarDelCarrito(fila);
             default -> {
                return;
             }
@@ -126,131 +128,138 @@ public class PanelCarrito extends JPanel {
       });
    }
 
-   private void sumarAlCarrito (DefaultTableModel model, int fila) {
-      final int columnaAgregar = 7;
+   private void sumarAlCarrito (int fila) {
+      final int columnaAgregar = NOMBRE_COLUMNAS.AGREGAR.getIndex();
       if (!((boolean) model.getValueAt(fila, columnaAgregar))) {
          return;
       }
-      final int columnaCantidad = 5;
+      final int columnaISBN     = NOMBRE_COLUMNAS.ISBN.getIndex();
+      final int columnaCantidad = NOMBRE_COLUMNAS.CANTIDAD.getIndex();
       try {
-         int cantidad = (int) (model.getValueAt(fila, columnaCantidad)); //Posible error en la conversion de tipo de dato, en ese caso usar parseInt()
-         model.setValueAt(cantidad + 1, fila, columnaCantidad);
+         long ISBN     = (long) model.getValueAt(fila, columnaISBN);
+         int  cantidad = (int) model.getValueAt(fila, columnaCantidad);
+         //Se tiene una lista local de libros, por lo que no se necesita hacer una consulta a la base de datos
+         //Ademas se evitan errores donde se intente agregar un Libro que no fue mostrado, facilitando la mantenibilidad cuando no se deba mostrar un Libro ya sea porque no hay
+         //stock o sitacion similar
+         Libro libro = librosLocales.get(ISBN);
+         if (libro.getCantidadDisponible() > cantidad) {
+            cantidad += 1;
+            carritoDeCompras.replace(ISBN, cantidad);
+            model.setValueAt(cantidad, fila, columnaCantidad);
+            return;
+         }
+         String mensaje = String.format("No quedan mas unidades de %s", libro.getTitulo());
+         JOptionPane.showMessageDialog(null, mensaje, "Alerta", JOptionPane.INFORMATION_MESSAGE);
       } catch (NullPointerException e) {
          System.err.println(e.getMessage());
       } finally {
          model.setValueAt(false, fila, columnaAgregar);
       }
-      actualizarCarrito(model);
    }
 
-   private void quitarAlCarrito (DefaultTableModel model, int fila) {
-      final int columnaQuitar = 8;
+   private void quitarAlCarrito (int fila) {
+      final int columnaQuitar = NOMBRE_COLUMNAS.QUITAR.getIndex();
       if (!(boolean) model.getValueAt(fila, columnaQuitar)) {
          return;
       }
-      final int columnaCantidad = 5;
+      final int columnaISBN     = NOMBRE_COLUMNAS.ISBN.getIndex();
+      final int columnaCantidad = NOMBRE_COLUMNAS.CANTIDAD.getIndex();
       try {
-         int cantidad = Integer.parseInt(model.getValueAt(fila, columnaCantidad).toString());
+         int  cantidad = (int) model.getValueAt(fila, columnaCantidad);
+         long ISBN     = (long) model.getValueAt(fila, columnaISBN);
          if (cantidad > 1) {
-            model.setValueAt(cantidad - 1, fila, columnaCantidad);
-         } else {
-            model.removeRow(fila);
+            cantidad -= 1;
+            carritoDeCompras.replace(ISBN, cantidad);
+            model.setValueAt(cantidad, fila, columnaCantidad);
+            return;
          }
+         model.removeRow(fila);
       } catch (NullPointerException e) {
          System.err.println(e.getMessage());
       } finally {
          model.setValueAt(false, fila, columnaQuitar);
       }
-      actualizarCarrito(model);
    }
 
-   private void actualizarCarrito (DefaultTableModel model) {
-      final int columnaISBN          = 0;
-      final int columnaValorUnitario = 3;
-      final int columnaCantidad      = 5;
-      final int columnaPrecioVenta   = 6;
-      for (int fila = 0; fila < model.getRowCount(); fila++) {
-         long ISBN     = (long) model.getValueAt(fila, columnaISBN);
-         int  cantidad = (int) model.getValueAt(fila, columnaCantidad);
-         if (cantidad < 1) {
-            carritoDeCompras.remove(ISBN);
-         }
-         carritoDeCompras.put(ISBN, cantidad);
-         double valorUnitario = (double) model.getValueAt(fila, columnaValorUnitario);
-         double precioVenta   = obtenerPrecioVenta(valorUnitario, cantidad);
-         model.setValueAt(precioVenta, fila, columnaPrecioVenta);
-      }
-   }
-
-   private void descartarDelCarrito (DefaultTableModel model, int fila) {
-      final int columnaISBN = 0;
-      carritoDeCompras.remove((long) model.getValueAt(fila, columnaISBN));
+   private void descartarDelCarrito (int fila) {
+      final int columnaISBN = NOMBRE_COLUMNAS.ISBN.getIndex();
+      long      ISBN        = (long) model.getValueAt(fila, columnaISBN);
+      carritoDeCompras.remove(ISBN);
       model.removeRow(fila);
    }
 
-   public void actualizarCarritoArchivo () {
-      HashMap<Long, Integer> carritoDeCompras = getCarritoDeComprasTemporal();
-      VentanaPrincipal.guardarCarritoDeCompras(identificadorCarrito, carritoDeCompras);
-   }
-
    void agregarArticulo (long ISBN) {
-      model.addRow(formatearArticulo(ISBN));
-      carritoDeCompras.put(ISBN, 1);
+      Libro libro = librosLocales.get(ISBN);
+      if (libro == null) {
+         return;
+      }
+      if (carritoDeCompras.get(ISBN) == null) {
+         carritoDeCompras.put(ISBN, 1);
+         rellenarDatosFilaLibro(libro);
+         return;
+      }
+      aumentarCantidad(ISBN);
    }
 
-   private Object[] formatearArticulo (long ISBN) {
-      Object[] datosImportados = ventanaPrincipal.obtenerDatosLibroCarrito(ISBN);
-      String   titulo          = (String) datosImportados[1];
-      String   autores         = (String) datosImportados[2];
-      double   precioUnitario  = (double) datosImportados[3];
-      double   precioImpuesto  = obtenerPrecioImpuesto(precioUnitario);
-      int      cantidad        = obtenerCantidadLibro(ISBN);
-      double   precioTotal     = obtenerPrecioVenta(precioUnitario, cantidad);
-      boolean  agregar         = false;
-      boolean  quitar          = false;
-      boolean  descartar       = false;
-      return new Object[] {ISBN, titulo, autores, precioUnitario, precioImpuesto, cantidad, precioTotal, agregar, quitar, descartar};
+   private void rellenarDatosFilaLibro (Libro libro) {
+      Object[] datosFila      = new Object[7];
+      long     ISBN           = libro.getISBN();
+      double   precioImpuesto = obtenerPrecioImpuesto(ISBN);
+      datosFila[NOMBRE_COLUMNAS.ISBN.getIndex()]           = libro.getISBN();
+      datosFila[NOMBRE_COLUMNAS.TITULO.getIndex()]         = libro.getTitulo();
+      datosFila[NOMBRE_COLUMNAS.AUTORES.getIndex()]        = libro.getAutores();
+      datosFila[NOMBRE_COLUMNAS.VALOR_UNITARIO.getIndex()] = libro.getValorUnitario();
+      datosFila[NOMBRE_COLUMNAS.VALOR_IMPUESTO.getIndex()] = obtenerPrecioImpuesto(ISBN);
+      datosFila[NOMBRE_COLUMNAS.CANTIDAD.getIndex()]       = 1;
+      datosFila[NOMBRE_COLUMNAS.VALOR_TOTAL.getIndex()]    = libro.getValorUnitario() + precioImpuesto;
+      datosFila[NOMBRE_COLUMNAS.AGREGAR.getIndex()]        = false;
+      datosFila[NOMBRE_COLUMNAS.QUITAR.getIndex()]         = false;
+      datosFila[NOMBRE_COLUMNAS.DESCARTAR.getIndex()]      = false;
+      model.addRow(datosFila);
    }
 
-   private double obtenerPrecioVenta (double valorUnitario, int cantidad) {
-      return ventanaPrincipal.obtenerPrecioTotalProducto(valorUnitario, cantidad);
+   void aumentarCantidad (long ISBN) {
+      final int columnaISBN     = NOMBRE_COLUMNAS.ISBN.getIndex();
+      final int columnaCantidad = NOMBRE_COLUMNAS.CANTIDAD.getIndex();
+      int       cantidad        = carritoDeCompras.get(ISBN);
+      if (cantidad >= 10) {
+         JOptionPane.showMessageDialog(null, "No se pueden agregar mas de 10 unidades del mismo libro", "Alerta", JOptionPane.INFORMATION_MESSAGE);
+         return;
+      }
+      cantidad += 1;
+      for (int i = 0; i < model.getRowCount(); i++) {
+         if ((long) model.getValueAt(i, columnaISBN) == ISBN) {
+            carritoDeCompras.replace(ISBN, cantidad);
+            model.setValueAt(cantidad, i, columnaCantidad);
+            actualizarPrecioVenta(ISBN, i);
+            return;
+         }
+      }
    }
 
-   private double obtenerPrecioImpuesto (double valorUnitario) {
+   private void actualizarPrecioVenta (long ISBN, int filaModel) {
+      final int columnaPrecioVenta = NOMBRE_COLUMNAS.VALOR_TOTAL.getIndex();
+      double    valorUnitario      = librosLocales.get(ISBN).getValorUnitario();
+      int       cantidad           = carritoDeCompras.get(ISBN);
+      double    precioVenta        = ventanaPrincipal.obtenerPrecioTotalProducto(valorUnitario, cantidad);
+      model.setValueAt(precioVenta, filaModel, columnaPrecioVenta);
+   }
+
+   private double obtenerPrecioImpuesto (long ISBN) {
+      double valorUnitario = librosLocales.get(ISBN).getValorUnitario();
       return ventanaPrincipal.obtenerPrecioImpuesto(valorUnitario);
    }
 
    private void actualizarPrecioTotal () {
-      double precioTotal = ventanaPrincipal.obtenerPrecioVentaTotal(model);
-      labelTotal.setText(String.format("$%,.2f", precioTotal));
+      subTotal = ventanaPrincipal.obtenerPrecioVentaTotal(model);
+      labelTotal.setText(String.format("$%,.2f", subTotal));
    }
 
-   void incrementarCantidad (Long ISBN) {
-      final int columnaISBN           = 0;
-      final int columnaPrecioUnitario = 3;
-      final int columnaCantidad       = 5;
-      final int columnaPrecioVenta    = 6;
-      for (int fila = 0; fila < model.getRowCount(); fila++) {
-         if (model.getValueAt(fila, columnaISBN).equals(ISBN)) {
-            int cantidad = ((int) model.getValueAt(fila, columnaCantidad)) + 1;
-            carritoDeCompras.put(ISBN, cantidad);
-            model.setValueAt(cantidad, fila, columnaCantidad);
-            double precioUnitario = (double) model.getValueAt(fila, columnaPrecioUnitario);
-            model.setValueAt(obtenerPrecioVenta(precioUnitario, cantidad), fila, columnaPrecioVenta);
-            break;
-         }
-      }
-      actualizarPrecioTotal();
+   public void setLibrosLocales (HashMap<Long, Libro> librosLocales) {
+      this.librosLocales = librosLocales;
    }
 
-   private int obtenerCantidadLibro (long ISBN) {
-      if (carritoDeCompras.get(ISBN) == null) {
-         return 1;
-      }
-      return carritoDeCompras.get(ISBN);
-   }
-
-   private enum NOMBRE_COLUMNAS {
+   enum NOMBRE_COLUMNAS {
       ISBN(0),
       TITULO(1),
       AUTORES(2),

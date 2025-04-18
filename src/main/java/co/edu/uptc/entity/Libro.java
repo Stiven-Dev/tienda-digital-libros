@@ -19,7 +19,7 @@ import jakarta.persistence.*;
    @Column(name = "numero_paginas", nullable = false)
    private int      numeroPaginas;
    @Column(name = "precio_venta", nullable = false)
-   private double   precioVenta;
+   private double   valorUnitario;
    @Column(name = "cantidad_disponible", nullable = false)
    private int      cantidadDisponible;
    @Enumerated(EnumType.STRING)
@@ -41,7 +41,7 @@ import jakarta.persistence.*;
                  String categoria,
                  String editorial,
                  int numeroPaginas,
-                 double precioVenta,
+                 double valorUnitario,
                  int cantidadDisponible,
                  FORMATOS FORMATO) {
       this.ISBN               = ISBN;
@@ -51,7 +51,7 @@ import jakarta.persistence.*;
       this.categoria          = categoria;
       this.editorial          = editorial;
       this.numeroPaginas      = numeroPaginas;
-      this.precioVenta        = precioVenta;
+      this.valorUnitario      = valorUnitario;
       this.cantidadDisponible = cantidadDisponible;
       this.FORMATO            = FORMATO;
    }
@@ -112,12 +112,12 @@ import jakarta.persistence.*;
       this.numeroPaginas = numeroPaginas;
    }
 
-   public double getPrecioVenta () {
-      return precioVenta;
+   public double getValorUnitario () {
+      return valorUnitario;
    }
 
-   public void setPrecioVenta (double precioVenta) {
-      this.precioVenta = precioVenta;
+   public void setValorUnitario (double valorUnitario) {
+      this.valorUnitario = valorUnitario;
    }
 
    public int getCantidadDisponible () {

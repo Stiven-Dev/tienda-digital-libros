@@ -3,12 +3,8 @@ package co.edu.uptc.model;
 import co.edu.uptc.entity.Libro;
 import jakarta.json.*;
 
-import javax.swing.table.DefaultTableModel;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Tienda {
    private static final String RUTA_CARRITOS = "persistencia/CARRITOS.json";
@@ -175,7 +171,7 @@ public class Tienda {
          libro.setCategoria(libroObject.getString("categoria"));
          libro.setEditorial(libroObject.getString("editorial"));
          libro.setNumeroPaginas(libroObject.getInt("numPaginas"));
-         libro.setPrecioVenta(libroObject.getJsonNumber("precioVenta").doubleValue());
+         libro.setValorUnitario(libroObject.getJsonNumber("precioVenta").doubleValue());
          libro.setCantidadDisponible(libroObject.getInt("cantidadInventario"));
          libro.setFormato(Libro.FORMATOS.valueOf(libroObject.getString("formato")));
          listaDeLibros.add(libro);
@@ -202,7 +198,7 @@ public class Tienda {
             dataVectorLibros[i][5]  = libro.getEditorial();
             dataVectorLibros[i][6]  = libro.getAnioPublicacion();
             dataVectorLibros[i][7]  = libro.getFormato();
-            dataVectorLibros[i][8]  = libro.getPrecioVenta();
+            dataVectorLibros[i][8]  = libro.getValorUnitario();
             dataVectorLibros[i][9]  = libro.getCantidadDisponible();
             dataVectorLibros[i][10] = false;
          }
@@ -211,7 +207,8 @@ public class Tienda {
       }
       return dataVectorLibros;
    }
-//
+
+   //
 //   public Object[] buscarLibro (long ISBN) {
 //      try {
 //         InputStream inputStream = new FileInputStream(RUTA_LIBROS);
@@ -406,18 +403,18 @@ public class Tienda {
 //      return subTotal * obtenerPorcentajeDescuento(rol);
 //   }
 //
-//   public double calcularPrecioVenta (double valorUnitario, int cantidad) {
-//      double valorImpuesto = calcularValorImpuesto(valorUnitario);
-//      return (valorUnitario + valorImpuesto) * cantidad;
-//   }
-//
-//   public double calcularValorImpuesto (double precioUnidad) {
-//      if (precioUnidad >= 50000) {
-//         return precioUnidad * 0.19;
-//      } else {
-//         return precioUnidad * 0.05;
-//      }
-//   }
+   public double calcularPrecioVenta (double valorUnitario, int cantidad) {
+      double valorImpuesto = calcularValorImpuesto(valorUnitario);
+      return (valorUnitario + valorImpuesto) * cantidad;
+   }
+
+   public double calcularValorImpuesto (double precioUnidad) {
+      if (precioUnidad >= 50000) {
+         return precioUnidad * 0.19;
+      } else {
+         return precioUnidad * 0.05;
+      }
+   }
 //
 //   public boolean actualizarLibro (Object[] datos) {
 //      long ISBN = (long) datos[0];
