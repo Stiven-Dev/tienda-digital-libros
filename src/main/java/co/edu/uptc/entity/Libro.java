@@ -1,121 +1,123 @@
-package co.edu.uptc.modelo;
+package co.edu.uptc.entity;
 
-public class Libro{
-	private long   isbn;
-	private String titulo;
-	private String autores;
-	private int    anioPublicacion;
-	private String categoria;
-	private String editorial;
-	private int    numeroPaginas;
-	private double precioVenta;
-	private int    cantidadDisponible;
-	private String formato;
+public class Libro {
+   private long    ISBN;
+   private String  titulo;
+   private String  autores;
+   private int     anioPublicacion;
+   private String  categoria;
+   private String  editorial;
+   private int     numeroPaginas;
+   private double  precioVenta;
+   private int     cantidadDisponible;
+   private FORMATO formato;
 
-	public Libro (){
-	}
+   public enum FORMATO {
+      DIGITAL, IMPRESO
+   }
 
-	public Libro (
-			long isbn,
-			String titulo,
-			String autores,
-			int anioPublicacion,
-			String categoria,
-			String editorial,
-			int numeroPaginas,
-			double precioVenta,
-			int cantidadDisponible,
-			String formato
-	){
-		this.isbn               = isbn;
-		this.titulo             = titulo;
-		this.autores            = autores;
-		this.anioPublicacion    = anioPublicacion;
-		this.categoria          = categoria;
-		this.editorial          = editorial;
-		this.numeroPaginas      = numeroPaginas;
-		this.precioVenta        = precioVenta;
-		this.cantidadDisponible = cantidadDisponible;
-		this.formato            = formato.toUpperCase();
-	}
+   public Libro () {
+   }
 
-	public long getIsbn (){
-		return isbn;
-	}
+   public Libro (long ISBN,
+                 String titulo,
+                 String autores,
+                 int anioPublicacion,
+                 String categoria,
+                 String editorial,
+                 int numeroPaginas,
+                 double precioVenta,
+                 int cantidadDisponible,
+                 FORMATO formato) {
+      this.ISBN               = ISBN;
+      this.titulo             = titulo;
+      this.autores            = autores;
+      this.anioPublicacion    = anioPublicacion;
+      this.categoria          = categoria;
+      this.editorial          = editorial;
+      this.numeroPaginas      = numeroPaginas;
+      this.precioVenta        = precioVenta;
+      this.cantidadDisponible = cantidadDisponible;
+      this.formato            = formato;
+   }
 
-	public void setIsbn (long paramIsbn){
-		isbn = paramIsbn;
-	}
+   public long getISBN () {
+      return ISBN;
+   }
 
-	public String getTitulo (){
-		return titulo;
-	}
+   public void setISBN (long ISBN) {
+      this.ISBN = ISBN;
+   }
 
-	public void setTitulo (String paramTitulo){
-		titulo = paramTitulo;
-	}
+   public String getTitulo () {
+      return titulo;
+   }
 
-	public String getAutores (){
-		return autores;
-	}
+   public void setTitulo (String titulo) {
+      this.titulo = titulo;
+   }
 
-	public void setAutores (String paramAutores){
-		autores = paramAutores;
-	}
+   public String getAutores () {
+      return autores;
+   }
 
-	public int getAnioPublicacion (){
-		return anioPublicacion;
-	}
+   public void setAutores (String autores) {
+      this.autores = autores;
+   }
 
-	public void setAnioPublicacion (int paramAnioPublicacion){
-		anioPublicacion = paramAnioPublicacion;
-	}
+   public int getAnioPublicacion () {
+      return anioPublicacion;
+   }
 
-	public String getCategoria (){
-		return categoria;
-	}
+   public void setAnioPublicacion (int anioPublicacion) {
+      this.anioPublicacion = anioPublicacion;
+   }
 
-	public void setCategoria (String paramCategoria){
-		categoria = paramCategoria;
-	}
+   public String getCategoria () {
+      return categoria;
+   }
 
-	public String getEditorial (){
-		return editorial;
-	}
+   public void setCategoria (String categoria) {
+      this.categoria = categoria;
+   }
 
-	public void setEditorial (String paramEditorial){
-		editorial = paramEditorial;
-	}
+   public String getEditorial () {
+      return editorial;
+   }
 
-	public int getNumeroPaginas (){
-		return numeroPaginas;
-	}
+   public void setEditorial (String editorial) {
+      this.editorial = editorial;
+   }
 
-	public void setNumeroPaginas (int paramNumeroPaginas){
-		numeroPaginas = paramNumeroPaginas;
-	}
+   public int getNumeroPaginas () {
+      return numeroPaginas;
+   }
 
-	public double getPrecioVenta (){
-		return precioVenta;
-	}
+   public void setNumeroPaginas (int numeroPaginas) {
+      this.numeroPaginas = numeroPaginas;
+   }
 
-	public void setPrecioVenta (double paramPrecioVenta){
-		precioVenta = paramPrecioVenta;
-	}
+   public double getPrecioVenta () {
+      return precioVenta;
+   }
 
-	public int getCantidadDisponible (){
-		return cantidadDisponible;
-	}
+   public void setPrecioVenta (double precioVenta) {
+      this.precioVenta = precioVenta;
+   }
 
-	public void setCantidadDisponible (int paramCantidadDisponible){
-		cantidadDisponible = paramCantidadDisponible;
-	}
+   public int getCantidadDisponible () {
+      return cantidadDisponible;
+   }
 
-	public String getFormato (){
-		return formato.toUpperCase();
-	}
+   public void setCantidadDisponible (int cantidadDisponible) {
+      this.cantidadDisponible = cantidadDisponible;
+   }
 
-	public void setFormato (String paramFormato){
-		formato = paramFormato.toUpperCase();
-	}
+   public FORMATO getFormato () {
+      return formato;
+   }
+
+   public void setFormato (FORMATO formato) {
+      this.formato = formato;
+   }
 }

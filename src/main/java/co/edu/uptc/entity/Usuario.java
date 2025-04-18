@@ -1,108 +1,113 @@
-package co.edu.uptc.modelo;
+package co.edu.uptc.entity;
 
-import java.util.HashMap;
+import java.util.List;
 
-public class Usuario{
-	private String                 nombreCompleto;
-	private String                 correoElectronico;
-	private String                 direccionEnvio;
-	private long                   telefonoContacto;
-	private char[]                 claveAcceso;
-	private ROLES                  rolUsuario;
-	private HashMap<Long, Integer> carritoDeCompras;
-	private int                    CID; //Carrito ID
+public class Usuario {
+   private long         ID;
+   private String       nombreCompleto;
+   private String       correoElectronico;
+   private String       direccionEnvio;
+   private long         telefonoContacto;
+   private char[]       claveAcceso;
+   private TIPO_USUARIO tipoUsuario;
+   private Carrito      carrito;
+   private List<Compra> compras;
 
-	public Usuario (){}
+   public enum TIPO_USUARIO {
+      ADMIN, PREMIUM, REGULAR
+   }
 
-	public Usuario (
-			String nombreCompleto,
-			String correoElectronico,
-			String direccionEnvio,
-			long telefonoContacto,
-			char[] claveAcceso,
-			int CID,
-			HashMap<Long, Integer> carritoDeCompras
-	){
-		this.nombreCompleto    = nombreCompleto;
-		this.correoElectronico = correoElectronico.toUpperCase();
-		this.direccionEnvio    = direccionEnvio;
-		this.telefonoContacto  = telefonoContacto;
-		this.claveAcceso       = claveAcceso;
-		this.rolUsuario        = validarRolUsuario(correoElectronico);
-		this.CID               = CID;
-		this.carritoDeCompras  = carritoDeCompras;
-	}
+   public Usuario () {}
 
-	static ROLES validarRolUsuario (String correoElectronico){
-		if (correoElectronico.matches("^(?i)admin.*$")){
-			return ROLES.ADMIN;
-		}else if (correoElectronico.matches("^(?i)premium.*$")){
-			return ROLES.PREMIUM;
-		}
-		return ROLES.REGULAR;
-	}
+   public Usuario (long ID,
+                   String nombreCompleto,
+                   String correoElectronico,
+                   String direccionEnvio,
+                   long telefonoContacto,
+                   char[] claveAcceso,
+                   TIPO_USUARIO tipoUsuario,
+                   Carrito carrito,
+                   List<Compra> compras) {
+      this.ID                = ID;
+      this.nombreCompleto    = nombreCompleto;
+      this.correoElectronico = correoElectronico;
+      this.direccionEnvio    = direccionEnvio;
+      this.telefonoContacto  = telefonoContacto;
+      this.claveAcceso       = claveAcceso;
+      this.tipoUsuario       = tipoUsuario;
+      this.carrito           = carrito;
+      this.compras           = compras;
+   }
 
-	String getNombreCompleto (){
-		return nombreCompleto;
-	}
+   public long getID () {
+      return ID;
+   }
 
-	void setNombreCompleto (String paramNombreCompleto){
-		nombreCompleto = paramNombreCompleto;
-	}
+   public void setID (long ID) {
+      this.ID = ID;
+   }
 
-	String getCorreoElectronico (){
-		return correoElectronico;
-	}
+   public String getNombreCompleto () {
+      return nombreCompleto;
+   }
 
-	void setCorreoElectronico (String paramCorreoElectronico){
-		correoElectronico = paramCorreoElectronico;
-	}
+   public void setNombreCompleto (String nombreCompleto) {
+      this.nombreCompleto = nombreCompleto;
+   }
 
-	String getDireccionEnvio (){
-		return direccionEnvio;
-	}
+   public String getCorreoElectronico () {
+      return correoElectronico;
+   }
 
-	void setDireccionEnvio (String paramDireccionEnvio){
-		direccionEnvio = paramDireccionEnvio;
-	}
+   public void setCorreoElectronico (String correoElectronico) {
+      this.correoElectronico = correoElectronico;
+   }
 
-	long getTelefonoContacto (){
-		return telefonoContacto;
-	}
+   public String getDireccionEnvio () {
+      return direccionEnvio;
+   }
 
-	void setTelefonoContacto (long paramTelefonoContacto){
-		telefonoContacto = paramTelefonoContacto;
-	}
+   public void setDireccionEnvio (String direccionEnvio) {
+      this.direccionEnvio = direccionEnvio;
+   }
 
-	char[] getClaveAcceso (){
-		return claveAcceso;
-	}
+   public long getTelefonoContacto () {
+      return telefonoContacto;
+   }
 
-	public void setClaveAcceso (char[] paramClaveAcceso){
-		claveAcceso = paramClaveAcceso;
-	}
+   public void setTelefonoContacto (long telefonoContacto) {
+      this.telefonoContacto = telefonoContacto;
+   }
 
-	public ROLES getRolUsuario (){
-		return rolUsuario;
-	}
+   public char[] getClaveAcceso () {
+      return claveAcceso;
+   }
 
-	public void setRolUsuario (ROLES rolUsuario){
-		this.rolUsuario = rolUsuario;
-	}
+   public void setClaveAcceso (char[] claveAcceso) {
+      this.claveAcceso = claveAcceso;
+   }
 
-	public HashMap<Long, Integer> getCarritoDeCompras (){
-		return carritoDeCompras;
-	}
+   public TIPO_USUARIO getTipoUsuario () {
+      return tipoUsuario;
+   }
 
-	public void setCarritoDeCompras (HashMap<Long, Integer> carritoDeCompras){
-		this.carritoDeCompras = carritoDeCompras;
-	}
+   public void setTipoUsuario (TIPO_USUARIO tipoUsuario) {
+      this.tipoUsuario = tipoUsuario;
+   }
 
-	public int getCID (){
-		return CID;
-	}
+   public Carrito getCarrito () {
+      return carrito;
+   }
 
-	public void setCID (int CID){
-		this.CID = CID;
-	}
+   public void setCarrito (Carrito carrito) {
+      this.carrito = carrito;
+   }
+
+   public List<Compra> getCompras () {
+      return compras;
+   }
+
+   public void setCompras (List<Compra> compras) {
+      this.compras = compras;
+   }
 }
