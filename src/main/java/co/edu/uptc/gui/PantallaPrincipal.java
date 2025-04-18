@@ -6,8 +6,7 @@ import java.awt.*;
 public class PantallaPrincipal extends JPanel{
 	private final Evento                evento;
 	private final VentanaPrincipal      ventanaPrincipal;
-	private final Font                  fuentePestania = new Font("Arial", Font.BOLD, 15);
-	private final JTabbedPane           panelPrincipal;
+   private final JTabbedPane           panelPrincipal;
 	private       PanelLibros           panelLibros;
 	private       PanelCarrito          panelCarrito;
 	private       PanelPerfil           panelPerfil;
@@ -22,7 +21,8 @@ public class PantallaPrincipal extends JPanel{
 		this.ventanaPrincipal = ventana;
 		setLayout(new BorderLayout());
 		panelPrincipal = new JTabbedPane();
-		panelPrincipal.setFont(fuentePestania);
+      Font fuentePestania = new Font("Arial", Font.BOLD, 15);
+      panelPrincipal.setFont(fuentePestania);
 
 		inicializarPanelLibros(ventana);
 		panelPrincipal.addTab("Lista de Libros", panelLibros);

@@ -1,24 +1,31 @@
 package co.edu.uptc.entity;
 
+import jakarta.persistence.*;
+
 import java.util.HashMap;
 
-public class Carrito {
+@Entity @Table(name = "carrito") public class Carrito {
+   @Id
+   @JoinColumn(name = "ID")
    private long                 ID;
+   @OneToOne
+   @MapsId
+   @JoinColumn(name = "ID")
+   private Usuario              usuario;
+   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+   @JoinColumn(name = "ID")
+   @MapKeyColumn(name = "ISBN")
    private HashMap<Long, Libro> articulos;
 
-   public Carrito () {}
-
-   public Carrito (long ID, HashMap<Long, Libro> articulos) {
-      this.ID        = ID;
-      this.articulos = articulos;
+   public Carrito () {
    }
 
    public long getID () {
-      return ID;
+      return usuario.getID();
    }
 
-   public void setID (long ID) {
-      this.ID = ID;
+   public void setUsuario (Usuario usuario) {
+      this.usuario = usuario;
    }
 
    public HashMap<Long, Libro> getArticulos () {

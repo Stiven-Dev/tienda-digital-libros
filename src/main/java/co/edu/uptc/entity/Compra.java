@@ -1,14 +1,24 @@
 package co.edu.uptc.entity;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class Compra {
+@Entity @Table(name = "compra") public class Compra {
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
    private       long              ID_Compra;
+   @ManyToOne
+   @JoinColumn(name = "ID_Usuario", nullable = false)
    private       int               ID_Asociado;
+   @Column(name = "fecha_compra", nullable = false)
    private       LocalDateTime     fechaCompra;
+   @Column(name = "valor_compra", nullable = false)
    private       double            valorCompra;
+   @Column(name = "cantidad_compra", nullable = false)
    private       int               cantidadCompra;
+   @Transient
    private final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MMMM/yyyy HH:mm");
 
    public Compra () {}

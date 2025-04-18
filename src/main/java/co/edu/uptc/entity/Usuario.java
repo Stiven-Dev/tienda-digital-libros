@@ -1,50 +1,41 @@
 package co.edu.uptc.entity;
 
+import jakarta.persistence.*;
+
 import java.util.List;
 
-public class Usuario {
+@Entity @Table(name = "usuario") public class Usuario {
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
    private long         ID;
+   @Column(name = "nombre_completo", nullable = false)
    private String       nombreCompleto;
+   @Column(name = "correo_electronico", nullable = false)
    private String       correoElectronico;
+   @Column(name = "direccion_envio", nullable = false)
    private String       direccionEnvio;
+   @Column(name = "telefono_contacto", nullable = false)
    private long         telefonoContacto;
+   @Column(name = "clave_acceso", nullable = false)
    private char[]       claveAcceso;
-   private TIPO_USUARIO tipoUsuario;
+   @Enumerated(EnumType.STRING)
+   @Column(name = "tipo_usuario", nullable = false)
+   private ROLES        tipoUsuario;
+   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
    private Carrito      carrito;
+   @OneToMany(mappedBy = "ID_Asociado", cascade = CascadeType.ALL)
    private List<Compra> compras;
 
-   public enum TIPO_USUARIO {
-      ADMIN, PREMIUM, REGULAR
+   public enum ROLES {
+      ADMIN,
+      PREMIUM,
+      REGULAR
    }
 
    public Usuario () {}
 
-   public Usuario (long ID,
-                   String nombreCompleto,
-                   String correoElectronico,
-                   String direccionEnvio,
-                   long telefonoContacto,
-                   char[] claveAcceso,
-                   TIPO_USUARIO tipoUsuario,
-                   Carrito carrito,
-                   List<Compra> compras) {
-      this.ID                = ID;
-      this.nombreCompleto    = nombreCompleto;
-      this.correoElectronico = correoElectronico;
-      this.direccionEnvio    = direccionEnvio;
-      this.telefonoContacto  = telefonoContacto;
-      this.claveAcceso       = claveAcceso;
-      this.tipoUsuario       = tipoUsuario;
-      this.carrito           = carrito;
-      this.compras           = compras;
-   }
-
    public long getID () {
       return ID;
-   }
-
-   public void setID (long ID) {
-      this.ID = ID;
    }
 
    public String getNombreCompleto () {
@@ -87,11 +78,11 @@ public class Usuario {
       this.claveAcceso = claveAcceso;
    }
 
-   public TIPO_USUARIO getTipoUsuario () {
+   public ROLES getTipoUsuario () {
       return tipoUsuario;
    }
 
-   public void setTipoUsuario (TIPO_USUARIO tipoUsuario) {
+   public void setTipoUsuario (ROLES tipoUsuario) {
       this.tipoUsuario = tipoUsuario;
    }
 

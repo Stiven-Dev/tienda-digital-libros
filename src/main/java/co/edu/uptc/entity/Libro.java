@@ -1,19 +1,34 @@
 package co.edu.uptc.entity;
 
-public class Libro {
-   private long    ISBN;
-   private String  titulo;
-   private String  autores;
-   private int     anioPublicacion;
-   private String  categoria;
-   private String  editorial;
-   private int     numeroPaginas;
-   private double  precioVenta;
-   private int     cantidadDisponible;
-   private FORMATO formato;
+import jakarta.persistence.*;
 
-   public enum FORMATO {
-      DIGITAL, IMPRESO
+@Entity @Table(name = "libro") public class Libro {
+   @Id
+   @Column(name = "ISBN", unique = true, nullable = false)
+   private long     ISBN;
+   @Column(name = "titulo", nullable = false)
+   private String   titulo;
+   @Column(name = "autores", nullable = false)
+   private String   autores;
+   @Column(name = "anio_publicacion", nullable = false)
+   private int      anioPublicacion;
+   @Column(name = "categoria", nullable = false)
+   private String   categoria;
+   @Column(name = "editorial", nullable = false)
+   private String   editorial;
+   @Column(name = "numero_paginas", nullable = false)
+   private int      numeroPaginas;
+   @Column(name = "precio_venta", nullable = false)
+   private double   precioVenta;
+   @Column(name = "cantidad_disponible", nullable = false)
+   private int      cantidadDisponible;
+   @Enumerated(EnumType.STRING)
+   @Column(name = "formato", nullable = false)
+   private FORMATOS FORMATO;
+
+   public enum FORMATOS {
+      DIGITAL,
+      IMPRESO
    }
 
    public Libro () {
@@ -28,7 +43,7 @@ public class Libro {
                  int numeroPaginas,
                  double precioVenta,
                  int cantidadDisponible,
-                 FORMATO formato) {
+                 FORMATOS FORMATO) {
       this.ISBN               = ISBN;
       this.titulo             = titulo;
       this.autores            = autores;
@@ -38,7 +53,7 @@ public class Libro {
       this.numeroPaginas      = numeroPaginas;
       this.precioVenta        = precioVenta;
       this.cantidadDisponible = cantidadDisponible;
-      this.formato            = formato;
+      this.FORMATO            = FORMATO;
    }
 
    public long getISBN () {
@@ -113,11 +128,11 @@ public class Libro {
       this.cantidadDisponible = cantidadDisponible;
    }
 
-   public FORMATO getFormato () {
-      return formato;
+   public FORMATOS getFormato () {
+      return FORMATO;
    }
 
-   public void setFormato (FORMATO formato) {
-      this.formato = formato;
+   public void setFormato (FORMATOS FORMATOS) {
+      this.FORMATO = FORMATOS;
    }
 }
