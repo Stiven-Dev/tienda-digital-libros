@@ -75,6 +75,7 @@ public class PanelLibros extends JPanel {
 
    private void refrescarLista () {
       model.setDataVector(ventana.obtenerVectorLibros(), NOMBRE_COLUMNAS.getCabecera());
+      ventana.setLibrosLocales(ventana.obtenerMapLibros());
    }
 
    public DefaultTableModel getTableModel () {

@@ -12,11 +12,11 @@ import java.time.format.DateTimeFormatter;
    @ManyToOne
    @JoinColumn(name = "ID_Usuario", nullable = false)
    private       int               ID_Asociado;
-   @Column(name = "fecha_compra", nullable = false)
+   @Column(name = "fechaCompra", nullable = false)
    private       LocalDateTime     fechaCompra;
-   @Column(name = "valor_compra", nullable = false)
+   @Column(name = "valorCompra", nullable = false)
    private       double            valorCompra;
-   @Column(name = "cantidad_compra", nullable = false)
+   @Column(name = "cantidadCompra", nullable = false)
    private       int               cantidadCompra;
    @Transient
    private final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MMMM/yyyy HH:mm");

@@ -1,10 +1,12 @@
 package co.edu.uptc.model;
 
 import co.edu.uptc.entity.Libro;
-import jakarta.json.*;
+import co.edu.uptc.entity.Usuario;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonObject;
 
-import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Tienda {
    private static final String RUTA_CARRITOS = "persistencia/CARRITOS.json";
@@ -180,30 +182,25 @@ public class Tienda {
    }
 
    public Object[][] getDataVectorLibros () {
-      Object[][] dataVectorLibros = null;
-      try (InputStream inputStream = new FileInputStream(RUTA_LIBROS);
-           JsonReader reader = Json.createReader(inputStream)
-      ) {
-         JsonObject       jsonObject    = reader.readObject();
-         JsonArray        libros        = jsonObject.getJsonArray("LIBROS");
-         ArrayList<Libro> listaDeLibros = obtenerListaDeLibros(libros);
-         dataVectorLibros = new Object[libros.size()][11];
-         for (int i = 0; i < listaDeLibros.size(); i++) {
-            Libro libro = listaDeLibros.get(i);
-            dataVectorLibros[i][0]  = libro.getISBN();
-            dataVectorLibros[i][1]  = libro.getTitulo();
-            dataVectorLibros[i][2]  = libro.getAutores();
-            dataVectorLibros[i][3]  = libro.getCategoria();
-            dataVectorLibros[i][4]  = libro.getNumeroPaginas();
-            dataVectorLibros[i][5]  = libro.getEditorial();
-            dataVectorLibros[i][6]  = libro.getAnioPublicacion();
-            dataVectorLibros[i][7]  = libro.getFormato();
-            dataVectorLibros[i][8]  = libro.getValorUnitario();
-            dataVectorLibros[i][9]  = libro.getCantidadDisponible();
-            dataVectorLibros[i][10] = false;
-         }
-      } catch (Exception e) {
-         System.err.println(e.getMessage());
+      HashMap<Long, Libro> mapLibros = Operacion.obtenerMapLibrosLocales();
+      if (mapLibros == null) return null;
+      Object[][] dataVectorLibros = new Object[mapLibros.size()][11];
+      int        i                = 0;
+      for (Libro libro : mapLibros.values()) {
+         //Se valida que el libro tenga suficientes unidades para ser mostrado al público
+         if (libro.getCantidadDisponible() < 1) continue;
+         dataVectorLibros[i][0]  = libro.getISBN();
+         dataVectorLibros[i][1]  = libro.getTitulo();
+         dataVectorLibros[i][2]  = libro.getAutores();
+         dataVectorLibros[i][3]  = libro.getCategoria();
+         dataVectorLibros[i][4]  = libro.getNumeroPaginas();
+         dataVectorLibros[i][5]  = libro.getEditorial();
+         dataVectorLibros[i][6]  = libro.getAnioPublicacion();
+         dataVectorLibros[i][7]  = libro.getFormato();
+         dataVectorLibros[i][8]  = libro.getValorUnitario();
+         dataVectorLibros[i][9]  = libro.getCantidadDisponible();
+         dataVectorLibros[i][10] = false;
+         i++;
       }
       return dataVectorLibros;
    }
@@ -314,24 +311,11 @@ public class Tienda {
 //      return librosCarrito;
 //   }
 //
-//   public boolean usuarioExiste (String correoElectronico) {
-//      try (InputStream inputStream = new FileInputStream(RUTA_USUARIOS);
-//           JsonReader reader = Json.createReader(inputStream)
-//      ) {
-//         JsonObject jsonObject     = reader.readObject();
-//         ROLES      ROL            = Usuario.validarRolUsuario(correoElectronico);
-//         JsonArray  usuariosDelRol = jsonObject.getJsonArray(ROL.name());
-//         for (JsonObject usuario : usuariosDelRol.getValuesAs(JsonObject.class)) {
-//            if (usuario.getString("correoElectronico").equals(correoElectronico)) {
-//               return true;
-//            }
-//         }
-//      } catch (Exception e) {
-//         System.err.println(e.getMessage());
-//      }
-//      return false;
-//   }
-//
+   public boolean isCorreoDuplicado (String correoElectronico) {
+      return obtenerUsuarioMedianteCorreo(correoElectronico) != null;
+   }
+
+   //
 //   @SuppressWarnings("unchecked") //Se valida previamente que el objeto en el indice 6 es un HashMap<Long, Integer>
 //   public void registrarUsuario (Object[] datosUsuario) {
 //      Usuario usuario = new Usuario((String) datosUsuario[0], //Nombre Completo
@@ -414,6 +398,18 @@ public class Tienda {
       } else {
          return precioUnidad * 0.05;
       }
+   }
+
+   public HashMap<Long, Libro> getLibrosLocales () {
+      return Operacion.obtenerMapLibrosLocales();
+   }
+
+   public void registrarUsuario (Usuario usuario) {
+      Operacion.guardarUsuario(usuario);
+   }
+
+   public Usuario obtenerUsuarioMedianteCorreo (String correoElectronico) {
+      return Operacion.obtenerUsuarioMedianteCorreo(correoElectronico);
    }
 //
 //   public boolean actualizarLibro (Object[] datos) {

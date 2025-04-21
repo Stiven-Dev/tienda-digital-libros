@@ -10,17 +10,17 @@ import jakarta.persistence.*;
    private String   titulo;
    @Column(name = "autores", nullable = false)
    private String   autores;
-   @Column(name = "anio_publicacion", nullable = false)
+   @Column(name = "anioPublicacion", nullable = false)
    private int      anioPublicacion;
    @Column(name = "categoria", nullable = false)
    private String   categoria;
    @Column(name = "editorial", nullable = false)
    private String   editorial;
-   @Column(name = "numero_paginas", nullable = false)
+   @Column(name = "numeroPaginas", nullable = false)
    private int      numeroPaginas;
-   @Column(name = "precio_venta", nullable = false)
+   @Column(name = "precioVenta", nullable = false)
    private double   valorUnitario;
-   @Column(name = "cantidad_disponible", nullable = false)
+   @Column(name = "cantidadDisponible", nullable = false)
    private int      cantidadDisponible;
    @Enumerated(EnumType.STRING)
    @Column(name = "formato", nullable = false)

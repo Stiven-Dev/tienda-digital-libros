@@ -8,19 +8,19 @@ import java.util.List;
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private long         ID;
-   @Column(name = "nombre_completo", nullable = false)
+   @Column(name = "nombreCompleto", nullable = false)
    private String       nombreCompleto;
-   @Column(name = "correo_electronico", nullable = false)
+   @Column(name = "correoElectronico", unique = true, nullable = false)
    private String       correoElectronico;
-   @Column(name = "direccion_envio", nullable = false)
+   @Column(name = "direccionEnvio", nullable = false)
    private String       direccionEnvio;
-   @Column(name = "telefono_contacto", nullable = false)
+   @Column(name = "telefonoContacto", nullable = false)
    private long         telefonoContacto;
-   @Column(name = "clave_acceso", nullable = false)
+   @Column(name = "claveAcceso", nullable = false)
    private char[]       claveAcceso;
    @Enumerated(EnumType.STRING)
-   @Column(name = "tipo_usuario", nullable = false)
-   private ROLES        tipoUsuario;
+   @Column(name = "tipoUsuario", nullable = false)
+   private ROLES        tipoUsuario = ROLES.REGULAR;
    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
    private Carrito      carrito;
    @OneToMany(mappedBy = "ID_Asociado", cascade = CascadeType.ALL)

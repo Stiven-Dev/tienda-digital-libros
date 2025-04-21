@@ -1,6 +1,6 @@
 package co.edu.uptc.gui;
 
-import co.edu.uptc.entity.Usuario.ROLES;
+import co.edu.uptc.entity.Usuario;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -14,19 +14,13 @@ public class PanelPerfil extends JPanel {
    private final JTextField        boxCorreo              = new JTextField();
    private final JTextField        boxDireccion           = new JTextField();
    private final JTextField        boxTelefono            = new JTextField();
+   private final JLabel            labelTipoUsuarioActual = new JLabel();
    private final Font              fuenteLabel            = new Font("Lucida Sans Unicode", Font.PLAIN, 20);
    private final Font              fuenteTextField        = new Font("Times New Roman", Font.PLAIN, 20);
    private final Font              fuenteBoton            = new Font("Lucida Sans Unicode", Font.BOLD, 20);
    private final JLabel            mensajeDeError         = new JLabel();
-   private       Object[]          datosUsuario           = new Object[7];
-   private       String            nombreCompleto         = "";
-   private       String            correoElectronico      = "";
-   private       String            direccion              = "";
-   private       long              telefono               = 0;
-   private       ROLES             tipoUsuario            = ROLES.REGULAR;
-   private       int               CID;
-   private final JLabel            labelTipoUsuarioActual = new JLabel(tipoUsuario.name());
-   private       JPasswordField    boxContrasena          = new JPasswordField();
+   private final JPasswordField    boxContrasena          = new JPasswordField();
+   private       Usuario           datosUsuario;
 
    public PanelPerfil (PantallaPrincipal pantallaPrincipal, Evento evento) {
       this.evento            = evento;
@@ -39,73 +33,51 @@ public class PanelPerfil extends JPanel {
       refrescarDatosPerfil(datosUsuario);
    }
 
-   private void refrescarDatosPerfil (Object[] datosUsuario) {
-      //TODO
-      if (datosUsuario.length < 5) {
-         rellenarDatosVacios();
-         return;
-      }
-      //Datos de Usuario
-      nombreCompleto    = (String) datosUsuario[0];
-      correoElectronico = (String) datosUsuario[1];
-      direccion         = (String) datosUsuario[2];
-      telefono          = (long) datosUsuario[3];
-      CID               = (int) datosUsuario[4];
-      PanelCarrito.setIdentificadorCarrito(CID);
-      //tipoUsuario = VentanaPrincipal.obtenerTipoUsuario(correoElectronico);
+   private void refrescarDatosPerfil (Usuario datosUsuario) {
+      this.datosUsuario = datosUsuario;
       inicializarPanelDatosUsuario();
       inicializarPanelFooter();
       revalidate();
       repaint();
    }
 
-   private void rellenarDatosVacios () {
-      inicializarPanelDatosUsuario();
-      inicializarPanelFooter();
-   }
-
    private void inicializarPanelDatosUsuario () {
-//TODO
-//		if (VentanaPrincipal.LOGIN_CORRECTO){
-//			removeAll();
-//		}
+      if (datosUsuario != null) {
+         boxNombreCompleto.setText(datosUsuario.getNombreCompleto());
+         boxCorreo.setText(datosUsuario.getCorreoElectronico());
+         boxDireccion.setText(datosUsuario.getDireccionEnvio());
+         boxTelefono.setText(String.valueOf(datosUsuario.getTelefonoContacto()));
+         boxContrasena.setText("********");
+         labelTipoUsuarioActual.setText(datosUsuario.getTipoUsuario().name());
+      }
       //Banners de Datos
       //Banner de Nombre Completo
       JPanel panelNombreCompleto = new JPanel(new GridLayout(1, 2));
       panelNombreCompleto.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Nombre", TitledBorder.CENTER, TitledBorder.TOP, fuenteLabel));
-      boxNombreCompleto.setText(nombreCompleto);
       boxNombreCompleto.setPreferredSize(new Dimension(160, 25));
       panelNombreCompleto.add(boxNombreCompleto);
       add(panelNombreCompleto);
       //Banner de Correo Electronico
-      JPanel panelCorreoElectronico = new JPanel(new GridLayout(1, 2));
-      panelCorreoElectronico.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
-                                                                        "Correo Electronico",
-                                                                        TitledBorder.CENTER,
-                                                                        TitledBorder.TOP,
-                                                                        fuenteLabel));
-      boxCorreo.setText(correoElectronico);
+      JPanel panelCorreo = new JPanel(new GridLayout(1, 2));
+      panelCorreo.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Correo Electronico", TitledBorder.CENTER, TitledBorder.TOP, fuenteLabel));
       boxCorreo.setPreferredSize(new Dimension(160, 25));
-      panelCorreoElectronico.add(boxCorreo);
-      add(panelCorreoElectronico);
+      panelCorreo.add(boxCorreo);
+      add(panelCorreo);
       //Banner de Direccion
       JPanel panelDireccion = new JPanel(new GridLayout(1, 2));
       panelDireccion.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Dirección", TitledBorder.CENTER, TitledBorder.TOP, fuenteLabel));
-      boxDireccion.setText(direccion);
       boxDireccion.setPreferredSize(new Dimension(160, 25));
       panelDireccion.add(boxDireccion);
       add(panelDireccion);
       //Banner de Teléfono
       JPanel panelTelefono = new JPanel(new GridLayout(1, 2));
       panelTelefono.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Teléfono", TitledBorder.CENTER, TitledBorder.TOP, fuenteLabel));
-      boxTelefono.setText(String.valueOf(telefono));
       boxTelefono.setPreferredSize(new Dimension(160, 25));
       panelTelefono.add(boxTelefono);
       add(panelTelefono);
       //Banner de Contraseña
       JPanel panelContrasena = new JPanel(new GridLayout(2, 1));
       panelContrasena.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Contraseña", TitledBorder.CENTER, TitledBorder.TOP, fuenteLabel));
-      boxContrasena = new JPasswordField();
       boxContrasena.setPreferredSize(new Dimension(160, 25));
       JCheckBox checkBoxMostrarContrasena = new JCheckBox("Mostrar Contraseña");
       checkBoxMostrarContrasena.setSelected(false);
@@ -123,7 +95,6 @@ public class PanelPerfil extends JPanel {
       //Banner de Tipo de Usuario
       JPanel panelTipoUsuario = new JPanel(new GridLayout(1, 2));
       panelTipoUsuario.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Tipo de Usuario", TitledBorder.CENTER, TitledBorder.TOP, fuenteLabel));
-      labelTipoUsuarioActual.setText(tipoUsuario.name());
       labelTipoUsuarioActual.setHorizontalAlignment(JLabel.CENTER);
       labelTipoUsuarioActual.setFont(new Font("Lucida Sans Unicode", Font.BOLD, 20));
       panelTipoUsuario.add(labelTipoUsuarioActual);
@@ -134,27 +105,31 @@ public class PanelPerfil extends JPanel {
       boxDireccion.setFont(fuenteTextField);
       boxTelefono.setFont(fuenteTextField);
       boxContrasena.setFont(fuenteTextField);
-      revalidate();
-      repaint();
    }
 
    private void inicializarPanelFooter () {
       JPanel panelFooter = new JPanel();
-      //TODO if (VentanaPrincipal.LOGIN_CORRECTO) {
-      if (true) {
+      if (datosUsuario != null) {
          panelFooter.setLayout(new GridLayout(2, 1));
          mensajeDeError.setForeground(Color.RED);
          mensajeDeError.setFont(new Font("Times New Roman", Font.BOLD, 20));
          mensajeDeError.setHorizontalAlignment(JLabel.CENTER);
          panelFooter.add(mensajeDeError);
+         botonGuardar.setActionCommand(Evento.EVENTO.ACTUALIZAR_DATOS_CLIENTE.name());
          botonGuardar.addActionListener(_ -> {
             mensajeDeError.setText(obtenerMensajeDeError());
+            if (mensajeDeError.getText().isBlank()) {
+               //No encontre otra forma de validar que cuando los campos esten llenos de forma correcta, agregar el listener de la clase Evento. Pero antes, eliminando el
+               // anterior, esto para evitar repeticiones inesperadas al pulsar el boton
+               botonGuardar.removeActionListener(evento);
+               botonGuardar.addActionListener(evento);
+            }
          });
          botonGuardar.setAlignmentX(JComponent.CENTER_ALIGNMENT);
          panelFooter.add(botonGuardar);
          //Asignacion de fuente al boton
          botonGuardar.setFont(fuenteBoton);
-         pantallaPrincipal.agregarPanelesSegunRol(tipoUsuario.name());
+         pantallaPrincipal.agregarPanelesSegunRol(datosUsuario.getTipoUsuario());
       } else {
          panelFooter.setLayout(new GridLayout(1, 1));
          JButton botonLoginSignUp = new JButton("Login / SignUp");
@@ -173,54 +148,50 @@ public class PanelPerfil extends JPanel {
    private String obtenerMensajeDeError () {
       //Validacion de Campos Vacios
       {
-         if (boxNombreCompleto.getText().isEmpty()) {
+         if (boxNombreCompleto.getText().isBlank()) {
             return "Debe rellenar el campo Nombre Completo";
          }
-         if (boxCorreo.getText().isEmpty()) {
+         if (boxCorreo.getText().isBlank()) {
             return "Debe rellenar el campo Correo Electronico";
          }
-         if (boxDireccion.getText().isEmpty()) {
+         if (boxDireccion.getText().isBlank()) {
             return "Debe rellenar el campo Dirección";
          }
-         if (boxTelefono.getText().isEmpty()) {
+         if (boxTelefono.getText().isBlank()) {
             return "Debe rellenar el campo Teléfono";
          }
-         if (boxContrasena.getPassword().length < 8) {
-            return "El campo contraseña debe tener mínimo 8 digitos";
+         if (boxContrasena.getPassword() == null || boxContrasena.getPassword().length == 0) {
+            return "Debe rellenar el campo Contraseña";
          }
       }
       //Validacion de Formato Valido
       {
+         //Validacion de Correo Electronico
          final String regexCorreo = "^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$";
          if (!boxCorreo.getText().matches(regexCorreo)) {
             return "El campo Correo Electronico tiene un formato inválido";
          }
+         //Validacion de Direccion
          final String regexDireccion = "^(Calle|Carrera|Avenida|Diagonal|Transversal|Circunvalar)\\s\\d+\\s*(#|No\\.)\\s*\\d+(-\\d+)?(\\s*,\\s*[\\w\\s]+)" + "?$\n";
          if (!boxDireccion.getText().matches(regexDireccion)) {
             return "El campo Dirección debe tener la siguiente forma: (Calle / Carrera / Avenida / Diagonal / Transversal / Circunvalar) número (# / No.)" + " " +
                    "número - numero, Texto Adicional";
          }
+         //Validacion de Telefono
          final String regexTelefono = "^3[0-9]{9}$";
          if (!boxTelefono.getText().matches(regexTelefono)) {
             return "El campo Teléfono tiene un formato inválido";
+         }
+         //Validacion de Contraseña
+         if (boxContrasena.getPassword().length < 8) {
+            return "El campo contraseña debe tener mínimo 8 digitos";
          }
       }
       return "";
    }
 
-   public void setDatosUsuario (Object[] datosUsuario) {
+   public void setDatosUsuario (Usuario datosUsuario) {
       this.datosUsuario = datosUsuario;
       refrescarDatosPerfil(this.datosUsuario);
-   }
-
-   void validarSesionIniciada () {
-      if (!mensajeDeError.getText().isBlank()) {
-         botonGuardar.setActionCommand(Evento.EVENTO.ACTUALIZAR_DATOS_CLIENTE.name());
-         botonGuardar.addActionListener(evento);
-      }
-   }
-
-   public int getCID () {
-      return CID;
    }
 }

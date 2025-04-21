@@ -1,9 +1,9 @@
 package co.edu.uptc.gui;
 
 import co.edu.uptc.entity.Libro;
+import co.edu.uptc.entity.Usuario;
 import co.edu.uptc.model.Tienda;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.WindowAdapter;
@@ -43,23 +43,17 @@ public class VentanaPrincipal extends JFrame {
    }
 
    void validarRegistro () {
-      Object[] datosUsuario      = getDatosSignUp();
-      String   correoElectronico = (String) datosUsuario[1];
-      if (!tienda.usuarioExiste(correoElectronico)) {
-         String                 nombreCompleto = (String) datosUsuario[0];
-         String                 direccion      = (String) datosUsuario[2];
-         long                   telefono       = (long) datosUsuario[3];
-         char[]                 claveAcceso    = (char[]) datosUsuario[4];
-         int                    CID            = Tienda.obtenerNuevoCID();
-         HashMap<Long, Integer> carrito        = pantallaPrincipal.getPanelCarrito().getCarritoDeComprasTemporal();
-         Object[]               datos          = new Object[] {nombreCompleto, correoElectronico, direccion, telefono, claveAcceso, CID, carrito};
-         tienda.registrarUsuario(datos);
-         LOGIN_CORRECTO = true;
-         pantallaPrincipal.iniciarSesion(tienda.obtenerUsuarioSeguro(correoElectronico));
+      Usuario datosUsuario      = getDatosSignUp();
+      String  correoElectronico = datosUsuario.getCorreoElectronico();
+      if (tienda.isCorreoDuplicado(correoElectronico)) {
+         pantallaPrincipal.getPanelCrearCuentas().setMensajeDeError("Ya existe un usuario con ese correo");
+         return;
       }
+      tienda.registrarUsuario(datosUsuario);
+      pantallaPrincipal.iniciarSesion(tienda.obtenerUsuarioMedianteCorreo(correoElectronico));
    }
 
-   private Object[] getDatosSignUp () {
+   private Usuario getDatosSignUp () {
       return getDialogLoginSignUp().getDatosRegistro();
    }
 
@@ -175,7 +169,7 @@ public class VentanaPrincipal extends JFrame {
          pantallaPrincipal.getPanelCrearCuentas().setMensajeDeError("Debe rellenar el campo Correo Electronico");
          return;
       }
-      if (tienda.usuarioExiste(correo)) {
+      if (tienda.isCorreoDuplicado(correo)) {
          pantallaPrincipal.getPanelCrearCuentas().setMensajeDeError("Ya hay un usuario con ese correo");
          return;
       }
@@ -200,11 +194,19 @@ public class VentanaPrincipal extends JFrame {
       //TODO
    }
 
-   Object[][] obtenerListaCompras (int CID) {
-      return tienda.getDataVectorCompras(CID);
+   Object[][] obtenerListaCompras (int ID) {
+      return tienda.getDataVectorCompras(ID);
+   }
+
+   HashMap<Long, Libro> obtenerMapLibros () {
+      return tienda.getLibrosLocales();
    }
 
    public void validarInicioSesion () {
       //TODO
+   }
+
+   public void setLibrosLocales (HashMap<Long, Libro> libroHashMap) {
+      pantallaPrincipal.getPanelCarrito().setLibrosLocales(libroHashMap);
    }
 }

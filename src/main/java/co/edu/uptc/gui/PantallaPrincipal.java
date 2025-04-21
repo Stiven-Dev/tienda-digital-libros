@@ -1,110 +1,101 @@
 package co.edu.uptc.gui;
 
+import co.edu.uptc.entity.Usuario;
+
 import javax.swing.*;
 import java.awt.*;
 
-public class PantallaPrincipal extends JPanel{
-	private final Evento                evento;
-	private final VentanaPrincipal      ventanaPrincipal;
+public class PantallaPrincipal extends JPanel {
+   private final Evento                evento;
+   private final VentanaPrincipal      ventanaPrincipal;
    private final JTabbedPane           panelPrincipal;
-	private       PanelLibros           panelLibros;
-	private       PanelCarrito          panelCarrito;
-	private       PanelPerfil           panelPerfil;
-	private       PanelAgregarLibro     panelAgregarLibro; //Solo para los administradores
-	private       PanelActualizarLibro  panelActualizarLibro; //Solo para los administradores
-	private       PanelEliminarLibro    panelEliminarLibro; //Solo para los administradores
-	private       PanelCrearCuentas     panelCrearCuentas; //Solo para los administradores
-	private       PanelHistorialCompras panelHistorialCompras;
+   private       PanelLibros           panelLibros;
+   private       PanelCarrito          panelCarrito;
+   private       PanelPerfil           panelPerfil;
+   private       PanelAgregarLibro     panelAgregarLibro; //Solo para los administradores
+   private       PanelActualizarLibro  panelActualizarLibro; //Solo para los administradores
+   private       PanelEliminarLibro    panelEliminarLibro; //Solo para los administradores
+   private       PanelCrearCuentas     panelCrearCuentas; //Solo para los administradores
+   private       PanelHistorialCompras panelHistorialCompras;
 
-	public PantallaPrincipal (VentanaPrincipal ventana, Evento evento){
-		this.evento           = evento;
-		this.ventanaPrincipal = ventana;
-		setLayout(new BorderLayout());
-		panelPrincipal = new JTabbedPane();
+   public PantallaPrincipal (VentanaPrincipal ventana, Evento evento) {
+      this.evento           = evento;
+      this.ventanaPrincipal = ventana;
+      setLayout(new BorderLayout());
+      panelPrincipal = new JTabbedPane();
       Font fuentePestania = new Font("Arial", Font.BOLD, 15);
       panelPrincipal.setFont(fuentePestania);
+      inicializarPanelLibros(ventana);
+      panelPrincipal.addTab("Lista de Libros", panelLibros);
+      inicializarPanelCarrito();
+      panelPrincipal.addTab("PanelCarrito", panelCarrito);
+      inicializarPanelPerfil();
+      panelPrincipal.addTab("Perfil", panelPerfil);
+      add(panelPrincipal, BorderLayout.CENTER);
+      ventana.add(this);
+   }
 
-		inicializarPanelLibros(ventana);
-		panelPrincipal.addTab("Lista de Libros", panelLibros);
-		inicializarPanelCarrito();
-		panelPrincipal.addTab("PanelCarrito", panelCarrito);
-		inicializarPanelPerfil();
-		panelPrincipal.addTab("Perfil", panelPerfil);
+   public void agregarPanelesSegunRol (Usuario.ROLES rol) {
+      if (rol.equals(Usuario.ROLES.ADMIN)) {
+         inicalizarPanelesAdministrador();
+         panelPrincipal.addTab("Agregar Libro", panelAgregarLibro);
+         panelPrincipal.addTab("Modificar Libro", panelActualizarLibro);
+         panelPrincipal.addTab("Eliminar Libro", panelEliminarLibro);
+         panelPrincipal.addTab("Crear Cuentas", panelCrearCuentas);
+      }
+      inicializarPanelHistorialCompras();
+      panelPrincipal.addTab("Historial de Compras", panelHistorialCompras);
+   }
 
-		add(panelPrincipal, BorderLayout.CENTER);
-		ventana.add(this);
-	}
+   private void inicalizarPanelesAdministrador () {
+      panelAgregarLibro    = new PanelAgregarLibro(evento);
+      panelActualizarLibro = new PanelActualizarLibro(evento);
+      panelEliminarLibro   = new PanelEliminarLibro(evento);
+      panelCrearCuentas    = new PanelCrearCuentas(evento);
+   }
 
-	public void agregarPanelesSegunRol (String rol){
-		if (rol.equals("ADMIN")){
-			inicalizarPanelesAdministrador();
-			panelPrincipal.addTab("Agregar Libro", panelAgregarLibro);
-			panelPrincipal.addTab("Modificar Libro", panelActualizarLibro);
-			panelPrincipal.addTab("Eliminar Libro", panelEliminarLibro);
-			panelPrincipal.addTab("Crear Cuentas", panelCrearCuentas);
-		}
-		inicializarPanelHistorialCompras();
-		panelPrincipal.addTab("Historial de Compras", panelHistorialCompras);
-	}
+   private void inicializarPanelLibros (VentanaPrincipal ventana) {
+      panelLibros = new PanelLibros(ventana, evento);
+   }
 
-	private void inicalizarPanelesAdministrador (){
-		panelAgregarLibro    = new PanelAgregarLibro(evento);
-		panelActualizarLibro = new PanelActualizarLibro(evento);
-		panelEliminarLibro   = new PanelEliminarLibro(evento);
-		panelCrearCuentas    = new PanelCrearCuentas(evento);
-	}
+   private void inicializarPanelCarrito () {
+      panelCarrito = new PanelCarrito(ventanaPrincipal, evento);
+   }
 
-	private void inicializarPanelLibros (VentanaPrincipal ventana){
-		panelLibros = new PanelLibros(ventana, evento);
-	}
+   private void inicializarPanelPerfil () {
+      panelPerfil = new PanelPerfil(this, evento);
+   }
 
-	private void inicializarPanelCarrito (){
-		panelCarrito = new PanelCarrito(ventanaPrincipal, evento);
-	}
+   private void inicializarPanelHistorialCompras () {
+      //panelHistorialCompras = new PanelHistorialCompras(ventanaPrincipal, panelPerfil.get());
+   }
 
-	private void inicializarPanelPerfil (){
-		panelPerfil = new PanelPerfil(this, evento);
-	}
+   PanelLibros getPanelLibros () {
+      return panelLibros;
+   }
 
-	private void inicializarPanelHistorialCompras (){
-		panelHistorialCompras = new PanelHistorialCompras(ventanaPrincipal, panelPerfil.getCID());
-	}
+   Object[] getDatosLibroNuevo () {
+      return panelAgregarLibro.getDatosLibro();
+   }
 
-	PanelLibros getPanelLibros (){
-		return panelLibros;
-	}
+   void iniciarSesion (Usuario datosUsuario) {
+      panelPerfil.setDatosUsuario(datosUsuario);
+      ventanaPrincipal.eliminarPanelLoginSignUp();
+   }
 
-	Object[] getDatosLibroNuevo (){
-		return panelAgregarLibro.getDatosLibro();
-	}
+   PanelActualizarLibro getPanelActualizarLibro () {
+      return panelActualizarLibro;
+   }
 
-	void iniciarSesion (Object[] datosUsuario){
-		panelPerfil.setDatosUsuario(datosUsuario);
-		ventanaPrincipal.eliminarPanelLoginSignUp();
-		activarFuncionalidadBotones();
-	}
+   PanelCarrito getPanelCarrito () {
+      return panelCarrito;
+   }
 
-	private void activarFuncionalidadBotones (){
-		panelPerfil.validarSesionIniciada();
-		panelAgregarLibro.validarSesionIniciada();
-		panelActualizarLibro.validarSesionIniciada();
-		panelEliminarLibro.validarSesionIniciada();
-		panelCrearCuentas.validarSesionIniciada();
-	}
+   PanelEliminarLibro getPanelEliminarLibro () {
+      return panelEliminarLibro;
+   }
 
-	PanelActualizarLibro getPanelActualizarLibro (){
-		return panelActualizarLibro;
-	}
-
-	PanelCarrito getPanelCarrito (){
-		return panelCarrito;
-	}
-
-	PanelEliminarLibro getPanelEliminarLibro (){
-		return panelEliminarLibro;
-	}
-
-	PanelCrearCuentas getPanelCrearCuentas (){
-		return panelCrearCuentas;
-	}
+   PanelCrearCuentas getPanelCrearCuentas () {
+      return panelCrearCuentas;
+   }
 }
