@@ -27,7 +27,7 @@ public class Evento implements ActionListener{
 			case PAGAR_EFECTIVO -> ventana.pagarEfectivo();
 			case PAGAR_TARJETA -> ventana.pagarTarjeta();
 			case REGISTRAR -> ventana.validarRegistro();
-			case VALIDAR_CORREO -> ventana.usuarioExiste();
+			case VALIDAR_CORREO -> ventana.validarCorreoDisponible();
 		}
 	}
 

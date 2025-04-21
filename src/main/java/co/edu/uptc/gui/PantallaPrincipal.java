@@ -80,7 +80,7 @@ public class PantallaPrincipal extends JPanel {
 
    void iniciarSesion (Usuario datosUsuario) {
       panelPerfil.setDatosUsuario(datosUsuario);
-      ventanaPrincipal.eliminarPanelLoginSignUp();
+      ventanaPrincipal.eliminarDialogLoginSignUp();
    }
 
    PanelActualizarLibro getPanelActualizarLibro () {

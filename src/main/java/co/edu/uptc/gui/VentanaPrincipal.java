@@ -43,13 +43,13 @@ public class VentanaPrincipal extends JFrame {
    }
 
    void validarRegistro () {
-      Usuario datosUsuario      = getDatosSignUp();
-      String  correoElectronico = datosUsuario.getCorreoElectronico();
-      if (tienda.isCorreoDuplicado(correoElectronico)) {
+      Usuario usuario           = getDatosSignUp();
+      String  correoElectronico = usuario.getCorreoElectronico();
+      if (obtenerUsuarioMedianteCorreo(correoElectronico) != null) {
          pantallaPrincipal.getPanelCrearCuentas().setMensajeDeError("Ya existe un usuario con ese correo");
          return;
       }
-      tienda.registrarUsuario(datosUsuario);
+      tienda.crearCuenta(usuario);
       pantallaPrincipal.iniciarSesion(tienda.obtenerUsuarioMedianteCorreo(correoElectronico));
    }
 
@@ -129,7 +129,7 @@ public class VentanaPrincipal extends JFrame {
       return tienda.calcularValorImpuesto(valorUnitario);
    }
 
-   void eliminarPanelLoginSignUp () {
+   void eliminarDialogLoginSignUp () {
       dialogLoginSignup.dispose();
    }
 
@@ -155,7 +155,7 @@ public class VentanaPrincipal extends JFrame {
    }
 
    void crearCuenta () {
-      Object[] datosUsuario = pantallaPrincipal.getPanelCrearCuentas().getDatosUsuario();
+      Usuario datosUsuario = pantallaPrincipal.getPanelCrearCuentas().getDatosUsuario();
       if (tienda.crearCuenta(datosUsuario)) {
          JOptionPane.showMessageDialog(this, "Cuenta creada correctamente", "Información", JOptionPane.INFORMATION_MESSAGE);
       } else {
@@ -163,17 +163,17 @@ public class VentanaPrincipal extends JFrame {
       }
    }
 
-   void usuarioExiste () {
+   void validarCorreoDisponible () {
       String correo = pantallaPrincipal.getPanelCrearCuentas().getCorreo();
       if (correo.isBlank()) {
          pantallaPrincipal.getPanelCrearCuentas().setMensajeDeError("Debe rellenar el campo Correo Electronico");
          return;
       }
-      if (tienda.isCorreoDuplicado(correo)) {
+      if (tienda.obtenerUsuarioMedianteCorreo(correo) != null) {
          pantallaPrincipal.getPanelCrearCuentas().setMensajeDeError("Ya hay un usuario con ese correo");
          return;
       }
-      pantallaPrincipal.getPanelCrearCuentas().setMensajeDeError("Usuario Disponible");
+      pantallaPrincipal.getPanelCrearCuentas().setMensajeDisponible("Usuario Disponible");
    }
 
    void pagarEfectivo () {
@@ -203,7 +203,20 @@ public class VentanaPrincipal extends JFrame {
    }
 
    public void validarInicioSesion () {
-      //TODO
+      Usuario usuario = getDialogLoginSignUp().getDatosLogin();
+      if (usuario.getCorreoElectronico().isBlank() || usuario.getClaveAcceso().length == 0) {
+         JOptionPane.showMessageDialog(this, "Debe rellenar todos los campos", "Alerta", JOptionPane.INFORMATION_MESSAGE);
+         return;
+      }
+      usuario = obtenerUsuarioMedianteCorreo(usuario.getCorreoElectronico());
+      if (usuario == null) {
+         return;
+      }
+      pantallaPrincipal.iniciarSesion(usuario);
+   }
+
+   private Usuario obtenerUsuarioMedianteCorreo (String correoElectronico) {
+      return tienda.obtenerUsuarioMedianteCorreo(correoElectronico);
    }
 
    public void setLibrosLocales (HashMap<Long, Libro> libroHashMap) {

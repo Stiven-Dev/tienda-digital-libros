@@ -11,7 +11,6 @@ import java.util.Arrays;
 public class DialogLoginSignup extends JDialog {
    private final JTabbedPane    panelContenedor;
    private final Evento         evento;
-   private final Font           fuentePestania  = new Font("Arial", Font.BOLD, 15);
    private final Font           fuenteLabel     = new Font("Lucida Sans Unicode", Font.PLAIN, 20);
    private final Font           fuenteTextField = new Font("Times New Roman", Font.PLAIN, 20);
    private final Font           fuenteBoton     = new Font("Lucida Sans Unicode", Font.BOLD, 20);
@@ -29,6 +28,7 @@ public class DialogLoginSignup extends JDialog {
       super(ventanaPrincipal, "Inicio de Sesión / Registro", true);
       this.evento     = evento;
       panelContenedor = new JTabbedPane();
+      Font fuentePestania = new Font("Arial", Font.BOLD, 15);
       panelContenedor.setFont(fuentePestania);
       agregarLogin();
       agregarRegistro();

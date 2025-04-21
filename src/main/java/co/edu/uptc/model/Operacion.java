@@ -56,14 +56,16 @@ public class Operacion {
       return usuario;
    }
 
-   public static void guardarUsuario (Usuario usuario) {
+   public static boolean registrarUsuario (Usuario usuario) {
       try {
          entityManager.getTransaction().begin();
          entityManager.persist(usuario);
          entityManager.getTransaction().commit();
+         return true;
       } catch (Exception e) {
          entityManager.getTransaction().rollback();
          System.err.println("Error al guardar usuario: " + e.getMessage());
+         return false;
       }
    }
 }

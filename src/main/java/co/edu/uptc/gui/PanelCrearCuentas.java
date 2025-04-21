@@ -1,5 +1,7 @@
 package co.edu.uptc.gui;
 
+import co.edu.uptc.entity.Usuario;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -170,11 +172,23 @@ public class PanelCrearCuentas extends JPanel {
       return boxCorreo.getText();
    }
 
-   public Object[] getDatosUsuario () {
-      return new Object[] {boxNombre.getText(), boxCorreo.getText(), boxDireccion.getText(), boxTelefono.getText(), boxClave.getText()};
+   public Usuario getDatosUsuario () {
+      Usuario usuario = new Usuario();
+      usuario.setCorreoElectronico(boxCorreo.getText());
+      usuario.setNombreCompleto(boxNombre.getText());
+      usuario.setDireccionEnvio(boxDireccion.getText());
+      usuario.setTelefonoContacto(Long.parseLong(boxTelefono.getText()));
+      usuario.setClaveAcceso(boxClave.getText().toCharArray());
+      return usuario;
    }
 
    public void setMensajeDeError (String mensaje) {
+      mensajeDeError.setForeground(Color.RED);
+      mensajeDeError.setText(mensaje);
+   }
+
+   public void setMensajeDisponible (String mensaje) {
+      mensajeDeError.setForeground(Color.GREEN);
       mensajeDeError.setText(mensaje);
    }
 }
