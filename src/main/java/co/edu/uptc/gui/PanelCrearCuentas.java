@@ -187,8 +187,8 @@ public class PanelCrearCuentas extends JPanel {
       mensajeDeError.setText(mensaje);
    }
 
-   public void setMensajeDisponible (String mensaje) {
+   public void setMensajeDisponible () {
       mensajeDeError.setForeground(Color.GREEN);
-      mensajeDeError.setText(mensaje);
+      mensajeDeError.setText("Usuario Disponible");
    }
 }

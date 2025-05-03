@@ -12,14 +12,12 @@ import jakarta.persistence.*;
    private String   autores;
    @Column(name = "anioPublicacion", nullable = false)
    private int      anioPublicacion;
-   @Column(name = "categoria", nullable = false)
-   private String   categoria;
-   @Column(name = "editorial", nullable = false)
-   private String   editorial;
+   @Column(name = "genero", nullable = false)
+   private String   genero;
    @Column(name = "numeroPaginas", nullable = false)
    private int      numeroPaginas;
    @Column(name = "precioVenta", nullable = false)
-   private double   valorUnitario;
+   private double   precioVenta;
    @Column(name = "cantidadDisponible", nullable = false)
    private int      cantidadDisponible;
    @Enumerated(EnumType.STRING)
@@ -34,24 +32,14 @@ import jakarta.persistence.*;
    public Libro () {
    }
 
-   public Libro (long ISBN,
-                 String titulo,
-                 String autores,
-                 int anioPublicacion,
-                 String categoria,
-                 String editorial,
-                 int numeroPaginas,
-                 double valorUnitario,
-                 int cantidadDisponible,
-                 FORMATOS FORMATO) {
+   public Libro (long ISBN, String titulo, String autores, int anioPublicacion, String genero, int numeroPaginas, double precioVenta, int cantidadDisponible, FORMATOS FORMATO) {
       this.ISBN               = ISBN;
       this.titulo             = titulo;
       this.autores            = autores;
       this.anioPublicacion    = anioPublicacion;
-      this.categoria          = categoria;
-      this.editorial          = editorial;
+      this.genero             = genero;
       this.numeroPaginas      = numeroPaginas;
-      this.valorUnitario      = valorUnitario;
+      this.precioVenta        = precioVenta;
       this.cantidadDisponible = cantidadDisponible;
       this.FORMATO            = FORMATO;
    }
@@ -88,20 +76,12 @@ import jakarta.persistence.*;
       this.anioPublicacion = anioPublicacion;
    }
 
-   public String getCategoria () {
-      return categoria;
+   public String getGenero () {
+      return genero;
    }
 
-   public void setCategoria (String categoria) {
-      this.categoria = categoria;
-   }
-
-   public String getEditorial () {
-      return editorial;
-   }
-
-   public void setEditorial (String editorial) {
-      this.editorial = editorial;
+   public void setGenero (String genero) {
+      this.genero = genero;
    }
 
    public int getNumeroPaginas () {
@@ -112,12 +92,12 @@ import jakarta.persistence.*;
       this.numeroPaginas = numeroPaginas;
    }
 
-   public double getValorUnitario () {
-      return valorUnitario;
+   public double getPrecioVenta () {
+      return precioVenta;
    }
 
-   public void setValorUnitario (double valorUnitario) {
-      this.valorUnitario = valorUnitario;
+   public void setPrecioVenta (double precioVenta) {
+      this.precioVenta = precioVenta;
    }
 
    public int getCantidadDisponible () {

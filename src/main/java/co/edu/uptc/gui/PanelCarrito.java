@@ -4,6 +4,7 @@ import co.edu.uptc.entity.Libro;
 import co.edu.uptc.gui.Evento.EVENTO;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -13,13 +14,19 @@ public class PanelCarrito extends JPanel {
    private final Evento                 evento;
    private final VentanaPrincipal       ventanaPrincipal;
    private final HashMap<Long, Integer> carritoDeCompras;
-   private final Font                   fuenteCabecera = new Font("Arial", Font.BOLD, 15);
-   private final Font                   fuenteCelda    = new Font("Lucida Sans Unicode", Font.PLAIN, 15);
-   private final Font                   fuenteBoton    = new Font("Lucida Sans Unicode", Font.BOLD, 20);
+   private final Font                   fuenteCabecera     = new Font("Arial", Font.BOLD, 15);
+   private final Font                   fuenteCelda        = new Font("Lucida Sans Unicode", Font.PLAIN, 15);
+   private final Font                   fuenteBoton        = new Font("Lucida Sans Unicode", Font.BOLD, 20);
+   private       int                    cantidadLibros     = 0;
+   private       double                 valorTotalImpuesto = 0;
+   private       double                 subTotal           = 0;
+   private       double                 total              = 0;
+   private final JLabel                 labelCantidad      = new JLabel(String.format("Cantidad de libros: %d", cantidadLibros));
+   private final JLabel                 labelImpuesto      = new JLabel(String.format("Impuesto: $%,.2f", valorTotalImpuesto));
+   private final JLabel                 labelSubTotal      = new JLabel(String.format("Subtotal: $%,.2f", subTotal));
+   private final JLabel                 labelTotal         = new JLabel(String.format("Total: $%f", total));
    private       HashMap<Long, Libro>   librosLocales;
    public        DefaultTableModel      model;
-   private       double                 subTotal;
-   private       JLabel                 labelTotal;
 
    public PanelCarrito (VentanaPrincipal ventanaPrincipal, Evento evento) {
       this.evento           = evento;
@@ -64,7 +71,7 @@ public class PanelCarrito extends JPanel {
    }
 
    private void inicializarPanelCarrito () {
-      setLayout(new BorderLayout());
+      setLayout(new GridLayout(3, 1));
       model = getDefaultTableModel();
       modificacionesCarrito();
       JTable tableCarrito = new JTable(model);
@@ -72,7 +79,7 @@ public class PanelCarrito extends JPanel {
       tableCarrito.setFont(fuenteCelda);
       formatearColumnas(tableCarrito);
       JScrollPane scrollPane = new JScrollPane(tableCarrito);
-      add(scrollPane, BorderLayout.CENTER);
+      add(scrollPane);
    }
 
    private void formatearColumnas (JTable tableCarrito) {
@@ -82,6 +89,22 @@ public class PanelCarrito extends JPanel {
    }
 
    private void inicializarPanelFooter () {
+      JPanel panelDescripcionCompra = new JPanel(new GridLayout(3, 1));
+      panelDescripcionCompra.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
+                                                                        "Descripcion de la compra",
+                                                                        TitledBorder.CENTER,
+                                                                        TitledBorder.TOP,
+                                                                        fuenteCabecera));
+      //Centrado de lables
+      labelCantidad.setHorizontalAlignment(JLabel.CENTER);
+      labelImpuesto.setHorizontalAlignment(JLabel.CENTER);
+      labelSubTotal.setHorizontalAlignment(JLabel.CENTER);
+      //Asignacion de fuente a cada label
+      labelCantidad.setFont(fuenteCelda);
+      labelImpuesto.setFont(fuenteCelda);
+      labelSubTotal.setFont(fuenteCelda);
+      add(panelDescripcionCompra);
+
       //Footer (incluye el label de precio total)
       JButton botonPagarEfectivo = new JButton("Pagar En Efectivo");
       JButton botonPagarTarjeta  = new JButton("Pagar Con Tarjeta");
@@ -89,7 +112,6 @@ public class PanelCarrito extends JPanel {
       botonPagarTarjeta.setActionCommand(EVENTO.PAGAR_TARJETA.name());
       botonPagarTarjeta.addActionListener(evento);
       botonPagarEfectivo.addActionListener(evento);
-      labelTotal = new JLabel("Total: $0.00");
       labelTotal.setHorizontalAlignment(JLabel.CENTER);
       labelTotal.setFont(new Font("Lucida Sans Typewriter", Font.BOLD, 20));
       GridBagConstraints gbc = new GridBagConstraints();
@@ -109,7 +131,9 @@ public class PanelCarrito extends JPanel {
       //Asignacion de fuente a cada boton
       botonPagarEfectivo.setFont(fuenteBoton);
       botonPagarTarjeta.setFont(fuenteBoton);
-      add(footer, BorderLayout.SOUTH);
+      add(footer);
+
+      actualizarLabelsCompra();
    }
 
    private void modificacionesCarrito () {
@@ -124,7 +148,7 @@ public class PanelCarrito extends JPanel {
                return;
             }
          }
-         actualizarPrecioTotal();
+         actualizarDatosCompra();
       });
    }
 
@@ -208,10 +232,10 @@ public class PanelCarrito extends JPanel {
       datosFila[NOMBRE_COLUMNAS.ISBN.getIndex()]           = libro.getISBN();
       datosFila[NOMBRE_COLUMNAS.TITULO.getIndex()]         = libro.getTitulo();
       datosFila[NOMBRE_COLUMNAS.AUTORES.getIndex()]        = libro.getAutores();
-      datosFila[NOMBRE_COLUMNAS.VALOR_UNITARIO.getIndex()] = libro.getValorUnitario();
+      datosFila[NOMBRE_COLUMNAS.VALOR_UNITARIO.getIndex()] = libro.getPrecioVenta();
       datosFila[NOMBRE_COLUMNAS.VALOR_IMPUESTO.getIndex()] = obtenerPrecioImpuesto(ISBN);
       datosFila[NOMBRE_COLUMNAS.CANTIDAD.getIndex()]       = 1;
-      datosFila[NOMBRE_COLUMNAS.VALOR_TOTAL.getIndex()]    = libro.getValorUnitario() + precioImpuesto;
+      datosFila[NOMBRE_COLUMNAS.VALOR_TOTAL.getIndex()]    = libro.getPrecioVenta() + precioImpuesto;
       datosFila[NOMBRE_COLUMNAS.AGREGAR.getIndex()]        = false;
       datosFila[NOMBRE_COLUMNAS.QUITAR.getIndex()]         = false;
       datosFila[NOMBRE_COLUMNAS.DESCARTAR.getIndex()]      = false;
@@ -239,27 +263,37 @@ public class PanelCarrito extends JPanel {
 
    private void actualizarPrecioVenta (long ISBN, int filaModel) {
       final int columnaPrecioVenta = NOMBRE_COLUMNAS.VALOR_TOTAL.getIndex();
-      double    valorUnitario      = librosLocales.get(ISBN).getValorUnitario();
+      double    valorUnitario      = librosLocales.get(ISBN).getPrecioVenta();
       int       cantidad           = carritoDeCompras.get(ISBN);
       double    precioVenta        = ventanaPrincipal.obtenerPrecioTotalProducto(valorUnitario, cantidad);
       model.setValueAt(precioVenta, filaModel, columnaPrecioVenta);
    }
 
    private double obtenerPrecioImpuesto (long ISBN) {
-      double valorUnitario = librosLocales.get(ISBN).getValorUnitario();
+      double valorUnitario = librosLocales.get(ISBN).getPrecioVenta();
       return ventanaPrincipal.obtenerPrecioImpuesto(valorUnitario);
    }
 
-   private void actualizarPrecioTotal () {
-      subTotal = ventanaPrincipal.obtenerPrecioVentaTotal(model);
-      labelTotal.setText(String.format("$%,.2f", subTotal));
+   private void actualizarDatosCompra () {
+      cantidadLibros     = ventanaPrincipal.obtenerCantidadLibros(model);
+      valorTotalImpuesto = ventanaPrincipal.obtenerValorTotalImpuesto(model);
+      subTotal           = ventanaPrincipal.obtenerSubTotalVenta(model);
+      total              = ventanaPrincipal.obtenerTotalVenta(subTotal);
+      actualizarLabelsCompra();
+   }
+
+   private void actualizarLabelsCompra () {
+      labelCantidad.setText(String.format("Cantidad de libros: %d", cantidadLibros));
+      labelImpuesto.setText(String.format("Impuesto: $%,.2f", valorTotalImpuesto));
+      labelSubTotal.setText(String.format("Subtotal: $%,.2f", subTotal));
+      labelTotal.setText(String.format("Total: $%f", total));
    }
 
    public void setLibrosLocales (HashMap<Long, Libro> librosLocales) {
       this.librosLocales = librosLocales;
    }
 
-   enum NOMBRE_COLUMNAS {
+   public enum NOMBRE_COLUMNAS {
       ISBN(0),
       TITULO(1),
       AUTORES(2),
@@ -278,7 +312,7 @@ public class PanelCarrito extends JPanel {
          this.name  = this.name();
       }
 
-      int getIndex () {
+      public int getIndex () {
          return index;
       }
 

@@ -20,7 +20,7 @@ public class PanelPerfil extends JPanel {
    private final Font              fuenteBoton            = new Font("Lucida Sans Unicode", Font.BOLD, 20);
    private final JLabel            mensajeDeError         = new JLabel();
    private final JPasswordField    boxContrasena          = new JPasswordField();
-   private       Usuario           datosUsuario;
+   private       Usuario           datosUsuario           = null;
 
    public PanelPerfil (PantallaPrincipal pantallaPrincipal, Evento evento) {
       this.evento            = evento;
@@ -30,26 +30,11 @@ public class PanelPerfil extends JPanel {
 
    private void inicializarPanelPerfil () {
       setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-      refrescarDatosPerfil(datosUsuario);
-   }
-
-   private void refrescarDatosPerfil (Usuario datosUsuario) {
-      this.datosUsuario = datosUsuario;
       inicializarPanelDatosUsuario();
       inicializarPanelFooter();
-      revalidate();
-      repaint();
    }
 
    private void inicializarPanelDatosUsuario () {
-      if (datosUsuario != null) {
-         boxNombreCompleto.setText(datosUsuario.getNombreCompleto());
-         boxCorreo.setText(datosUsuario.getCorreoElectronico());
-         boxDireccion.setText(datosUsuario.getDireccionEnvio());
-         boxTelefono.setText(String.valueOf(datosUsuario.getTelefonoContacto()));
-         boxContrasena.setText("********");
-         labelTipoUsuarioActual.setText(datosUsuario.getTipoUsuario().name());
-      }
       //Banners de Datos
       //Banner de Nombre Completo
       JPanel panelNombreCompleto = new JPanel(new GridLayout(1, 2));
@@ -115,7 +100,7 @@ public class PanelPerfil extends JPanel {
          mensajeDeError.setFont(new Font("Times New Roman", Font.BOLD, 20));
          mensajeDeError.setHorizontalAlignment(JLabel.CENTER);
          panelFooter.add(mensajeDeError);
-         botonGuardar.setActionCommand(Evento.EVENTO.ACTUALIZAR_DATOS_CLIENTE.name());
+         botonGuardar.setActionCommand(Evento.EVENTO.ACTUALIZAR_CLIENTE.name());
          botonGuardar.addActionListener(_ -> {
             mensajeDeError.setText(obtenerMensajeDeError());
             if (mensajeDeError.getText().isBlank()) {
@@ -141,8 +126,6 @@ public class PanelPerfil extends JPanel {
          panelFooter.add(botonLoginSignUp);
       }
       add(panelFooter);
-      revalidate();
-      repaint();
    }
 
    private String obtenerMensajeDeError () {
@@ -192,6 +175,17 @@ public class PanelPerfil extends JPanel {
 
    public void setDatosUsuario (Usuario datosUsuario) {
       this.datosUsuario = datosUsuario;
-      refrescarDatosPerfil(this.datosUsuario);
+      boxNombreCompleto.setText(datosUsuario.getNombreCompleto());
+      boxCorreo.setText(datosUsuario.getCorreoElectronico());
+      boxDireccion.setText(datosUsuario.getDireccionEnvio());
+      boxTelefono.setText(String.valueOf(datosUsuario.getTelefonoContacto()));
+      boxContrasena.setText("********");
+      labelTipoUsuarioActual.setText(datosUsuario.getTipoUsuario().name());
+   }
+
+   public Usuario getDatosUsuario () {
+      Usuario usuarioSeguro = datosUsuario;
+      usuarioSeguro.setClaveAcceso(new char[] {});
+      return usuarioSeguro;
    }
 }

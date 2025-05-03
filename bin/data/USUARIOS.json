@@ -1,0 +1,56 @@
+{
+  "ADMIN": [
+    {
+      "nombreCompleto": "Administrador Uno",
+      "correoElectronico": "admin1@example.com",
+      "direccionEnvio": "Calle Admin 1",
+      "telefonoContacto": 1111111111,
+      "claveAcceso": "admin",
+      "CID": 1
+    },
+    {
+      "nombreCompleto": "Administrador Dos",
+      "correoElectronico": "admin2@example.com",
+      "direccionEnvio": "Calle Admin 2",
+      "telefonoContacto": 2222222222,
+      "claveAcceso": "admin456",
+      "CID": 2
+    }
+  ],
+  "REGULAR": [
+    {
+      "nombreCompleto": "correoElectronico Regular Uno",
+      "correoElectronico": "regular1@example.com",
+      "direccionEnvio": "Avenida Regular 1",
+      "telefonoContacto": 3333333333,
+      "claveAcceso": "regular123",
+      "CID": 3
+    },
+    {
+      "nombreCompleto": "correoElectronico Regular Dos",
+      "correoElectronico": "regular2@example.com",
+      "direccionEnvio": "Avenida Regular 2",
+      "telefonoContacto": 4444444444,
+      "claveAcceso": "regular456",
+      "CID": 4
+    }
+  ],
+  "PREMIUM": [
+    {
+      "nombreCompleto": "correoElectronico Premium Uno",
+      "correoElectronico": "premium1@example.com",
+      "direccionEnvio": "Calle Premium 1",
+      "telefonoContacto": 5555555555,
+      "claveAcceso": "premium123",
+      "CID": 5
+    },
+    {
+      "nombreCompleto": "correoElectronico Premium Dos",
+      "correoElectronico": "premium2@example.com",
+      "direccionEnvio": "Calle Premium 2",
+      "telefonoContacto": 6666666666,
+      "claveAcceso": "premium456",
+      "CID": 6
+    }
+  ]
+}

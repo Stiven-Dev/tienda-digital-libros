@@ -12,10 +12,10 @@ public class PantallaPrincipal extends JPanel {
    private       PanelLibros           panelLibros;
    private       PanelCarrito          panelCarrito;
    private       PanelPerfil           panelPerfil;
-   private       PanelAgregarLibro     panelAgregarLibro; //Solo para los administradores
-   private       PanelActualizarLibro  panelActualizarLibro; //Solo para los administradores
-   private       PanelEliminarLibro    panelEliminarLibro; //Solo para los administradores
-   private       PanelCrearCuentas     panelCrearCuentas; //Solo para los administradores
+   private PanelAgregarLibro             panelAgregarLibro; //Solo para los administradores
+   private PanelActualizarLibro panelActualizarLibro; //Solo para los administradores
+   private PanelEliminarLibro   panelEliminarLibro; //Solo para los administradores
+   private PanelCrearCuentas    panelCrearCuentas; //Solo para los administradores
    private       PanelHistorialCompras panelHistorialCompras;
 
    public PantallaPrincipal (VentanaPrincipal ventana, Evento evento) {
@@ -67,7 +67,7 @@ public class PantallaPrincipal extends JPanel {
    }
 
    private void inicializarPanelHistorialCompras () {
-      //panelHistorialCompras = new PanelHistorialCompras(ventanaPrincipal, panelPerfil.get());
+      panelHistorialCompras = new PanelHistorialCompras(ventanaPrincipal, panelPerfil.);
    }
 
    PanelLibros getPanelLibros () {
@@ -76,6 +76,10 @@ public class PantallaPrincipal extends JPanel {
 
    Object[] getDatosLibroNuevo () {
       return panelAgregarLibro.getDatosLibro();
+   }
+
+   PanelPerfil getPanelPerfil () {
+      return panelPerfil;
    }
 
    void iniciarSesion (Usuario datosUsuario) {

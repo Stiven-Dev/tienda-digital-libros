@@ -205,8 +205,9 @@ public class DialogLoginSignup extends JDialog {
       JButton botonRegistrar = new JButton("Crear Cuenta");
       botonRegistrar.addActionListener(_ -> {
          mensajeDeError.setText(obtenerMensajeDeError());
+         botonRegistrar.setActionCommand(Evento.EVENTO.REGISTRAR.name());
          if (mensajeDeError.getText().isEmpty()) {
-            botonRegistrar.setActionCommand(Evento.EVENTO.REGISTRAR.name());
+            botonRegistrar.removeActionListener(evento);
             botonRegistrar.addActionListener(evento);
          }
       });
@@ -252,7 +253,7 @@ public class DialogLoginSignup extends JDialog {
       if (boxTelefono.getText().length() != 10) {
          return "El campo Teléfono debe tener 10 caracteres";
       }
-      if (!boxTelefono.getText().matches("[0-9]{10}")) {
+      if (!boxTelefono.getText().matches("3[0-9]{9}")) {
          return "El campo Teléfono debe tener 10 caracteres numéricos";
       }
       final String regexDireccion = "^(Calle|Carrera|Avenida|Diagonal|Transversal|Circunvalar)\\s\\d+\\s*(#|No\\.)\\s*\\d+(-\\d+)?(\\s*,\\s*[\\w\\s]+)?$\n";

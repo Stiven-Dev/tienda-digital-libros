@@ -3,6 +3,7 @@ package co.edu.uptc.gui;
 import co.edu.uptc.entity.Libro;
 import co.edu.uptc.entity.Usuario;
 import co.edu.uptc.model.Tienda;
+import co.edu.uptc.util.JPAUtil;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -43,14 +44,14 @@ public class VentanaPrincipal extends JFrame {
    }
 
    void validarRegistro () {
-      Usuario usuario           = getDatosSignUp();
-      String  correoElectronico = usuario.getCorreoElectronico();
+      Usuario usuarioARegistrar = getDatosSignUp();
+      String  correoElectronico = usuarioARegistrar.getCorreoElectronico();
       if (obtenerUsuarioMedianteCorreo(correoElectronico) != null) {
-         pantallaPrincipal.getPanelCrearCuentas().setMensajeDeError("Ya existe un usuario con ese correo");
+         JOptionPane.showMessageDialog(this, "Ya existe un usuario con ese correo", "Alerta", JOptionPane.INFORMATION_MESSAGE);
          return;
       }
-      tienda.crearCuenta(usuario);
-      pantallaPrincipal.iniciarSesion(tienda.obtenerUsuarioMedianteCorreo(correoElectronico));
+      tienda.crearCuenta(usuarioARegistrar);
+      pantallaPrincipal.iniciarSesion(usuarioARegistrar);
    }
 
    private Usuario getDatosSignUp () {
@@ -81,17 +82,11 @@ public class VentanaPrincipal extends JFrame {
       }
    }
 
-   void agregarLibroArchivo () {
-      if (tienda.agregarLibroArchivo(pantallaPrincipal.getDatosLibroNuevo())) {
-         JOptionPane.showMessageDialog(this, "Libro agregado correctamente", "Alerta", JOptionPane.INFORMATION_MESSAGE);
-      } else {
-         JOptionPane.showMessageDialog(this, "Libro ya existe", "Alerta", JOptionPane.INFORMATION_MESSAGE);
-      }
-   }
-
    private void salirFormaSegura () {
+      //TODO
       //pantallaPrincipal.getPanelCarrito().actualizarCarritoArchivo();
       dispose();
+      JPAUtil.closeFactory();
       System.exit(0);
    }
 
@@ -100,16 +95,30 @@ public class VentanaPrincipal extends JFrame {
       dialogLoginSignup.setVisible(true);
    }
 
-   void buscarLibroActualizar () {
-      long     ISBN  = pantallaPrincipal.getPanelActualizarLibro().getISBN();
-      Object[] datos = tienda.buscarLibro(ISBN);
-      if (datos != null) {
-         pantallaPrincipal.getPanelActualizarLibro().setDatosLibro(datos);
+   void buscarLibro (JPanel panel) {
+      long                  ISBN;
+      PanelLibroModificable panelLibroModificable;
+      switch (panel.getName()) {
+         case "PanelEliminarLibro" -> {
+            ISBN                  = pantallaPrincipal.getPanelEliminarLibro().getISBN();
+            panelLibroModificable = pantallaPrincipal.getPanelEliminarLibro();
+         }
+         case "PanelActualizarLibro" -> {
+            ISBN                  = pantallaPrincipal.getPanelActualizarLibro().getISBN();
+            panelLibroModificable = pantallaPrincipal.getPanelActualizarLibro();
+         }
+         default -> {
+            return;
+         }
+      }
+      Libro libro = tienda.buscarLibro(ISBN);
+      if (libro != null) {
+         panelLibroModificable.setDatosLibro(libro);
       }
    }
 
    void actualizarLibro () {
-      Object[] datos = pantallaPrincipal.getPanelActualizarLibro().getDatosLibro();
+      Libro datos = pantallaPrincipal.getPanelActualizarLibro().getDatosLibro();
       if (tienda.actualizarLibro(datos)) {
          JOptionPane.showMessageDialog(this, "Libro actualizado correctamente", "Alerta", JOptionPane.INFORMATION_MESSAGE);
       } else {
@@ -117,8 +126,12 @@ public class VentanaPrincipal extends JFrame {
       }
    }
 
-   double obtenerPrecioVentaTotal (DefaultTableModel model) {
+   double obtenerSubTotalVenta (DefaultTableModel model) {
       return tienda.calcularSubTotalVenta(model);
+   }
+
+   double obtenerTotalVenta (double subTotal) {
+      return tienda.calcularTotalVenta(subTotal, pantallaPrincipal.getPanelPerfil().getDatosUsuario().getTipoUsuario());
    }
 
    double obtenerPrecioTotalProducto (double valorUnitario, int cantidad) {
@@ -135,23 +148,12 @@ public class VentanaPrincipal extends JFrame {
 
    void eliminarLibro () {
       long ISBN = pantallaPrincipal.getPanelEliminarLibro().getISBN();
-      if (tienda.eliminarLibro(ISBN)) {
-         JOptionPane.showMessageDialog(this, "Libro eliminado correctamente", "Alerta", JOptionPane.INFORMATION_MESSAGE);
-      } else {
+      if (tienda.ventasAsociadas(ISBN)) {
          JOptionPane.showMessageDialog(this, "No es posible eliminar el libro", "Alerta", JOptionPane.INFORMATION_MESSAGE);
-      }
-   }
-
-   void buscarLibroEliminar () {
-      long ISBN = pantallaPrincipal.getPanelEliminarLibro().getISBN();
-      if (ISBN == -1) {
-         pantallaPrincipal.getPanelEliminarLibro().setMensajeDeError("Debe rellenar el campo ISBN");
          return;
       }
-      Object[] datosObtenidos = tienda.buscarLibro(ISBN);
-      if (datosObtenidos != null) {
-         pantallaPrincipal.getPanelEliminarLibro().setDatosLibro(datosObtenidos);
-      }
+      tienda.eliminarLibro(ISBN);
+      JOptionPane.showMessageDialog(this, "Libro eliminado correctamente", "Alerta", JOptionPane.INFORMATION_MESSAGE);
    }
 
    void crearCuenta () {
@@ -173,24 +175,24 @@ public class VentanaPrincipal extends JFrame {
          pantallaPrincipal.getPanelCrearCuentas().setMensajeDeError("Ya hay un usuario con ese correo");
          return;
       }
-      pantallaPrincipal.getPanelCrearCuentas().setMensajeDisponible("Usuario Disponible");
+      pantallaPrincipal.getPanelCrearCuentas().setMensajeDisponible();
    }
 
    void pagarEfectivo () {
-      if (LOGIN_CORRECTO) {
-         JOptionPane.showMessageDialog(null, "Pago en efectivo", "Alerta", JOptionPane.INFORMATION_MESSAGE);
-      } else {
+      if (pantallaPrincipal.getPanelPerfil().getDatosUsuario() == null) {
          JOptionPane.showMessageDialog(null, "Debe iniciar sesion para pagar", "Alerta", JOptionPane.INFORMATION_MESSAGE);
+         return;
       }
+      JOptionPane.showMessageDialog(null, "Pago en efectivo", "Alerta", JOptionPane.INFORMATION_MESSAGE);
       //TODO
    }
 
    void pagarTarjeta () {
-      if (LOGIN_CORRECTO) {
-         JOptionPane.showMessageDialog(null, "Pago con Tarjeta", "Alerta", JOptionPane.INFORMATION_MESSAGE);
-      } else {
+      if (pantallaPrincipal.getPanelPerfil().getDatosUsuario() == null) {
          JOptionPane.showMessageDialog(null, "Debe iniciar sesion para pagar", "Alerta", JOptionPane.INFORMATION_MESSAGE);
+         return;
       }
+      JOptionPane.showMessageDialog(null, "Pago con Tarjeta", "Alerta", JOptionPane.INFORMATION_MESSAGE);
       //TODO
    }
 
@@ -202,7 +204,7 @@ public class VentanaPrincipal extends JFrame {
       return tienda.getLibrosLocales();
    }
 
-   public void validarInicioSesion () {
+   void validarInicioSesion () {
       Usuario usuario = getDialogLoginSignUp().getDatosLogin();
       if (usuario.getCorreoElectronico().isBlank() || usuario.getClaveAcceso().length == 0) {
          JOptionPane.showMessageDialog(this, "Debe rellenar todos los campos", "Alerta", JOptionPane.INFORMATION_MESSAGE);
@@ -219,7 +221,15 @@ public class VentanaPrincipal extends JFrame {
       return tienda.obtenerUsuarioMedianteCorreo(correoElectronico);
    }
 
-   public void setLibrosLocales (HashMap<Long, Libro> libroHashMap) {
+   void setLibrosLocales (HashMap<Long, Libro> libroHashMap) {
       pantallaPrincipal.getPanelCarrito().setLibrosLocales(libroHashMap);
+   }
+
+   double obtenerValorTotalImpuesto (DefaultTableModel model) {
+      return tienda.calcularValorTotalImpuesto(model);
+   }
+
+   public int obtenerCantidadLibros (DefaultTableModel model) {
+      return tienda.obtenerCantidadLibros(model);
    }
 }

@@ -18,7 +18,7 @@ public class PanelAgregarLibro extends JPanel{
 	private       JTextField        boxTitulo;
 	private       JTextField        boxAutor;
 	private       JTextField        boxAnioPublicacion;
-	private       JTextField        boxGenero;
+	private       JTextField        boxCategoria;
 	private       JTextField        boxEditorial;
 	private       JTextField        boxNumPaginas;
 	private       JTextField        boxPrecioVenta;
@@ -45,7 +45,7 @@ public class PanelAgregarLibro extends JPanel{
 		JLabel labelTitulo             = new JLabel("*Titulo", SwingConstants.CENTER);
 		JLabel labelAutor              = new JLabel("*Autor(es)", SwingConstants.CENTER);
 		JLabel labelAnioPublicacion    = new JLabel("*Año de Publicación", SwingConstants.CENTER);
-		JLabel labelGenero             = new JLabel("*Género", SwingConstants.CENTER);
+		JLabel labelCategoria             = new JLabel("*Género", SwingConstants.CENTER);
 		JLabel labelEditorial          = new JLabel("*Editorial", SwingConstants.CENTER);
 		JLabel labelNumPaginas         = new JLabel("*Número de Páginas", SwingConstants.CENTER);
 		JLabel labelPrecioVenta        = new JLabel("*Precio de Venta", SwingConstants.CENTER);
@@ -57,7 +57,7 @@ public class PanelAgregarLibro extends JPanel{
 		labelTitulo.setFont(fuenteLabel);
 		labelAutor.setFont(fuenteLabel);
 		labelAnioPublicacion.setFont(fuenteLabel);
-		labelGenero.setFont(fuenteLabel);
+		labelCategoria.setFont(fuenteLabel);
 		labelEditorial.setFont(fuenteLabel);
 		labelNumPaginas.setFont(fuenteLabel);
 		labelPrecioVenta.setFont(fuenteLabel);
@@ -69,7 +69,7 @@ public class PanelAgregarLibro extends JPanel{
 		boxTitulo             = new JTextField();
 		boxAutor              = new JTextField("Anonimo");
 		boxAnioPublicacion    = new JTextField();
-		boxGenero             = new JTextField();
+		boxCategoria             = new JTextField();
 		boxEditorial          = new JTextField();
 		boxNumPaginas         = new JTextField("1");
 		boxPrecioVenta        = new JTextField("1.0");
@@ -81,7 +81,7 @@ public class PanelAgregarLibro extends JPanel{
 		boxTitulo.setFont(fuenteTextField);
 		boxAutor.setFont(fuenteTextField);
 		boxAnioPublicacion.setFont(fuenteTextField);
-		boxGenero.setFont(fuenteTextField);
+		boxCategoria.setFont(fuenteTextField);
 		boxEditorial.setFont(fuenteTextField);
 		boxNumPaginas.setFont(fuenteTextField);
 		boxPrecioVenta.setFont(fuenteTextField);
@@ -92,7 +92,7 @@ public class PanelAgregarLibro extends JPanel{
 		boxTitulo.setHorizontalAlignment(JTextField.CENTER);
 		boxAutor.setHorizontalAlignment(JTextField.CENTER);
 		boxAnioPublicacion.setHorizontalAlignment(JTextField.CENTER);
-		boxGenero.setHorizontalAlignment(JTextField.CENTER);
+		boxCategoria.setHorizontalAlignment(JTextField.CENTER);
 		boxEditorial.setHorizontalAlignment(JTextField.CENTER);
 		boxNumPaginas.setHorizontalAlignment(JTextField.CENTER);
 		boxPrecioVenta.setHorizontalAlignment(JTextField.CENTER);
@@ -137,14 +137,14 @@ public class PanelAgregarLibro extends JPanel{
 		//Fila 4, Columna 0 y 1 => Labels Género y Editorial
 		gbc.gridy = 4;
 		gbc.gridx = 0;
-		panelCampos.add(labelGenero, gbc);
+		panelCampos.add(labelCategoria, gbc);
 		gbc.gridx = 1;
 		panelCampos.add(labelEditorial, gbc);
 
 		//Fila 5, Columna 0 y 1 => Box Género y Editorial
 		gbc.gridy = 5;
 		gbc.gridx = 0;
-		panelCampos.add(boxGenero, gbc);
+		panelCampos.add(boxCategoria, gbc);
 		gbc.gridx = 1;
 		panelCampos.add(boxEditorial, gbc);
 
@@ -211,7 +211,7 @@ public class PanelAgregarLibro extends JPanel{
 			if (boxAnioPublicacion.getText().isEmpty()){
 				return "Debe rellenar el campo Año de Publicación";
 			}
-			if (boxGenero.getText().isEmpty()){
+			if (boxCategoria.getText().isEmpty()){
 				return "Debe rellenar el campo Género";
 			}
 			if (boxEditorial.getText().isEmpty()){
@@ -284,7 +284,7 @@ public class PanelAgregarLibro extends JPanel{
 		datos[1] = boxTitulo.getText();
 		datos[2] = boxAutor.getText();
 		datos[3] = Integer.parseInt(boxAnioPublicacion.getText());
-		datos[4] = boxGenero.getText();
+		datos[4] = boxCategoria.getText();
 		datos[5] = boxEditorial.getText();
 		datos[6] = Integer.parseInt(boxNumPaginas.getText());
 		datos[7] = Double.parseDouble(boxPrecioVenta.getText());
@@ -295,7 +295,7 @@ public class PanelAgregarLibro extends JPanel{
 
 	void validarSesionIniciada (){
 		if (mensajeDeError.getText().isBlank()){
-			botonGuardar.setActionCommand(Evento.EVENTO.AGREGAR_LIBRO_AL_ARCHIVO.name());
+			botonGuardar.setActionCommand(Evento.EVENTO.GUARDAR_LIBRO_AL_ARCHIVO.name());
 			botonGuardar.addActionListener(evento);
 		}
 	}

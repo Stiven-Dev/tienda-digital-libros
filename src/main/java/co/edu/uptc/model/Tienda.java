@@ -2,18 +2,13 @@ package co.edu.uptc.model;
 
 import co.edu.uptc.entity.Libro;
 import co.edu.uptc.entity.Usuario;
-import jakarta.json.JsonArray;
-import jakarta.json.JsonObject;
+import co.edu.uptc.gui.PanelCarrito;
+import co.edu.uptc.entity.Usuario.ROLES;
 
-import java.util.ArrayList;
+import javax.swing.table.DefaultTableModel;
 import java.util.HashMap;
 
 public class Tienda {
-   private static final String RUTA_CARRITOS = "persistencia/CARRITOS.json";
-   private static final String RUTA_LIBROS   = "persistencia/LIBROS.json";
-   private static final String RUTA_USUARIOS = "persistencia/USUARIOS.json";
-   private static final String RUTA_COMPRAS  = "persistencia/COMPRAS.json";
-
    public Tienda () {
    }
 
@@ -82,52 +77,21 @@ public class Tienda {
 //      return Usuario.validarRolUsuario(correoElectronico);
 //   }
 //
-//   public boolean agregarLibroArchivo (Object[] datos) {
-//      long   ISBN               = (long) datos[0];
-//      String titulo             = (String) datos[1];
-//      String autor              = (String) datos[2];
-//      int    anioPublicacion    = (int) datos[3];
-//      String genero             = (String) datos[4];
-//      String editorial          = (String) datos[5];
-//      int    numeroPaginas      = (int) datos[6];
-//      double precioVenta        = (double) datos[7];
-//      int    cantidadDisponible = (int) datos[8];
-//      String formato            = (String) datos[9];
-//      Libro  libro              = new Libro(ISBN, titulo, autor, anioPublicacion, genero, editorial, numeroPaginas, precioVenta, cantidadDisponible, formato);
-//      if (buscarLibro(ISBN) == null) {
-//         escribirLibroEnArchivo(libro);
-//         return true;
-//      }
-//      return false;
-//   }
-//
-//   private void escribirLibroEnArchivo (Libro libro) {
-//      JsonObject jsonActual;
-//      try (InputStream inputStream = new FileInputStream(RUTA_LIBROS);
-//           JsonReader reader = Json.createReader(inputStream)
-//      ) {
-//         jsonActual = reader.readObject();
-//      } catch (Exception e) {
-//         System.err.println(e.getMessage());
-//         return;
-//      }
-//      JsonArray        librosArray  = jsonActual.getJsonArray("LIBROS");
-//      JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-//      for (JsonValue libroActual : librosArray) {
-//         arrayBuilder.add(libroActual);
-//      }
-//      arrayBuilder.add(convertirLibroAJson(libro));
-//      arrayBuilder.build();
-//      JsonObject jsonFinal = Json.createObjectBuilder().add("LIBROS", arrayBuilder).build();
-//      try (OutputStream outputStream = new FileOutputStream(RUTA_USUARIOS);
-//           JsonWriter writer = Json.createWriter(outputStream)
-//      ) {
-//         writer.writeObject(jsonFinal);
-//      } catch (Exception e) {
-//         System.err.println(e.getMessage());
-//      }
-//   }
-//
+   public boolean agregarLibroArchivo (Libro datosLibro) {
+      long ISBN = datosLibro.getISBN();
+      if (buscarLibro(ISBN) == null) {
+         escribirLibroEnArchivo(datosLibro);
+         return true;
+      }
+      return false;
+   }
+
+   //
+   private void escribirLibroEnArchivo (Libro libro) {
+      OperacionHibernate.registrarLibro(libro);
+   }
+
+   //
 //   private JsonObject convertirLibroAJson (Libro libro) {
 //      JsonObjectBuilder libroJson = Json.createObjectBuilder();
 //      libroJson.add("ISBN", libro.getIsbn());
@@ -162,27 +126,9 @@ public class Tienda {
 //      return null;
 //   }
 //
-   private ArrayList<Libro> obtenerListaDeLibros (JsonArray librosJson) {
-      ArrayList<Libro> listaDeLibros = new ArrayList<>();
-      for (JsonObject libroObject : librosJson.getValuesAs(JsonObject.class)) {
-         Libro libro = new Libro();
-         libro.setISBN(libroObject.getJsonNumber("ISBN").longValue());
-         libro.setTitulo(libroObject.getString("titulo"));
-         libro.setAutores(libroObject.getString("autores"));
-         libro.setAnioPublicacion(libroObject.getInt("añoPublicacion"));
-         libro.setCategoria(libroObject.getString("categoria"));
-         libro.setEditorial(libroObject.getString("editorial"));
-         libro.setNumeroPaginas(libroObject.getInt("numPaginas"));
-         libro.setValorUnitario(libroObject.getJsonNumber("precioVenta").doubleValue());
-         libro.setCantidadDisponible(libroObject.getInt("cantidadInventario"));
-         libro.setFormato(Libro.FORMATOS.valueOf(libroObject.getString("formato")));
-         listaDeLibros.add(libro);
-      }
-      return listaDeLibros;
-   }
 
    public Object[][] getDataVectorLibros () {
-      HashMap<Long, Libro> mapLibros = Operacion.obtenerMapLibrosLocales();
+      HashMap<Long, Libro> mapLibros = OperacionHibernate.obtenerMapLibrosLocales();
       if (mapLibros == null) return null;
       Object[][] dataVectorLibros = new Object[mapLibros.size()][11];
       int        i                = 0;
@@ -194,29 +140,20 @@ public class Tienda {
          dataVectorLibros[i][2]  = libro.getAutores();
          dataVectorLibros[i][3]  = libro.getCategoria();
          dataVectorLibros[i][4]  = libro.getNumeroPaginas();
-         dataVectorLibros[i][5]  = libro.getEditorial();
+         dataVectorLibros[i][5]  = libro.getGenero();
          dataVectorLibros[i][6]  = libro.getAnioPublicacion();
          dataVectorLibros[i][7]  = libro.getFormato();
-         dataVectorLibros[i][8]  = libro.getValorUnitario();
+         dataVectorLibros[i][8]  = libro.getPrecioVenta();
          dataVectorLibros[i][9]  = libro.getCantidadDisponible();
          dataVectorLibros[i][10] = false;
          i++;
       }
       return dataVectorLibros;
    }
-   //
-//   public Object[] buscarLibro (long ISBN) {
-//      try {
-//         InputStream inputStream = new FileInputStream(RUTA_LIBROS);
-//         JsonReader  reader      = Json.createReader(inputStream);
-//         JsonObject  jsonObject  = reader.readObject();
-//         JsonArray   libros      = jsonObject.getJsonArray("LIBROS");
-//         return obtenerLibro(ISBN, libros);
-//      } catch (IOException e) {
-//         System.err.println(e.getMessage());
-//         return null;
-//      }
-//   }
+
+   public Libro buscarLibro (long ISBN) {
+      return OperacionHibernate.obtenerLibroISBN(ISBN);
+   }
 //
 //   public boolean validarUsuarioLogin (String correoElectronico, String claveAcceso) {
 //      Usuario usuario = obtenerUsuario(correoElectronico);
@@ -324,28 +261,26 @@ public class Tienda {
 //      );
 //      guardarDatosUsuario(usuario);
 //   }
-//
-//
-//   private float obtenerPorcentajeDescuento (ROLES rol) {
-//      return rol == ROLES.PREMIUM ? 0.85f : 0.19f;
-//   }
-//
-//   public double calcularSubTotalVenta (DefaultTableModel model) {
-//      double    totalVentaNeto       = 0;
-//      final int columnaValorUnitario = 3;
-//      final int columnaCantidad      = 5;
-//      for (int fila = 0; fila < model.getRowCount(); fila++) {
-//         double valorUnitario = (double) model.getValueAt(fila, columnaValorUnitario);
-//         int    cantidad      = (int) model.getValueAt(fila, columnaCantidad);
-//         totalVentaNeto += calcularPrecioVenta(valorUnitario, cantidad);
-//      }
-//      return totalVentaNeto;
-//   }
-//
-//   public double calcularTotalVenta (double subTotal, ROLES rol) {
-//      return subTotal * obtenerPorcentajeDescuento(rol);
-//   }
-//
+   private float obtenerPorcentajeDescuento (ROLES rol) {
+      return rol == ROLES.PREMIUM ? 0.15f : 0;
+   }
+
+   public double calcularSubTotalVenta (DefaultTableModel model) {
+      double    subTotalVenta        = 0;
+      final int columnaValorUnitario = PanelCarrito.NOMBRE_COLUMNAS.VALOR_UNITARIO.getIndex();
+      final int columnaCantidad      = PanelCarrito.NOMBRE_COLUMNAS.CANTIDAD.getIndex();
+      for (int fila = 0; fila < model.getRowCount(); fila++) {
+         double valorUnitario = (double) model.getValueAt(fila, columnaValorUnitario);
+         int    cantidad      = (int) model.getValueAt(fila, columnaCantidad);
+         subTotalVenta += calcularPrecioVenta(valorUnitario, cantidad);
+      }
+      return subTotalVenta;
+   }
+
+   public double calcularTotalVenta (double subTotal, ROLES rol) {
+      return subTotal * (1 - obtenerPorcentajeDescuento(rol));
+   }
+
    public double calcularPrecioVenta (double valorUnitario, int cantidad) {
       double valorImpuesto = calcularValorImpuesto(valorUnitario);
       return (valorUnitario + valorImpuesto) * cantidad;
@@ -360,78 +295,44 @@ public class Tienda {
    }
 
    public HashMap<Long, Libro> getLibrosLocales () {
-      return Operacion.obtenerMapLibrosLocales();
+      return OperacionHibernate.obtenerMapLibrosLocales();
    }
 
    public boolean registrarUsuario (Usuario usuario) {
-      return Operacion.registrarUsuario(usuario);
+      return OperacionHibernate.registrarUsuario(usuario);
    }
 
    public Usuario obtenerUsuarioMedianteCorreo (String correoElectronico) {
-      return Operacion.obtenerUsuarioMedianteCorreo(correoElectronico);
+      return OperacionHibernate.obtenerUsuarioMedianteCorreo(correoElectronico);
    }
 
-   //
-//   public boolean actualizarLibro (Object[] datos) {
-//      long ISBN = (long) datos[0];
-//      if (!eliminarLibro(ISBN)) return false;
-//      agregarLibroArchivo(datos);
-//      return true;
-//   }
-//
-//   public boolean eliminarLibro (long ISBN) {
-//      Object libroObject = buscarLibro(ISBN);
-//      //Se verifica que se obtenga un libro válido
-//      if (libroObject == null) {
-//         return false;
-//      }
-//      //Se verifica que no exista ventas asociadas al libro para poder eliminarlo
-//      if (ventasAsociadasLibro(ISBN)) {
-//         return false;
-//      }
-//      JsonObject jsonActual;
-//      try (InputStream inputStream = new FileInputStream(RUTA_LIBROS);
-//           JsonReader reader = Json.createReader(inputStream)
-//      ) {
-//         jsonActual = reader.readObject();
-//      } catch (Exception e) {
-//         System.err.println(e.getMessage());
-//         return false;
-//      }
-//      JsonArray        librosExistentes = jsonActual.getJsonArray("LIBROS");
-//      JsonArrayBuilder librosBuilder    = Json.createArrayBuilder();
-//      for (JsonValue libroValue : librosExistentes) {
-//         JsonObject libro      = (JsonObject) libroValue;
-//         long       ISBNActual = libro.getJsonNumber("ISBN").longValue();
-//         if (ISBNActual == ISBN) {
-//            continue;
-//         }
-//         librosBuilder.add(libro);
-//      }
-//      librosBuilder.build();
-//      JsonObject nuevoJson = Json.createObjectBuilder().add("LIBROS", librosBuilder).build();
-//      try (OutputStream outputStream = new FileOutputStream(RUTA_LIBROS);
-//           JsonWriter writer = Json.createWriter(outputStream)
-//      ) {
-//         writer.writeObject(nuevoJson);
-//      } catch (Exception e) {
-//         System.err.println("Error al escribir en LIBROS.json: " + e.getMessage());
-//      }
-//      return true;
-//   }
-//
-//   public boolean ventasAsociadasLibro (long ISBN) {
-//      //TODO
-//      return true;
-//   }
-//
+   public boolean actualizarLibro (Libro datosLibro) {
+      long  ISBN  = datosLibro.getISBN();
+      Libro libro = buscarLibro(ISBN);
+      if (libro != null) {
+         actualizarLibro(datosLibro);
+         return true;
+      }
+      return false;
+   }
+
+   public boolean ventasAsociadas (long IBSN) {
+      return OperacionHibernate.ventasAsociadas(IBSN);
+   }
+
+   public void eliminarLibro (long ISBN) {
+      Libro libro = buscarLibro(ISBN);
+      OperacionHibernate.eliminarLibro(libro);
+   }
+
    public boolean crearCuenta (Usuario usuario) {
       if (obtenerUsuarioMedianteCorreo(usuario.getCorreoElectronico()) != null) {
          return false;
       }
       return registrarUsuario(usuario);
    }
-//
+
+   //
 //   public static long obtenerNuevoIDCompras () {
 //      try {
 //         InputStream inputStream = new FileInputStream(RUTA_COMPRAS);
@@ -445,29 +346,32 @@ public class Tienda {
 //      }
 //   }
 //
-//   public Object[][] getDataVectorCompras (int CID) {
-//      Object[][] dataVectorCompras = null;
-//      try (InputStream inputStream = new FileInputStream(RUTA_COMPRAS);
-//           JsonReader reader = Json.createReader(inputStream)
-//      ) {
-//         JsonObject        jsonObject     = reader.readObject();
-//         JsonArray         compras        = jsonObject.getJsonArray("COMPRAS");
-//         ArrayList<Compra> listaDeCompras = obtenerListaTotalDeCompras(compras);
-//         listaDeCompras = filtrarPorCID(listaDeCompras, CID);
-//         Collections.reverse(listaDeCompras);
-//         dataVectorCompras = new Object[listaDeCompras.size()][4];
-//         for (int i = 0; i < listaDeCompras.size(); i++) {
-//            Compra compra = listaDeCompras.get(i);
-//            dataVectorCompras[i][0] = compra.getID_Compra();
-//            dataVectorCompras[i][1] = compra.getCantidadCompra();
-//            dataVectorCompras[i][2] = compra.getValorCompra();
-//            dataVectorCompras[i][3] = compra.getFechaCompraString();
-//         }
-//      } catch (Exception e) {
-//         System.err.println(e.getMessage());
-//      }
-//      return dataVectorCompras;
-//   }
+   public Object[][] getDataVectorCompras (int CID) {
+      return OperacionHibernate.obtenerListaCompras();
+   }
+
+   public double calcularValorTotalImpuesto (DefaultTableModel model) {
+      double    valorTotalImpuesto   = 0;
+      final int columnaValorImpuesto = PanelCarrito.NOMBRE_COLUMNAS.VALOR_IMPUESTO.getIndex();
+      final int columnaCantidad      = PanelCarrito.NOMBRE_COLUMNAS.CANTIDAD.getIndex();
+      for (int i = 0; i < model.getRowCount(); i++) {
+         double valorImpuestoUnidad = (double) model.getValueAt(i, columnaValorImpuesto);
+         int    cantidadLibro       = (int) model.getValueAt(i, columnaCantidad);
+         double valorImpuestoLibro  = valorImpuestoUnidad * cantidadLibro;
+         valorTotalImpuesto += valorImpuestoLibro;
+      }
+      return valorTotalImpuesto;
+   }
+
+   public int obtenerCantidadLibros (DefaultTableModel model) {
+      int       cantidadTotalLibros = 0;
+      final int columnaCantidad     = PanelCarrito.NOMBRE_COLUMNAS.CANTIDAD.getIndex();
+      for (int i = 0; i < model.getRowCount(); i++) {
+         int cantidadLibro = (int) model.getValueAt(i, columnaCantidad);
+         cantidadTotalLibros += cantidadLibro;
+      }
+      return cantidadTotalLibros;
+   }
 //
 //   private ArrayList<Compra> filtrarPorCID (ArrayList<Compra> listaTotalDeCompras, int CID) {
 //      ArrayList<Compra> listaFiltrada = new ArrayList<>();

@@ -62,7 +62,7 @@ public class PanelLibros extends JPanel {
       JScrollPane scrollPane = new JScrollPane(tableLibros);
       add(scrollPane, BorderLayout.CENTER);
       JButton botonAgregar = new JButton("Agregar Libro");
-      botonAgregar.setActionCommand(EVENTO.AGREGAR_LIBRO_AL_CARRITO.name());
+      botonAgregar.setActionCommand(EVENTO.GUARDAR_LIBRO_AL_CARRITO.name());
       botonAgregar.addActionListener(evento);
       add(botonAgregar, BorderLayout.SOUTH);
       //Asignacion de fuente al boton
@@ -86,7 +86,7 @@ public class PanelLibros extends JPanel {
       ISBN(0),
       TITULO(1),
       AUTOR(2),
-      GENERO(3),
+      CATEGORIA(3),
       PAGINAS(4),
       EDITORIAL(5),
       ANIO(6),
