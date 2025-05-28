@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.util.HashMap;
 
@@ -25,7 +26,7 @@ public class PanelCarrito extends JPanel {
    private final JLabel                 labelImpuesto      = new JLabel(String.format("Impuesto: $%,.2f", valorTotalImpuesto));
    private final JLabel                 labelSubTotal      = new JLabel(String.format("Subtotal: $%,.2f", subTotal));
    private final JLabel                 labelTotal         = new JLabel(String.format("Total: $%f", total));
-   private       HashMap<Long, Libro>   librosLocales;
+   private       GridBagConstraints     gbc;
    public        DefaultTableModel      model;
 
    public PanelCarrito (VentanaPrincipal ventanaPrincipal, Evento evento) {
@@ -71,15 +72,34 @@ public class PanelCarrito extends JPanel {
    }
 
    private void inicializarPanelCarrito () {
-      setLayout(new GridLayout(3, 1));
+      setLayout(new GridBagLayout());
+      gbc         = new GridBagConstraints();
+      gbc.insets  = new Insets(5, 5, 5, 5);
+      gbc.fill    = GridBagConstraints.BOTH;
+      gbc.gridx   = 0;
+      gbc.gridy   = 0;
+      gbc.weightx = 1;
+      gbc.weighty = 0.7f;
+
       model = getDefaultTableModel();
       modificacionesCarrito();
-      JTable tableCarrito = new JTable(model);
+      JTable tableCarrito = new JTable(model) {
+         @Override public Component prepareRenderer (TableCellRenderer renderer, int row, int column) {
+            Component component = super.prepareRenderer(renderer, row, column);
+            if (!isRowSelected(row)) {
+               component.setBackground(row % 2 == 0 ? Color.WHITE : new Color(220, 220, 220));
+            } else {
+               component.setBackground(Color.ORANGE);
+            }
+            return component;
+         }
+      };
       tableCarrito.getTableHeader().setFont(fuenteCabecera);
       tableCarrito.setFont(fuenteCelda);
+      tableCarrito.setRowHeight(30);
       formatearColumnas(tableCarrito);
       JScrollPane scrollPane = new JScrollPane(tableCarrito);
-      add(scrollPane);
+      add(scrollPane, gbc);
    }
 
    private void formatearColumnas (JTable tableCarrito) {
@@ -92,18 +112,25 @@ public class PanelCarrito extends JPanel {
       JPanel panelDescripcionCompra = new JPanel(new GridLayout(3, 1));
       panelDescripcionCompra.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
                                                                         "Descripcion de la compra",
-                                                                        TitledBorder.CENTER,
+                                                                        TitledBorder.RIGHT,
                                                                         TitledBorder.TOP,
                                                                         fuenteCabecera));
       //Centrado de lables
-      labelCantidad.setHorizontalAlignment(JLabel.CENTER);
-      labelImpuesto.setHorizontalAlignment(JLabel.CENTER);
-      labelSubTotal.setHorizontalAlignment(JLabel.CENTER);
+      labelCantidad.setHorizontalAlignment(JLabel.RIGHT);
+      labelImpuesto.setHorizontalAlignment(JLabel.RIGHT);
+      labelSubTotal.setHorizontalAlignment(JLabel.RIGHT);
       //Asignacion de fuente a cada label
       labelCantidad.setFont(fuenteCelda);
       labelImpuesto.setFont(fuenteCelda);
       labelSubTotal.setFont(fuenteCelda);
-      add(panelDescripcionCompra);
+      //Se añaden los labels al panel
+      panelDescripcionCompra.add(labelCantidad);
+      panelDescripcionCompra.add(labelImpuesto);
+      panelDescripcionCompra.add(labelSubTotal);
+
+      gbc.gridy   = 1;
+      gbc.weighty = 0.15f;
+      add(panelDescripcionCompra, gbc);
 
       //Footer (incluye el label de precio total)
       JButton botonPagarEfectivo = new JButton("Pagar En Efectivo");
@@ -114,24 +141,27 @@ public class PanelCarrito extends JPanel {
       botonPagarEfectivo.addActionListener(evento);
       labelTotal.setHorizontalAlignment(JLabel.CENTER);
       labelTotal.setFont(new Font("Lucida Sans Typewriter", Font.BOLD, 20));
-      GridBagConstraints gbc = new GridBagConstraints();
-      gbc.insets = new Insets(5, 5, 10, 5);
-      gbc.fill   = GridBagConstraints.HORIZONTAL;
-      float[] pesoComponentes = {0.5f, 0.15f, 0.15f};
-      JPanel  footer          = new JPanel(new GridBagLayout());
-      gbc.gridx   = 0;
-      gbc.weightx = pesoComponentes[0];
-      footer.add(labelTotal, gbc);
-      gbc.gridx   = 1;
-      gbc.weightx = pesoComponentes[1];
-      footer.add(botonPagarEfectivo, gbc);
-      gbc.gridx   = 2;
-      gbc.weightx = pesoComponentes[2];
-      footer.add(botonPagarTarjeta, gbc);
+
+      GridBagConstraints gbc2 = new GridBagConstraints();
+      gbc2.insets = new Insets(5, 5, 10, 5);
+      gbc2.fill   = GridBagConstraints.HORIZONTAL;
+      float  pesoBoton   = 0.15f;
+      JPanel panelFooter = new JPanel(new GridBagLayout());
+      gbc2.gridx   = 0;
+      gbc2.weightx = 0.5f;
+      panelFooter.add(labelTotal, gbc2);
+      gbc2.gridx   = 1;
+      gbc2.weightx = pesoBoton;
+      panelFooter.add(botonPagarEfectivo, gbc2);
+      gbc2.gridx = 2;
+      panelFooter.add(botonPagarTarjeta, gbc2);
       //Asignacion de fuente a cada boton
       botonPagarEfectivo.setFont(fuenteBoton);
       botonPagarTarjeta.setFont(fuenteBoton);
-      add(footer);
+
+      gbc.gridy   = 2;
+      gbc.weighty = 0.1f;
+      add(panelFooter, gbc);
 
       actualizarLabelsCompra();
    }
@@ -160,25 +190,33 @@ public class PanelCarrito extends JPanel {
       final int columnaISBN     = NOMBRE_COLUMNAS.ISBN.getIndex();
       final int columnaCantidad = NOMBRE_COLUMNAS.CANTIDAD.getIndex();
       try {
-         long ISBN     = (long) model.getValueAt(fila, columnaISBN);
-         int  cantidad = (int) model.getValueAt(fila, columnaCantidad);
-         //Se tiene una lista local de libros, por lo que no se necesita hacer una consulta a la base de datos
-         //Ademas se evitan errores donde se intente agregar un Libro que no fue mostrado, facilitando la mantenibilidad cuando no se deba mostrar un Libro ya sea porque no hay
-         //stock o sitacion similar
-         Libro libro = librosLocales.get(ISBN);
+         long  ISBN     = (long) model.getValueAt(fila, columnaISBN);
+         int   cantidad = (int) model.getValueAt(fila, columnaCantidad);
+         Libro libro    = obtenerLibroModel(fila);
+         if (carritoDeCompras.get(ISBN) >= 10) {
+            JOptionPane.showMessageDialog(null, "No se pueden agregar mas de 10 unidades del mismo libro", "Alerta", JOptionPane.INFORMATION_MESSAGE);
+            return;
+         }
          if (libro.getCantidadDisponible() > cantidad) {
             cantidad += 1;
             carritoDeCompras.replace(ISBN, cantidad);
             model.setValueAt(cantidad, fila, columnaCantidad);
+            actualizarPrecioVenta(ISBN, fila);
             return;
          }
-         String mensaje = String.format("No quedan mas unidades de %s", libro.getTitulo());
+         String mensaje = String.format("No quedan mas unidades de \"%s\"", libro.getTitulo());
          JOptionPane.showMessageDialog(null, mensaje, "Alerta", JOptionPane.INFORMATION_MESSAGE);
       } catch (NullPointerException e) {
          System.err.println(e.getMessage());
       } finally {
          model.setValueAt(false, fila, columnaAgregar);
       }
+   }
+
+   private Libro obtenerLibroModel (int fila) {
+      int  columnaISBN = NOMBRE_COLUMNAS.ISBN.getIndex();
+      long ISBN        = (long) model.getValueAt(fila, columnaISBN);
+      return ventanaPrincipal.obtenerLibroMedianteISBN(ISBN);
    }
 
    private void quitarAlCarrito (int fila) {
@@ -195,13 +233,14 @@ public class PanelCarrito extends JPanel {
             cantidad -= 1;
             carritoDeCompras.replace(ISBN, cantidad);
             model.setValueAt(cantidad, fila, columnaCantidad);
+            actualizarPrecioVenta(ISBN, fila);
+            model.setValueAt(false, fila, columnaQuitar);
             return;
          }
          model.removeRow(fila);
+         carritoDeCompras.remove(ISBN);
       } catch (NullPointerException e) {
          System.err.println(e.getMessage());
-      } finally {
-         model.setValueAt(false, fila, columnaQuitar);
       }
    }
 
@@ -213,29 +252,29 @@ public class PanelCarrito extends JPanel {
    }
 
    void agregarArticulo (long ISBN) {
-      Libro libro = librosLocales.get(ISBN);
+      Libro libro = ventanaPrincipal.obtenerLibroMedianteISBN(ISBN);
       if (libro == null) {
          return;
       }
       if (carritoDeCompras.get(ISBN) == null) {
          carritoDeCompras.put(ISBN, 1);
          rellenarDatosFilaLibro(libro);
+         actualizarDatosCompra();
          return;
       }
       aumentarCantidad(ISBN);
    }
 
    private void rellenarDatosFilaLibro (Libro libro) {
-      Object[] datosFila      = new Object[7];
-      long     ISBN           = libro.getISBN();
-      double   precioImpuesto = obtenerPrecioImpuesto(ISBN);
+      Object[] datosFila = new Object[10];
+      long     ISBN      = libro.getISBN();
       datosFila[NOMBRE_COLUMNAS.ISBN.getIndex()]           = libro.getISBN();
       datosFila[NOMBRE_COLUMNAS.TITULO.getIndex()]         = libro.getTitulo();
       datosFila[NOMBRE_COLUMNAS.AUTORES.getIndex()]        = libro.getAutores();
       datosFila[NOMBRE_COLUMNAS.VALOR_UNITARIO.getIndex()] = libro.getPrecioVenta();
       datosFila[NOMBRE_COLUMNAS.VALOR_IMPUESTO.getIndex()] = obtenerPrecioImpuesto(ISBN);
       datosFila[NOMBRE_COLUMNAS.CANTIDAD.getIndex()]       = 1;
-      datosFila[NOMBRE_COLUMNAS.VALOR_TOTAL.getIndex()]    = libro.getPrecioVenta() + precioImpuesto;
+      datosFila[NOMBRE_COLUMNAS.VALOR_TOTAL.getIndex()]    = libro.getPrecioVenta();
       datosFila[NOMBRE_COLUMNAS.AGREGAR.getIndex()]        = false;
       datosFila[NOMBRE_COLUMNAS.QUITAR.getIndex()]         = false;
       datosFila[NOMBRE_COLUMNAS.DESCARTAR.getIndex()]      = false;
@@ -246,8 +285,17 @@ public class PanelCarrito extends JPanel {
       final int columnaISBN     = NOMBRE_COLUMNAS.ISBN.getIndex();
       final int columnaCantidad = NOMBRE_COLUMNAS.CANTIDAD.getIndex();
       int       cantidad        = carritoDeCompras.get(ISBN);
+      Libro     libro           = ventanaPrincipal.obtenerLibroMedianteISBN(ISBN);
+      if (libro.getCantidadDisponible() <= cantidad) {
+         String mensaje = String.format("No quedan mas unidades de \"%s\"", libro.getTitulo());
+         JOptionPane.showMessageDialog(null, String.format(mensaje, "Alerta", JOptionPane.INFORMATION_MESSAGE));
+         return;
+      }
       if (cantidad >= 10) {
          JOptionPane.showMessageDialog(null, "No se pueden agregar mas de 10 unidades del mismo libro", "Alerta", JOptionPane.INFORMATION_MESSAGE);
+         return;
+      }
+      if (ventanaPrincipal.obtenerLibroMedianteISBN(ISBN).getCantidadDisponible() <= cantidad) {
          return;
       }
       cantidad += 1;
@@ -263,14 +311,14 @@ public class PanelCarrito extends JPanel {
 
    private void actualizarPrecioVenta (long ISBN, int filaModel) {
       final int columnaPrecioVenta = NOMBRE_COLUMNAS.VALOR_TOTAL.getIndex();
-      double    valorUnitario      = librosLocales.get(ISBN).getPrecioVenta();
+      double    valorUnitario      = obtenerLibroModel(filaModel).getPrecioVenta();
       int       cantidad           = carritoDeCompras.get(ISBN);
       double    precioVenta        = ventanaPrincipal.obtenerPrecioTotalProducto(valorUnitario, cantidad);
       model.setValueAt(precioVenta, filaModel, columnaPrecioVenta);
    }
 
    private double obtenerPrecioImpuesto (long ISBN) {
-      double valorUnitario = librosLocales.get(ISBN).getPrecioVenta();
+      double valorUnitario = ventanaPrincipal.obtenerLibroMedianteISBN(ISBN).getPrecioVenta();
       return ventanaPrincipal.obtenerPrecioImpuesto(valorUnitario);
    }
 
@@ -278,7 +326,11 @@ public class PanelCarrito extends JPanel {
       cantidadLibros     = ventanaPrincipal.obtenerCantidadLibros(model);
       valorTotalImpuesto = ventanaPrincipal.obtenerValorTotalImpuesto(model);
       subTotal           = ventanaPrincipal.obtenerSubTotalVenta(model);
-      total              = ventanaPrincipal.obtenerTotalVenta(subTotal);
+      if (ventanaPrincipal.usuarioRegistrado()) {
+         total = ventanaPrincipal.obtenerTotalVenta(subTotal);
+      } else {
+         total = subTotal;
+      }
       actualizarLabelsCompra();
    }
 
@@ -286,30 +338,26 @@ public class PanelCarrito extends JPanel {
       labelCantidad.setText(String.format("Cantidad de libros: %d", cantidadLibros));
       labelImpuesto.setText(String.format("Impuesto: $%,.2f", valorTotalImpuesto));
       labelSubTotal.setText(String.format("Subtotal: $%,.2f", subTotal));
-      labelTotal.setText(String.format("Total: $%f", total));
-   }
-
-   public void setLibrosLocales (HashMap<Long, Libro> librosLocales) {
-      this.librosLocales = librosLocales;
+      labelTotal.setText(String.format("Total: $%,.2f", total));
    }
 
    public enum NOMBRE_COLUMNAS {
-      ISBN(0),
-      TITULO(1),
-      AUTORES(2),
-      VALOR_UNITARIO(3),
-      VALOR_IMPUESTO(4),
-      CANTIDAD(5),
-      VALOR_TOTAL(6),
-      AGREGAR(7),
-      QUITAR(8),
-      DESCARTAR(9);
+      ISBN(0, "ISBN"),
+      TITULO(1, "Título"),
+      AUTORES(2, "Autores"),
+      VALOR_UNITARIO(3, "Vlr Unitario"),
+      VALOR_IMPUESTO(4, "Vlr Impuesto"),
+      CANTIDAD(5, "Cantidad"),
+      VALOR_TOTAL(6, "Vlr Total"),
+      AGREGAR(7, "+"),
+      QUITAR(8, "-"),
+      DESCARTAR(9, "x");
       private final int    index;
       private final String name;
 
-      NOMBRE_COLUMNAS (int index) {
+      NOMBRE_COLUMNAS (int index, String name) {
          this.index = index;
-         this.name  = this.name();
+         this.name  = name;
       }
 
       public int getIndex () {

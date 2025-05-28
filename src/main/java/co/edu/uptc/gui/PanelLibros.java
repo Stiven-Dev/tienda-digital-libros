@@ -1,23 +1,28 @@
 package co.edu.uptc.gui;
 
+import co.edu.uptc.entity.Libro;
 import co.edu.uptc.gui.Evento.EVENTO;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 
 public class PanelLibros extends JPanel {
-   private final Evento            evento;
-   private final VentanaPrincipal  ventana;
-   private final Font              fuenteCabecera = new Font("Arial", Font.BOLD, 15);
-   private final Font              fuenteCelda    = new Font("Lucida Sans Unicode", Font.PLAIN, 12);
-   private final Font              fuenteBoton    = new Font("Lucida Sans Unicode", Font.BOLD, 20);
-   private       DefaultTableModel model;
+   private final  Evento            evento;
+   private final  Font              fuenteCabecera = new Font("Arial", Font.BOLD, 15);
+   private final  Font              fuenteCelda    = new Font("Lucida Sans Unicode", Font.PLAIN, 12);
+   private final  Font              fuenteBoton    = new Font("Lucida Sans Unicode", Font.BOLD, 20);
+   private final  JPanel            panelBotones   = new JPanel(new GridBagLayout());
+   private        DefaultTableModel model;
+   private        JTable            tableLibros;
+   private        JButton           botonAgregarCarrito;
+   private static Libro             libroSeleccionado;
 
-   public PanelLibros (VentanaPrincipal ventana, Evento evento) {
-      this.ventana = ventana;
-      this.evento  = evento;
+   public PanelLibros (Evento evento) {
+      this.evento = evento;
       inicializarPanelLibros();
    }
 
@@ -52,57 +57,156 @@ public class PanelLibros extends JPanel {
 
    private void inicializarPanelLibros () {
       setLayout(new BorderLayout());
-      model = getDefaultTableModel();
-      refrescarLista();
-      JTable tableLibros = new JTable(model);
+      model       = getDefaultTableModel();
+      tableLibros = new JTable(model) {
+         @Override public Component prepareRenderer (TableCellRenderer renderer, int row, int column) {
+            Component component = super.prepareRenderer(renderer, row, column);
+            if (!isRowSelected(row)) {
+               component.setBackground(row % 2 == 0 ? Color.WHITE : new Color(220, 220, 220));
+            } else {
+               component.setBackground(Color.ORANGE);
+            }
+            return component;
+         }
+      };
+
+      tableLibros.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+      tableLibros.setRowHeight(30);
       tableLibros.getTableHeader().setFont(fuenteCabecera);
       tableLibros.setFont(fuenteCelda);
       formatearColumnas(tableLibros);
-      tableLibros.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
       JScrollPane scrollPane = new JScrollPane(tableLibros);
       add(scrollPane, BorderLayout.CENTER);
-      JButton botonAgregar = new JButton("Agregar Libro");
-      botonAgregar.setActionCommand(EVENTO.GUARDAR_LIBRO_AL_CARRITO.name());
-      botonAgregar.addActionListener(evento);
-      add(botonAgregar, BorderLayout.SOUTH);
+
+      botonAgregarCarrito = new JButton("Agregar Libro");
+      botonAgregarCarrito.setActionCommand(EVENTO.LIBRO_AL_CARRITO.name());
+      botonAgregarCarrito.addActionListener(evento);
       //Asignacion de fuente al boton
-      botonAgregar.setFont(fuenteBoton);
+      botonAgregarCarrito.setFont(fuenteBoton);
+
+      panelBotones.add(botonAgregarCarrito);
+      add(panelBotones, BorderLayout.SOUTH);
    }
 
    private void formatearColumnas (JTable tableLibros) {
       tableLibros.setDefaultRenderer(Object.class, celdasDoubleFormateadas());
    }
 
-   private void refrescarLista () {
-      model.setDataVector(ventana.obtenerVectorLibros(), NOMBRE_COLUMNAS.getCabecera());
-      ventana.setLibrosLocales(ventana.obtenerMapLibros());
+   void refrescarLista (VentanaPrincipal ventanaPrincipal) {
+      model.setDataVector(ventanaPrincipal.obtenerVectorLibros(), NOMBRE_COLUMNAS.getCabecera());
    }
 
    public DefaultTableModel getTableModel () {
       return model;
    }
 
-   private enum NOMBRE_COLUMNAS {
-      ISBN(0),
-      TITULO(1),
-      AUTOR(2),
-      CATEGORIA(3),
-      PAGINAS(4),
-      EDITORIAL(5),
-      ANIO(6),
-      FORMATO(7),
-      PRECIO(8),
-      CANTIDAD_DISPONIBLE(9),
-      AGREGAR(10);
+   protected void reasignarFuncionalidadAdmin () {
+      int              columnaAgregar = NOMBRE_COLUMNAS.AGREGAR.getIndex();
+      TableColumnModel columnModel    = tableLibros.getColumnModel();
+      columnModel.removeColumn(columnModel.getColumn(columnaAgregar));
+      tableLibros.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+      this.remove(botonAgregarCarrito);
+      reasignarPanelBotones();
+   }
+
+   private void reasignarPanelBotones () {
+      panelBotones.removeAll();
+      //Configuración de GridBagConstraints
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.insets  = new Insets(5, 5, 5, 5);
+      gbc.anchor  = GridBagConstraints.CENTER;
+      gbc.fill    = GridBagConstraints.BOTH;
+      gbc.weightx = 0.25;
+      gbc.gridy   = 0;
+
+      //Creación de botones
+      JButton botonAgregar    = new JButton("Agregar Libro");
+      JButton botonActualizar = new JButton("Actualizar Libro");
+      JButton botonEliminar   = new JButton("Eliminar Libro");
+
+      //Boton Actualizar
+      gbc.gridx = 0;
+      panelBotones.add(botonAgregar, gbc);
+      //Boton Actualizar
+      gbc.gridx = 1;
+      panelBotones.add(botonActualizar, gbc);
+      //Boton Eliminar
+      gbc.gridx = 2;
+      panelBotones.add(botonEliminar, gbc);
+
+      //Asignacion de funciones a los botones
+      agregarFuncionalidadBotones(botonAgregar, botonActualizar, botonEliminar);
+      this.add(panelBotones, BorderLayout.SOUTH);
+   }
+
+   private void agregarFuncionalidadBotones (JButton botonAgregar, JButton botonActualizar, JButton botonEliminar) {
+      //Boton Agregar
+      botonAgregar.setActionCommand(EVENTO.AGREGAR_LIBRO.name());
+      botonAgregar.addActionListener(evento);
+
+      //Boton Actualizar
+      botonActualizar.setActionCommand(EVENTO.ACTUALIZAR_LIBRO.name());
+      botonActualizar.addActionListener(_ -> {
+         int filaSeleccionada = tableLibros.getSelectedRow();
+         if (filaSeleccionada >= 0) {
+            libroSeleccionado = getLibroFila(filaSeleccionada);
+            botonActualizar.removeActionListener(evento);
+            botonActualizar.addActionListener(evento);
+         }
+      });
+
+      //Boton Eliminar
+      botonEliminar.setActionCommand(EVENTO.ELIMINAR_LIBRO.name());
+      botonEliminar.addActionListener(_ -> {
+         int filaSeleccionada = tableLibros.getSelectedRow();
+         if (filaSeleccionada >= 0) {
+            libroSeleccionado = getLibroFila(filaSeleccionada);
+            botonEliminar.removeActionListener(evento);
+            botonEliminar.addActionListener(evento);
+         }
+      });
+   }
+
+   private Libro getLibroFila (int filaSeleccionada) {
+      Libro libro = new Libro();
+      libro.setISBN((long) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.ISBN.getIndex()));
+      libro.setTitulo((String) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.TITULO.getIndex()));
+      libro.setAutores((String) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.AUTORES.getIndex()));
+      libro.setGenero((String) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.GENERO.getIndex()));
+      libro.setNumeroPaginas((int) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.PAGINAS.getIndex()));
+      libro.setEditorial((String) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.EDITORIAL.getIndex()));
+      libro.setAnioPublicacion((int) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.ANIO.getIndex()));
+      libro.setFORMATO(Libro.FORMATOS.valueOf((String) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.FORMATO.getIndex())));
+      libro.setPrecioVenta((double) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.PRECIO.getIndex()));
+      libro.setCantidadDisponible((int) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.CANTIDAD.getIndex()));
+      return libro;
+   }
+
+   public static Libro getLibroSeleccionado () {
+      return libroSeleccionado;
+   }
+
+   public enum NOMBRE_COLUMNAS {
+      ISBN(0, "ISBN"),
+      TITULO(1, "Título"),
+      AUTORES(2, "Autores"),
+      GENERO(3, "Género"),
+      PAGINAS(4, "# Páginas"),
+      EDITORIAL(5, "Editorial"),
+      ANIO(6, "Año Publicación"),
+      FORMATO(7, "Formato"),
+      PRECIO(8, "Precio"),
+      CANTIDAD(9, "Cantidad"),
+      AGREGAR(10, "+");
       private final int    index;
       private final String name;
 
-      NOMBRE_COLUMNAS (int index) {
+      NOMBRE_COLUMNAS (int index, String name) {
          this.index = index;
-         this.name  = this.name();
+         this.name  = name;
       }
 
-      int getIndex () {
+      public int getIndex () {
          return index;
       }
 

@@ -9,13 +9,12 @@ public class PanelHistorialCompras extends JPanel {
    private final VentanaPrincipal  ventanaPrincipal;
    private final Font              fuenteCabecera = new Font("Arial", Font.BOLD, 15);
    private final Font              fuenteCelda    = new Font("Lucida Sans Unicode", Font.PLAIN, 15);
-   private final String[]          nombreColumnas = {"#", "Cantidad", "Valor", "Fecha"};
+   private final Evento            evento;
    private       DefaultTableModel model;
-   private final int               ID;
 
-   public PanelHistorialCompras (VentanaPrincipal ventanaPrincipal, int ID) {
+   public PanelHistorialCompras (VentanaPrincipal ventanaPrincipal, Evento evento) {
       this.ventanaPrincipal = ventanaPrincipal;
-      this.ID               = ID;
+      this.evento           = evento;
       setLayout(new BorderLayout());
       inicializarPanel();
    }
@@ -32,7 +31,7 @@ public class PanelHistorialCompras extends JPanel {
    }
 
    private DefaultTableModel getDefaultTableModel () {
-      return new DefaultTableModel(nombreColumnas, 0) {
+      return new DefaultTableModel(NOMBRE_COLUMNAS.getCabecera(), 0) {
          @Override public boolean isCellEditable (int row, int column) {
             return false;
          }
@@ -60,6 +59,36 @@ public class PanelHistorialCompras extends JPanel {
    }
 
    private void rellenarTablaCompras () {
-      model.setDataVector(ventanaPrincipal.obtenerListaCompras(ID), nombreColumnas);
+      model.setDataVector(ventanaPrincipal.obtenerListaCompras(), NOMBRE_COLUMNAS.getCabecera());
+   }
+
+   public enum NOMBRE_COLUMNAS {
+      ID(0),
+      CANTIDAD(1),
+      VALOR(2),
+      FECHA(3);
+      private final int    index;
+      private final String name;
+
+      NOMBRE_COLUMNAS (int index) {
+         this.index = index;
+         this.name  = this.name();
+      }
+
+      public int getIndex () {
+         return index;
+      }
+
+      String getName () {
+         return name;
+      }
+
+      static String[] getCabecera () {
+         String[] cabecera = new String[NOMBRE_COLUMNAS.values().length];
+         for (NOMBRE_COLUMNAS columna : NOMBRE_COLUMNAS.values()) {
+            cabecera[columna.getIndex()] = columna.getName();
+         }
+         return cabecera;
+      }
    }
 }

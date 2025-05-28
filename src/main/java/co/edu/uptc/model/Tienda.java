@@ -2,10 +2,13 @@ package co.edu.uptc.model;
 
 import co.edu.uptc.entity.Libro;
 import co.edu.uptc.entity.Usuario;
-import co.edu.uptc.gui.PanelCarrito;
 import co.edu.uptc.entity.Usuario.ROLES;
+import co.edu.uptc.gui.PanelCarrito;
+import co.edu.uptc.gui.PanelLibros;
 
 import javax.swing.table.DefaultTableModel;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Tienda {
@@ -77,19 +80,10 @@ public class Tienda {
 //      return Usuario.validarRolUsuario(correoElectronico);
 //   }
 //
-   public boolean agregarLibroArchivo (Libro datosLibro) {
-      long ISBN = datosLibro.getISBN();
-      if (buscarLibro(ISBN) == null) {
-         escribirLibroEnArchivo(datosLibro);
-         return true;
-      }
-      return false;
-   }
 
-   //
-   private void escribirLibroEnArchivo (Libro libro) {
-      OperacionHibernate.registrarLibro(libro);
-   }
+//   private void escribirLibroEnArchivo (Libro libro) {
+//      Operacion.registrarLibro(libro);
+//   }
 
    //
 //   private JsonObject convertirLibroAJson (Libro libro) {
@@ -128,31 +122,30 @@ public class Tienda {
 //
 
    public Object[][] getDataVectorLibros () {
-      HashMap<Long, Libro> mapLibros = OperacionHibernate.obtenerMapLibrosLocales();
-      if (mapLibros == null) return null;
-      Object[][] dataVectorLibros = new Object[mapLibros.size()][11];
-      int        i                = 0;
-      for (Libro libro : mapLibros.values()) {
+      ArrayList<Libro> listaLibros = Operacion.obtenerListaLibros();
+      if (listaLibros.isEmpty()) return null;
+      Object[][] dataVectorLibros = new Object[listaLibros.size()][11];
+      for (int i = 0; i < listaLibros.size(); i++) {
+         Libro libro = listaLibros.get(i);
          //Se valida que el libro tenga suficientes unidades para ser mostrado al público
          if (libro.getCantidadDisponible() < 1) continue;
-         dataVectorLibros[i][0]  = libro.getISBN();
-         dataVectorLibros[i][1]  = libro.getTitulo();
-         dataVectorLibros[i][2]  = libro.getAutores();
-         dataVectorLibros[i][3]  = libro.getCategoria();
-         dataVectorLibros[i][4]  = libro.getNumeroPaginas();
-         dataVectorLibros[i][5]  = libro.getGenero();
-         dataVectorLibros[i][6]  = libro.getAnioPublicacion();
-         dataVectorLibros[i][7]  = libro.getFormato();
-         dataVectorLibros[i][8]  = libro.getPrecioVenta();
-         dataVectorLibros[i][9]  = libro.getCantidadDisponible();
-         dataVectorLibros[i][10] = false;
-         i++;
+         dataVectorLibros[i][PanelLibros.NOMBRE_COLUMNAS.ISBN.getIndex()]      = libro.getISBN();
+         dataVectorLibros[i][PanelLibros.NOMBRE_COLUMNAS.TITULO.getIndex()]    = libro.getTitulo();
+         dataVectorLibros[i][PanelLibros.NOMBRE_COLUMNAS.AUTORES.getIndex()]   = libro.getAutores();
+         dataVectorLibros[i][PanelLibros.NOMBRE_COLUMNAS.GENERO.getIndex()]    = libro.getGenero();
+         dataVectorLibros[i][PanelLibros.NOMBRE_COLUMNAS.PAGINAS.getIndex()]   = libro.getNumeroPaginas();
+         dataVectorLibros[i][PanelLibros.NOMBRE_COLUMNAS.EDITORIAL.getIndex()] = libro.getEditorial();
+         dataVectorLibros[i][PanelLibros.NOMBRE_COLUMNAS.ANIO.getIndex()]      = libro.getAnioPublicacion();
+         dataVectorLibros[i][PanelLibros.NOMBRE_COLUMNAS.FORMATO.getIndex()]   = libro.getFORMATO();
+         dataVectorLibros[i][PanelLibros.NOMBRE_COLUMNAS.PRECIO.getIndex()]    = libro.getPrecioVenta();
+         dataVectorLibros[i][PanelLibros.NOMBRE_COLUMNAS.CANTIDAD.getIndex()]  = libro.getCantidadDisponible();
+         dataVectorLibros[i][PanelLibros.NOMBRE_COLUMNAS.AGREGAR.getIndex()]   = false;
       }
       return dataVectorLibros;
    }
 
    public Libro buscarLibro (long ISBN) {
-      return OperacionHibernate.obtenerLibroISBN(ISBN);
+      return Operacion.obtenerLibroISBN(ISBN);
    }
 //
 //   public boolean validarUsuarioLogin (String correoElectronico, String claveAcceso) {
@@ -282,8 +275,7 @@ public class Tienda {
    }
 
    public double calcularPrecioVenta (double valorUnitario, int cantidad) {
-      double valorImpuesto = calcularValorImpuesto(valorUnitario);
-      return (valorUnitario + valorImpuesto) * cantidad;
+      return valorUnitario * cantidad;
    }
 
    public double calcularValorImpuesto (double precioUnidad) {
@@ -295,15 +287,34 @@ public class Tienda {
    }
 
    public HashMap<Long, Libro> getLibrosLocales () {
-      return OperacionHibernate.obtenerMapLibrosLocales();
+      ArrayList<Libro>     listaLibros = Operacion.obtenerListaLibros();
+      HashMap<Long, Libro> mapLibros   = new HashMap<>(listaLibros.size());
+      for (Libro libro : listaLibros) {
+         Long ISBN = libro.getISBN();
+         mapLibros.put(ISBN, libro);
+      }
+      return mapLibros;
    }
 
    public boolean registrarUsuario (Usuario usuario) {
-      return OperacionHibernate.registrarUsuario(usuario);
+      return Operacion.registrarUsuario(usuario);
+   }
+
+   public Usuario validarDatosLogin (Usuario datosLogin) {
+      String  correoElectronico = datosLogin.getCorreoElectronico();
+      char[]  claveAcceso       = datosLogin.getClaveAcceso();
+      Usuario usuarioObtenido   = obtenerUsuarioMedianteCorreo(correoElectronico);
+      if (usuarioObtenido == null) {
+         return null;
+      }
+      if (Arrays.equals(usuarioObtenido.getClaveAcceso(), claveAcceso)) {
+         return usuarioObtenido;
+      }
+      return null;
    }
 
    public Usuario obtenerUsuarioMedianteCorreo (String correoElectronico) {
-      return OperacionHibernate.obtenerUsuarioMedianteCorreo(correoElectronico);
+      return Operacion.obtenerUsuarioMedianteCorreo(correoElectronico);
    }
 
    public boolean actualizarLibro (Libro datosLibro) {
@@ -317,12 +328,12 @@ public class Tienda {
    }
 
    public boolean ventasAsociadas (long IBSN) {
-      return OperacionHibernate.ventasAsociadas(IBSN);
+      return Operacion.ventasAsociadas(IBSN);
    }
 
    public void eliminarLibro (long ISBN) {
       Libro libro = buscarLibro(ISBN);
-      OperacionHibernate.eliminarLibro(libro);
+      Operacion.eliminarLibro(libro);
    }
 
    public boolean crearCuenta (Usuario usuario) {
@@ -346,8 +357,8 @@ public class Tienda {
 //      }
 //   }
 //
-   public Object[][] getDataVectorCompras (int CID) {
-      return OperacionHibernate.obtenerListaCompras();
+   public Object[][] getDataVectorCompras (long ID) {
+      return Operacion.obtenerListaCompras();
    }
 
    public double calcularValorTotalImpuesto (DefaultTableModel model) {
@@ -372,6 +383,7 @@ public class Tienda {
       }
       return cantidadTotalLibros;
    }
+
 //
 //   private ArrayList<Compra> filtrarPorCID (ArrayList<Compra> listaTotalDeCompras, int CID) {
 //      ArrayList<Compra> listaFiltrada = new ArrayList<>();

@@ -1,27 +1,15 @@
 package co.edu.uptc.entity;
 
-import jakarta.persistence.*;
-
-@Entity @Table(name = "libro") public class Libro {
-   @Id
-   @Column(name = "ISBN", unique = true, nullable = false)
+public class Libro {
    private long     ISBN;
-   @Column(name = "titulo", nullable = false)
    private String   titulo;
-   @Column(name = "autores", nullable = false)
    private String   autores;
-   @Column(name = "anioPublicacion", nullable = false)
    private int      anioPublicacion;
-   @Column(name = "genero", nullable = false)
    private String   genero;
-   @Column(name = "numeroPaginas", nullable = false)
+   private String   editorial;
    private int      numeroPaginas;
-   @Column(name = "precioVenta", nullable = false)
    private double   precioVenta;
-   @Column(name = "cantidadDisponible", nullable = false)
    private int      cantidadDisponible;
-   @Enumerated(EnumType.STRING)
-   @Column(name = "formato", nullable = false)
    private FORMATOS FORMATO;
 
    public enum FORMATOS {
@@ -30,18 +18,6 @@ import jakarta.persistence.*;
    }
 
    public Libro () {
-   }
-
-   public Libro (long ISBN, String titulo, String autores, int anioPublicacion, String genero, int numeroPaginas, double precioVenta, int cantidadDisponible, FORMATOS FORMATO) {
-      this.ISBN               = ISBN;
-      this.titulo             = titulo;
-      this.autores            = autores;
-      this.anioPublicacion    = anioPublicacion;
-      this.genero             = genero;
-      this.numeroPaginas      = numeroPaginas;
-      this.precioVenta        = precioVenta;
-      this.cantidadDisponible = cantidadDisponible;
-      this.FORMATO            = FORMATO;
    }
 
    public long getISBN () {
@@ -84,6 +60,14 @@ import jakarta.persistence.*;
       this.genero = genero;
    }
 
+   public String getEditorial () {
+      return editorial;
+   }
+
+   public void setEditorial (String editorial) {
+      this.editorial = editorial;
+   }
+
    public int getNumeroPaginas () {
       return numeroPaginas;
    }
@@ -108,11 +92,11 @@ import jakarta.persistence.*;
       this.cantidadDisponible = cantidadDisponible;
    }
 
-   public FORMATOS getFormato () {
+   public FORMATOS getFORMATO () {
       return FORMATO;
    }
 
-   public void setFormato (FORMATOS FORMATOS) {
+   public void setFORMATO (FORMATOS FORMATOS) {
       this.FORMATO = FORMATOS;
    }
 }

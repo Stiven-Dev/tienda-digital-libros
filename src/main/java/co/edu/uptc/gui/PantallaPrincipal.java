@@ -10,52 +10,64 @@ public class PantallaPrincipal extends JPanel {
    private final VentanaPrincipal      ventanaPrincipal;
    private final JTabbedPane           panelPrincipal;
    private       PanelLibros           panelLibros;
-   private       PanelCarrito          panelCarrito;
+   private       PanelCarrito          panelCarrito; //Solo para Usuarios
    private       PanelPerfil           panelPerfil;
-   private PanelAgregarLibro             panelAgregarLibro; //Solo para los administradores
-   private PanelActualizarLibro panelActualizarLibro; //Solo para los administradores
-   private PanelEliminarLibro   panelEliminarLibro; //Solo para los administradores
-   private PanelCrearCuentas    panelCrearCuentas; //Solo para los administradores
-   private       PanelHistorialCompras panelHistorialCompras;
+   private       DialogAgregarLibro    dialogAgregarLibro; //Solo para los administradores
+   private       PanelActualizarLibro  panelActualizarLibro; //Solo para los administradores
+   private       PanelEliminarLibro    panelEliminarLibro; //Solo para los administradores
+   private       PanelCrearCuentas     panelCrearCuentas; //Solo para los administradores
+   private       PanelHistorialCompras panelHistorialCompras; //Se activa luego de Iniciar Sesión
 
-   public PantallaPrincipal (VentanaPrincipal ventana, Evento evento) {
+   public PantallaPrincipal (VentanaPrincipal ventanaPrincipal, Evento evento) {
       this.evento           = evento;
-      this.ventanaPrincipal = ventana;
+      this.ventanaPrincipal = ventanaPrincipal;
       setLayout(new BorderLayout());
       panelPrincipal = new JTabbedPane();
       Font fuentePestania = new Font("Arial", Font.BOLD, 15);
       panelPrincipal.setFont(fuentePestania);
-      inicializarPanelLibros(ventana);
+      ventanaPrincipal.add(this);
+      agregarPanelesFijos();
+   }
+
+   private void agregarPanelesFijos () {
+      inicializarPanelLibros();
       panelPrincipal.addTab("Lista de Libros", panelLibros);
       inicializarPanelCarrito();
       panelPrincipal.addTab("PanelCarrito", panelCarrito);
       inicializarPanelPerfil();
       panelPrincipal.addTab("Perfil", panelPerfil);
       add(panelPrincipal, BorderLayout.CENTER);
-      ventana.add(this);
    }
 
    public void agregarPanelesSegunRol (Usuario.ROLES rol) {
       if (rol.equals(Usuario.ROLES.ADMIN)) {
          inicalizarPanelesAdministrador();
-         panelPrincipal.addTab("Agregar Libro", panelAgregarLibro);
-         panelPrincipal.addTab("Modificar Libro", panelActualizarLibro);
-         panelPrincipal.addTab("Eliminar Libro", panelEliminarLibro);
          panelPrincipal.addTab("Crear Cuentas", panelCrearCuentas);
+         return;
       }
       inicializarPanelHistorialCompras();
       panelPrincipal.addTab("Historial de Compras", panelHistorialCompras);
    }
 
    private void inicalizarPanelesAdministrador () {
-      panelAgregarLibro    = new PanelAgregarLibro(evento);
-      panelActualizarLibro = new PanelActualizarLibro(evento);
-      panelEliminarLibro   = new PanelEliminarLibro(evento);
+      mostrarSoloPanelesAdmin();
+      dialogAgregarLibro   = new DialogAgregarLibro(evento);//TODO HACER PANEL UN JDIALOG MOSTRADO LUEGO DE ACCIONAR UN BOTON EN PANEL LIBROS
+      panelActualizarLibro = new PanelActualizarLibro(evento);//TODO ELIMINAR PANEL
+      panelEliminarLibro   = new PanelEliminarLibro(evento);//TODO ELIMINAR PANEL
       panelCrearCuentas    = new PanelCrearCuentas(evento);
    }
 
-   private void inicializarPanelLibros (VentanaPrincipal ventana) {
-      panelLibros = new PanelLibros(ventana, evento);
+   private void mostrarSoloPanelesAdmin () {
+      panelLibros.reasignarFuncionalidadAdmin();
+      panelPrincipal.remove(panelCarrito);
+      panelCarrito = null;
+      revalidate();
+      repaint();
+   }
+
+   private void inicializarPanelLibros () {
+      panelLibros = new PanelLibros(evento);
+      panelLibros.refrescarLista(ventanaPrincipal);
    }
 
    private void inicializarPanelCarrito () {
@@ -67,15 +79,11 @@ public class PantallaPrincipal extends JPanel {
    }
 
    private void inicializarPanelHistorialCompras () {
-      panelHistorialCompras = new PanelHistorialCompras(ventanaPrincipal, panelPerfil.);
+      panelHistorialCompras = new PanelHistorialCompras(ventanaPrincipal, evento);
    }
 
    PanelLibros getPanelLibros () {
       return panelLibros;
-   }
-
-   Object[] getDatosLibroNuevo () {
-      return panelAgregarLibro.getDatosLibro();
    }
 
    PanelPerfil getPanelPerfil () {
@@ -85,6 +93,7 @@ public class PantallaPrincipal extends JPanel {
    void iniciarSesion (Usuario datosUsuario) {
       panelPerfil.setDatosUsuario(datosUsuario);
       ventanaPrincipal.eliminarDialogLoginSignUp();
+      agregarPanelesSegunRol(datosUsuario.getTipoUsuario());
    }
 
    PanelActualizarLibro getPanelActualizarLibro () {
@@ -101,5 +110,11 @@ public class PantallaPrincipal extends JPanel {
 
    PanelCrearCuentas getPanelCrearCuentas () {
       return panelCrearCuentas;
+   }
+
+   public void mostrarDialogAgregarLibro () {
+      DialogAgregarLibro dialogAgregarLibro = new DialogAgregarLibro(evento);
+      dialogAgregarLibro.setLocationRelativeTo(this);
+      dialogAgregarLibro.setVisible(true);
    }
 }

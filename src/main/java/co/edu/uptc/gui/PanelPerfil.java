@@ -9,7 +9,7 @@ import java.awt.*;
 public class PanelPerfil extends JPanel {
    private final Evento            evento;
    private final PantallaPrincipal pantallaPrincipal;
-   private final JButton           botonGuardar           = new JButton("Guardar");
+   private final JButton           botonVariable          = new JButton("Guardar");
    private final JTextField        boxNombreCompleto      = new JTextField();
    private final JTextField        boxCorreo              = new JTextField();
    private final JTextField        boxDireccion           = new JTextField();
@@ -19,7 +19,7 @@ public class PanelPerfil extends JPanel {
    private final Font              fuenteTextField        = new Font("Times New Roman", Font.PLAIN, 20);
    private final Font              fuenteBoton            = new Font("Lucida Sans Unicode", Font.BOLD, 20);
    private final JLabel            mensajeDeError         = new JLabel();
-   private final JPasswordField    boxContrasena          = new JPasswordField();
+   private final JPasswordField    boxContrasenaNueva     = new JPasswordField();
    private       Usuario           datosUsuario           = null;
 
    public PanelPerfil (PantallaPrincipal pantallaPrincipal, Evento evento) {
@@ -63,18 +63,9 @@ public class PanelPerfil extends JPanel {
       //Banner de Contraseña
       JPanel panelContrasena = new JPanel(new GridLayout(2, 1));
       panelContrasena.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Contraseña", TitledBorder.CENTER, TitledBorder.TOP, fuenteLabel));
-      boxContrasena.setPreferredSize(new Dimension(160, 25));
-      JCheckBox checkBoxMostrarContrasena = new JCheckBox("Mostrar Contraseña");
-      checkBoxMostrarContrasena.setSelected(false);
-      checkBoxMostrarContrasena.setHorizontalAlignment(JCheckBox.CENTER);
-      checkBoxMostrarContrasena.addActionListener(_ -> {
-         if (checkBoxMostrarContrasena.isSelected()) {
-            boxContrasena.setEchoChar((char) 0);
-         } else {
-            boxContrasena.setEchoChar('•');
-         }
-      });
-      panelContrasena.add(boxContrasena);
+      boxContrasenaNueva.setPreferredSize(new Dimension(160, 25));
+      JCheckBox checkBoxMostrarContrasena = getCheckBoxMostrarContrasena();
+      panelContrasena.add(boxContrasenaNueva);
       panelContrasena.add(checkBoxMostrarContrasena);
       add(panelContrasena);
       //Banner de Tipo de Usuario
@@ -89,7 +80,21 @@ public class PanelPerfil extends JPanel {
       boxCorreo.setFont(fuenteTextField);
       boxDireccion.setFont(fuenteTextField);
       boxTelefono.setFont(fuenteTextField);
-      boxContrasena.setFont(fuenteTextField);
+      boxContrasenaNueva.setFont(fuenteTextField);
+   }
+
+   private JCheckBox getCheckBoxMostrarContrasena () {
+      JCheckBox checkBoxMostrarContrasena = new JCheckBox("Mostrar Contraseña");
+      checkBoxMostrarContrasena.setSelected(false);
+      checkBoxMostrarContrasena.setHorizontalAlignment(JCheckBox.CENTER);
+      checkBoxMostrarContrasena.addActionListener(_ -> {
+         if (checkBoxMostrarContrasena.isSelected()) {
+            boxContrasenaNueva.setEchoChar((char) 0);
+         } else {
+            boxContrasenaNueva.setEchoChar('•');
+         }
+      });
+      return checkBoxMostrarContrasena;
    }
 
    private void inicializarPanelFooter () {
@@ -100,31 +105,30 @@ public class PanelPerfil extends JPanel {
          mensajeDeError.setFont(new Font("Times New Roman", Font.BOLD, 20));
          mensajeDeError.setHorizontalAlignment(JLabel.CENTER);
          panelFooter.add(mensajeDeError);
-         botonGuardar.setActionCommand(Evento.EVENTO.ACTUALIZAR_CLIENTE.name());
-         botonGuardar.addActionListener(_ -> {
+         botonVariable.setText("Actualizar Datos");
+         botonVariable.setActionCommand(Evento.EVENTO.ACTUALIZAR_CLIENTE.name());
+         botonVariable.addActionListener(_ -> {
             mensajeDeError.setText(obtenerMensajeDeError());
             if (mensajeDeError.getText().isBlank()) {
                //No encontre otra forma de validar que cuando los campos esten llenos de forma correcta, agregar el listener de la clase Evento. Pero antes, eliminando el
                // anterior, esto para evitar repeticiones inesperadas al pulsar el boton
-               botonGuardar.removeActionListener(evento);
-               botonGuardar.addActionListener(evento);
+               botonVariable.removeActionListener(evento);
+               botonVariable.addActionListener(evento);
             }
          });
-         botonGuardar.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-         panelFooter.add(botonGuardar);
-         //Asignacion de fuente al boton
-         botonGuardar.setFont(fuenteBoton);
-         pantallaPrincipal.agregarPanelesSegunRol(datosUsuario.getTipoUsuario());
+         botonVariable.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+         panelFooter.add(botonVariable);
       } else {
          panelFooter.setLayout(new GridLayout(1, 1));
-         JButton botonLoginSignUp = new JButton("Login / SignUp");
-         botonLoginSignUp.setActionCommand(Evento.EVENTO.LOGIN_SIGNUP.name());
-         botonLoginSignUp.addActionListener(evento);
-         botonLoginSignUp.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-         //Asignacion de fuente al boton
-         botonLoginSignUp.setFont(fuenteBoton);
-         panelFooter.add(botonLoginSignUp);
+         botonVariable.setText("Iniciar Sesión / Crear Cuenta");
+         botonVariable.setActionCommand(Evento.EVENTO.LOGIN_SIGNUP.name());
+         botonVariable.removeActionListener(evento);
+         botonVariable.addActionListener(evento);
+         botonVariable.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+         panelFooter.add(botonVariable);
       }
+      //Asignacion de fuente al boton
+      botonVariable.setFont(fuenteBoton);
       add(panelFooter);
    }
 
@@ -143,7 +147,7 @@ public class PanelPerfil extends JPanel {
          if (boxTelefono.getText().isBlank()) {
             return "Debe rellenar el campo Teléfono";
          }
-         if (boxContrasena.getPassword() == null || boxContrasena.getPassword().length == 0) {
+         if (boxContrasenaNueva.getPassword() == null || boxContrasenaNueva.getPassword().length == 0) {
             return "Debe rellenar el campo Contraseña";
          }
       }
@@ -166,7 +170,7 @@ public class PanelPerfil extends JPanel {
             return "El campo Teléfono tiene un formato inválido";
          }
          //Validacion de Contraseña
-         if (boxContrasena.getPassword().length < 8) {
+         if (boxContrasenaNueva.getPassword().length < 8) {
             return "El campo contraseña debe tener mínimo 8 digitos";
          }
       }
@@ -179,13 +183,25 @@ public class PanelPerfil extends JPanel {
       boxCorreo.setText(datosUsuario.getCorreoElectronico());
       boxDireccion.setText(datosUsuario.getDireccionEnvio());
       boxTelefono.setText(String.valueOf(datosUsuario.getTelefonoContacto()));
-      boxContrasena.setText("********");
+      boxContrasenaNueva.setText("");
       labelTipoUsuarioActual.setText(datosUsuario.getTipoUsuario().name());
+      inicializarPanelFooter();
    }
 
    public Usuario getDatosUsuario () {
-      Usuario usuarioSeguro = datosUsuario;
-      usuarioSeguro.setClaveAcceso(new char[] {});
+      return datosUsuario;
+   }
+
+   public char[] getContrasenaNueva () {
+      return boxContrasenaNueva.getPassword();
+   }
+
+   public Usuario getDatosUsuarioSeguro () {
+      Usuario usuarioSeguro = null;
+      if (datosUsuario != null) {
+         usuarioSeguro = datosUsuario;
+         usuarioSeguro.setClaveAcceso(new char[0]);
+      }
       return usuarioSeguro;
    }
 }

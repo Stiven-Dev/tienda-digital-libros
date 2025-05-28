@@ -1,35 +1,17 @@
 package co.edu.uptc.entity;
 
-import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@Entity @Table(name = "compra") public class Compra {
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class Compra {
    private       long              ID_Compra;
-   @ManyToOne
-   @JoinColumn(name = "ID_Usuario", nullable = false)
    private       int               ID_Asociado;
-   @Column(name = "fechaCompra", nullable = false)
    private       LocalDateTime     fechaCompra;
-   @Column(name = "valorCompra", nullable = false)
    private       double            valorCompra;
-   @Column(name = "cantidadCompra", nullable = false)
    private       int               cantidadCompra;
-   @Transient
    private final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MMMM/yyyy HH:mm");
 
    public Compra () {}
-
-   public Compra (long ID_Compra, int ID_Asociado, LocalDateTime fechaCompra, double valorCompra, int cantidadCompra) {
-      this.ID_Compra      = ID_Compra;
-      this.ID_Asociado    = ID_Asociado;
-      this.fechaCompra    = fechaCompra;
-      this.valorCompra    = valorCompra;
-      this.cantidadCompra = cantidadCompra;
-   }
 
    public long getID_Compra () {
       return ID_Compra;
@@ -45,6 +27,10 @@ import java.time.format.DateTimeFormatter;
 
    public void setID_Asociado (int ID_Asociado) {
       this.ID_Asociado = ID_Asociado;
+   }
+
+   public void setFechaCompra (LocalDateTime fechaCompra) {
+      this.fechaCompra = fechaCompra;
    }
 
    public LocalDateTime getFechaCompra () {

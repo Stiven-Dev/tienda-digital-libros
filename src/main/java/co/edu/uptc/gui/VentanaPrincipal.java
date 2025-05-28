@@ -3,12 +3,13 @@ package co.edu.uptc.gui;
 import co.edu.uptc.entity.Libro;
 import co.edu.uptc.entity.Usuario;
 import co.edu.uptc.model.Tienda;
-import co.edu.uptc.util.JPAUtil;
+import co.edu.uptc.util.ConnectionToDB;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 public class VentanaPrincipal extends JFrame {
@@ -25,8 +26,8 @@ public class VentanaPrincipal extends JFrame {
 
    private void inicializarFrame () {
       setTitle("Tienda Digital de Libros");
-      setLocationRelativeTo(null);
-      //Esto para que no se cierre la ventana de golpe, sino que primero guarde y luego cierre
+      //Esto para que no se cierre la ventana de golpe, sino que primero guarde y luego cierre`
+
       setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
       addWindowListener(new WindowAdapter() {
          @Override public void windowClosing (WindowEvent e) {
@@ -34,9 +35,11 @@ public class VentanaPrincipal extends JFrame {
          }
       });
       this.pantallaPrincipal = new PantallaPrincipal(this, evento);
-      setVisible(true);
+      setSize(1000, 600);
+      setLocationRelativeTo(null);
       setResizable(true);
-      setSize(1400, 600);
+
+      setVisible(true);
    }
 
    public DialogLoginSignup getDialogLoginSignUp () {
@@ -65,14 +68,13 @@ public class VentanaPrincipal extends JFrame {
    void agregarLibroCarrito () {
       DefaultTableModel      tablaLibros      = pantallaPrincipal.getPanelLibros().getTableModel();
       HashMap<Long, Integer> carritoDeCompras = pantallaPrincipal.getPanelCarrito().getCarritoDeComprasTemporal();
-      final int              columnaISBN      = PanelCarrito.NOMBRE_COLUMNAS.ISBN.getIndex();
-      final int              columnaAgregar   = PanelCarrito.NOMBRE_COLUMNAS.AGREGAR.getIndex();
+      final int              columnaISBN      = PanelLibros.NOMBRE_COLUMNAS.ISBN.getIndex();
+      final int              columnaAgregar   = PanelLibros.NOMBRE_COLUMNAS.AGREGAR.getIndex();
       for (int fila = 0; fila < tablaLibros.getRowCount(); fila++) {
-         boolean valorAgregar = (boolean) tablaLibros.getValueAt(fila, columnaAgregar);
-         if (valorAgregar) {
+         boolean agregar = (Boolean) tablaLibros.getValueAt(fila, columnaAgregar);
+         if (agregar) {
             long ISBN = (long) tablaLibros.getValueAt(fila, columnaISBN);
             if (!carritoDeCompras.containsKey(ISBN)) {
-               carritoDeCompras.put(ISBN, 1);
                pantallaPrincipal.getPanelCarrito().agregarArticulo(ISBN);
             } else {
                pantallaPrincipal.getPanelCarrito().aumentarCantidad(ISBN);
@@ -86,7 +88,12 @@ public class VentanaPrincipal extends JFrame {
       //TODO
       //pantallaPrincipal.getPanelCarrito().actualizarCarritoArchivo();
       dispose();
-      JPAUtil.closeFactory();
+      try {
+         ConnectionToDB.getInstance().closeConnection();
+      } catch (SQLException e) {
+         System.err.println("Error al cerrar la conexión a la base de datos: " + e.getMessage());
+      }
+
       System.exit(0);
    }
 
@@ -95,7 +102,7 @@ public class VentanaPrincipal extends JFrame {
       dialogLoginSignup.setVisible(true);
    }
 
-   void buscarLibro (JPanel panel) {
+   void buscarLibroParaPanelModificaciones (JPanel panel) {
       long                  ISBN;
       PanelLibroModificable panelLibroModificable;
       switch (panel.getName()) {
@@ -196,12 +203,9 @@ public class VentanaPrincipal extends JFrame {
       //TODO
    }
 
-   Object[][] obtenerListaCompras (int ID) {
+   Object[][] obtenerListaCompras () {
+      long ID = pantallaPrincipal.getPanelPerfil().getDatosUsuario().getID();
       return tienda.getDataVectorCompras(ID);
-   }
-
-   HashMap<Long, Libro> obtenerMapLibros () {
-      return tienda.getLibrosLocales();
    }
 
    void validarInicioSesion () {
@@ -210,19 +214,19 @@ public class VentanaPrincipal extends JFrame {
          JOptionPane.showMessageDialog(this, "Debe rellenar todos los campos", "Alerta", JOptionPane.INFORMATION_MESSAGE);
          return;
       }
-      usuario = obtenerUsuarioMedianteCorreo(usuario.getCorreoElectronico());
+      usuario = validarLogin(usuario);
       if (usuario == null) {
          return;
       }
       pantallaPrincipal.iniciarSesion(usuario);
    }
 
-   private Usuario obtenerUsuarioMedianteCorreo (String correoElectronico) {
-      return tienda.obtenerUsuarioMedianteCorreo(correoElectronico);
+   private Usuario validarLogin (Usuario datosLogin) {
+      return tienda.validarDatosLogin(datosLogin);
    }
 
-   void setLibrosLocales (HashMap<Long, Libro> libroHashMap) {
-      pantallaPrincipal.getPanelCarrito().setLibrosLocales(libroHashMap);
+   private Usuario obtenerUsuarioMedianteCorreo (String correoElectronico) {
+      return tienda.obtenerUsuarioMedianteCorreo(correoElectronico);
    }
 
    double obtenerValorTotalImpuesto (DefaultTableModel model) {
@@ -231,5 +235,33 @@ public class VentanaPrincipal extends JFrame {
 
    public int obtenerCantidadLibros (DefaultTableModel model) {
       return tienda.obtenerCantidadLibros(model);
+   }
+
+   public Libro obtenerLibroMedianteISBN (long ISBN) {
+      return tienda.buscarLibro(ISBN);
+   }
+
+   public boolean usuarioRegistrado () {
+      Usuario usuario = pantallaPrincipal.getPanelPerfil().getDatosUsuario();
+      if (usuario == null) {
+         return false;
+      }
+      return usuario.getTipoUsuario() != Usuario.ROLES.ADMIN;
+   }
+
+   public void agregarLibro () {
+      pantallaPrincipal.mostrarDialogAgregarLibro();
+   }
+
+   public void actualizarDatosCliente () {
+      //TODO
+   }
+
+   public void cerrarSesion () {
+      //TODO
+   }
+
+   public void registrarLibro () {
+      //TODO
    }
 }

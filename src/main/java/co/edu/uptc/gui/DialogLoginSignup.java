@@ -17,12 +17,13 @@ public class DialogLoginSignup extends JDialog {
    private final JLabel         mensajeDeError  = new JLabel();
    private       JPanel         panelLogin;
    private       JPanel         panelRegistro;
+   private       JTextField     boxCorreoLogin;
+   private       JPasswordField boxContrasenaLogin;
    private       JTextField     boxNombreCompleto;
    private       JTextField     boxCorreo;
    private       JTextField     boxDireccion;
    private       JTextField     boxTelefono;
    private       JPasswordField boxContrasena;
-   private       JPasswordField passwordFieldContrasena;
 
    public DialogLoginSignup (VentanaPrincipal ventanaPrincipal, Evento evento) {
       super(ventanaPrincipal, "Inicio de Sesión / Registro", true);
@@ -37,6 +38,7 @@ public class DialogLoginSignup extends JDialog {
       add(panelContenedor);
       pack();
       setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+      setLocationRelativeTo(this);
    }
 
    private void agregarLogin () {
@@ -49,13 +51,13 @@ public class DialogLoginSignup extends JDialog {
       //Asignacion de fuente a cada label
       labelUsuario.setFont(fuenteLabel);
       labelContrasena.setFont(fuenteLabel);
-      boxCorreo               = new JTextField("admin1@example.com");
-      passwordFieldContrasena = new JPasswordField("admin");
+      boxCorreoLogin     = new JTextField("admin1@gmail.com");
+      boxContrasenaLogin = new JPasswordField("admin");
       //Asignacion de fuente a cada text field
-      boxCorreo.setFont(fuenteTextField);
-      passwordFieldContrasena.setFont(fuenteTextField);
+      boxCorreoLogin.setFont(fuenteTextField);
+      boxContrasenaLogin.setFont(fuenteTextField);
       //Validacion en tiempo real del campo de correo electronico
-      validarCampoCorreo(boxCorreo);
+      validarCampoCorreo(boxCorreoLogin);
       GridBagConstraints gbc = new GridBagConstraints();
       gbc.insets = new Insets(5, 5, 5, 5);
       gbc.fill   = GridBagConstraints.BOTH;
@@ -67,14 +69,14 @@ public class DialogLoginSignup extends JDialog {
       gbc.weightx = PESO_COMPONENTE;
       panelLoginDatos.add(labelUsuario, gbc);
       gbc.gridy = 1;
-      panelLoginDatos.add(boxCorreo, gbc);
+      panelLoginDatos.add(boxCorreoLogin, gbc);
       //Fila 2 y 3, Columna 0 => Contrasena
       gbc.gridx   = 0;
       gbc.gridy   = 2;
       gbc.weightx = PESO_COMPONENTE;
       panelLoginDatos.add(labelContrasena, gbc);
       gbc.gridy = 3;
-      panelLoginDatos.add(passwordFieldContrasena, gbc);
+      panelLoginDatos.add(boxContrasenaLogin, gbc);
       //Fila 4, columna 0=> CheckBox Mostrar Contraseña
       gbc.gridy = 4;
       JCheckBox checkBoxMostrarContrasena = new JCheckBox("Mostrar Contraseña");
@@ -82,9 +84,9 @@ public class DialogLoginSignup extends JDialog {
       checkBoxMostrarContrasena.setHorizontalAlignment(JCheckBox.CENTER);
       checkBoxMostrarContrasena.addActionListener(_ -> {
          if (checkBoxMostrarContrasena.isSelected()) {
-            passwordFieldContrasena.setEchoChar((char) 0);
+            boxContrasenaLogin.setEchoChar((char) 0);
          } else {
-            passwordFieldContrasena.setEchoChar('•');
+            boxContrasenaLogin.setEchoChar('•');
          }
       });
       panelLoginDatos.add(checkBoxMostrarContrasena, gbc);
@@ -128,11 +130,11 @@ public class DialogLoginSignup extends JDialog {
       labelContrasena.setFont(fuenteLabel);
       //Text Fields
       boxNombreCompleto = new JTextField("");
-      boxCorreo         = new JTextField("admin1@example.com");
+      boxCorreo         = new JTextField("admin.1@gmail.com");
       validarCampoCorreo(boxCorreo);
       boxDireccion  = new JTextField("");
       boxTelefono   = new JTextField("");
-      boxContrasena = new JPasswordField("admin");
+      boxContrasena = new JPasswordField("admin123");
       boxNombreCompleto.setHorizontalAlignment(JTextField.CENTER);
       boxCorreo.setHorizontalAlignment(JTextField.CENTER);
       boxDireccion.setHorizontalAlignment(JTextField.CENTER);
@@ -276,8 +278,8 @@ public class DialogLoginSignup extends JDialog {
 
    public Usuario getDatosLogin () {
       Usuario usuario = new Usuario();
-      usuario.setCorreoElectronico(boxCorreo.getText());
-      usuario.setClaveAcceso(boxContrasena.getPassword());
+      usuario.setCorreoElectronico(boxCorreoLogin.getText());
+      usuario.setClaveAcceso(boxContrasenaLogin.getPassword());
       return usuario;
    }
 

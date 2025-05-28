@@ -218,7 +218,7 @@ public class PanelEliminarLibro extends JPanel implements PanelLibroModificable 
       boxTitulo.setText(libro.getTitulo());
       boxAutor.setText(libro.getAutores());
       boxAnioPublicacion.setText(String.valueOf(libro.getAnioPublicacion()));
-      boxCategoria.setText(libro.getCategoria());
+      boxCategoria.setText(libro.getGenero());
       boxEditorial.setText(libro.getGenero());
    }
 }

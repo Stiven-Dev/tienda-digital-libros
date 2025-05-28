@@ -1,29 +1,16 @@
 package co.edu.uptc.entity;
 
-import jakarta.persistence.*;
-
 import java.util.List;
 
-@Entity @Table(name = "usuario") public class Usuario {
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class Usuario {
    private long         ID;
-   @Column(name = "nombreCompleto", nullable = false)
    private String       nombreCompleto;
-   @Column(name = "correoElectronico", unique = true, nullable = false)
    private String       correoElectronico;
-   @Column(name = "direccionEnvio", nullable = false)
    private String       direccionEnvio;
-   @Column(name = "telefonoContacto", nullable = false)
    private long         telefonoContacto;
-   @Column(name = "claveAcceso", nullable = false)
    private char[]       claveAcceso;
-   @Enumerated(EnumType.STRING)
-   @Column(name = "tipoUsuario", nullable = false)
    private ROLES        tipoUsuario = ROLES.REGULAR;
-   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
    private Carrito      carrito;
-   @OneToMany(mappedBy = "ID_Asociado", cascade = CascadeType.ALL)
    private List<Compra> compras;
 
    public enum ROLES {
@@ -33,6 +20,10 @@ import java.util.List;
    }
 
    public Usuario () {}
+
+   public void setID (long ID) {
+      this.ID = ID;
+   }
 
    public long getID () {
       return ID;
