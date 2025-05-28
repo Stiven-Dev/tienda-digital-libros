@@ -32,6 +32,7 @@ public class PanelCarrito extends JPanel {
    public PanelCarrito (VentanaPrincipal ventanaPrincipal, Evento evento) {
       this.evento           = evento;
       this.ventanaPrincipal = ventanaPrincipal;
+      setLayout(new GridBagLayout());
       inicializarPanelCarrito();
       carritoDeCompras = new HashMap<>();
       inicializarPanelFooter();
@@ -72,9 +73,8 @@ public class PanelCarrito extends JPanel {
    }
 
    private void inicializarPanelCarrito () {
-      setLayout(new GridBagLayout());
       gbc         = new GridBagConstraints();
-      gbc.insets  = new Insets(5, 5, 5, 5);
+      gbc.insets  = new Insets(0, 5, 0, 5);
       gbc.fill    = GridBagConstraints.BOTH;
       gbc.gridx   = 0;
       gbc.gridy   = 0;
@@ -142,19 +142,19 @@ public class PanelCarrito extends JPanel {
       labelTotal.setHorizontalAlignment(JLabel.CENTER);
       labelTotal.setFont(new Font("Lucida Sans Typewriter", Font.BOLD, 20));
 
-      GridBagConstraints gbc2 = new GridBagConstraints();
-      gbc2.insets = new Insets(5, 5, 10, 5);
-      gbc2.fill   = GridBagConstraints.HORIZONTAL;
-      float  pesoBoton   = 0.15f;
-      JPanel panelFooter = new JPanel(new GridBagLayout());
-      gbc2.gridx   = 0;
-      gbc2.weightx = 0.5f;
-      panelFooter.add(labelTotal, gbc2);
-      gbc2.gridx   = 1;
-      gbc2.weightx = pesoBoton;
-      panelFooter.add(botonPagarEfectivo, gbc2);
-      gbc2.gridx = 2;
-      panelFooter.add(botonPagarTarjeta, gbc2);
+      GridBagConstraints gbcFooter = new GridBagConstraints();
+      gbcFooter.insets = new Insets(5, 5, 10, 5);
+      gbcFooter.fill   = GridBagConstraints.HORIZONTAL;
+      final float pesoBoton   = 0.15f;
+      JPanel      panelFooter = new JPanel(new GridBagLayout());
+      gbcFooter.gridx   = 0;
+      gbcFooter.weightx = 0.7f;
+      panelFooter.add(labelTotal, gbcFooter);
+      gbcFooter.gridx   = 1;
+      gbcFooter.weightx = pesoBoton;
+      panelFooter.add(botonPagarEfectivo, gbcFooter);
+      gbcFooter.gridx = 2;
+      panelFooter.add(botonPagarTarjeta, gbcFooter);
       //Asignacion de fuente a cada boton
       botonPagarEfectivo.setFont(fuenteBoton);
       botonPagarTarjeta.setFont(fuenteBoton);
