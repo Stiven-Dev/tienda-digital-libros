@@ -384,6 +384,10 @@ public class Tienda {
       return cantidadTotalLibros;
    }
 
+   public void actualizarDatosUsuario (Usuario nuevosDatosUsuario) {
+      Operacion.actualizarDatosUsuario(nuevosDatosUsuario);
+   }
+
 //
 //   private ArrayList<Compra> filtrarPorCID (ArrayList<Compra> listaTotalDeCompras, int CID) {
 //      ArrayList<Compra> listaFiltrada = new ArrayList<>();

@@ -58,7 +58,6 @@ public class Operacion {
             }
          }
          preparedStatement.close();
-
       } catch (Exception e) {
          System.err.println("Error al obtener el usuario: " + e.getMessage());
       }
@@ -115,5 +114,12 @@ public class Operacion {
 
    public static void eliminarLibro (Libro libro) {
       //TODO
+   }
+
+   public static void actualizarDatosUsuario (Usuario nuevosDatosUsuario) {
+      //TODO actualizacion de datos del usuario
+      if (nuevosDatosUsuario.getClaveAcceso().length >= 0) {
+         //TODO validar si se cambia la contraseña o se deja la actual
+      }
    }
 }

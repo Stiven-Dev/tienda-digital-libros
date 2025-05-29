@@ -133,12 +133,13 @@ public class PanelCarrito extends JPanel {
       add(panelDescripcionCompra, gbc);
 
       //Footer (incluye el label de precio total)
-      JButton botonPagarEfectivo = new JButton("Pagar En Efectivo");
-      JButton botonPagarTarjeta  = new JButton("Pagar Con Tarjeta");
+      JButton botonPagarEfectivo = new JButtonAzul("Pagar En Efectivo");
+      JButton botonPagarTarjeta  = new JButtonAzul("Pagar Con Tarjeta");
       botonPagarEfectivo.setActionCommand(EVENTO.PAGAR_EFECTIVO.name());
       botonPagarTarjeta.setActionCommand(EVENTO.PAGAR_TARJETA.name());
-      botonPagarTarjeta.addActionListener(evento);
       botonPagarEfectivo.addActionListener(evento);
+      botonPagarTarjeta.addActionListener(evento);
+
       labelTotal.setHorizontalAlignment(JLabel.CENTER);
       labelTotal.setFont(new Font("Lucida Sans Typewriter", Font.BOLD, 20));
 
@@ -276,9 +277,9 @@ public class PanelCarrito extends JPanel {
       datosFila[NOMBRE_COLUMNAS.VALOR_IMPUESTO.getIndex()] = obtenerPrecioImpuesto(ISBN);
       datosFila[NOMBRE_COLUMNAS.CANTIDAD.getIndex()]       = 1;
       datosFila[NOMBRE_COLUMNAS.VALOR_TOTAL.getIndex()]    = libro.getPrecioVenta();
-      datosFila[NOMBRE_COLUMNAS.SUMAR.getIndex()]     = false;
-      datosFila[NOMBRE_COLUMNAS.RESTAR.getIndex()]    = false;
-      datosFila[NOMBRE_COLUMNAS.DESCARTAR.getIndex()] = false;
+      datosFila[NOMBRE_COLUMNAS.SUMAR.getIndex()]          = false;
+      datosFila[NOMBRE_COLUMNAS.RESTAR.getIndex()]         = false;
+      datosFila[NOMBRE_COLUMNAS.DESCARTAR.getIndex()]      = false;
       model.addRow(datosFila);
    }
 

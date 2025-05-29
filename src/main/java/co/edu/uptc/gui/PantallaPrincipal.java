@@ -9,32 +9,38 @@ public class PantallaPrincipal extends JPanel {
    private final Evento                evento;
    private final VentanaPrincipal      ventanaPrincipal;
    private final JTabbedPane           panelPrincipal;
+   private final JPanel                panelHeader = new JPanel(new GridBagLayout());
+   private final GridBagConstraints    gbc         = new GridBagConstraints();
    private       PanelLibros           panelLibros;
    private       PanelCarrito          panelCarrito; //Solo para Usuarios
    private       PanelPerfil           panelPerfil;
-   private       DialogAgregarLibro    dialogAgregarLibro; //Solo para los administradores
    private       PanelActualizarLibro  panelActualizarLibro; //Solo para los administradores
    private       PanelEliminarLibro    panelEliminarLibro; //Solo para los administradores
    private       PanelCrearCuentas     panelCrearCuentas; //Solo para los administradores
    private       PanelHistorialCompras panelHistorialCompras; //Se activa luego de Iniciar Sesión
+   private       Usuario               datosUsuario;
 
    public PantallaPrincipal (VentanaPrincipal ventanaPrincipal, Evento evento) {
       this.evento           = evento;
       this.ventanaPrincipal = ventanaPrincipal;
       setLayout(new BorderLayout());
+      gbc.insets = new Insets(5, 5, 5, 5);
+      gbc.fill   = GridBagConstraints.BOTH;
+
+      //panelHeader;
       panelPrincipal = new JTabbedPane();
       Font fuentePestania = new Font("Arial", Font.BOLD, 15);
       panelPrincipal.setFont(fuentePestania);
       ventanaPrincipal.add(this);
-      agregarPanelesFijos();
+      inicializarPanelesFijos();
    }
 
-   private void agregarPanelesFijos () {
+   private void inicializarPanelesFijos () {
       inicializarPanelLibros();
       panelPrincipal.addTab("Lista de Libros", panelLibros);
       inicializarPanelCarrito();
       panelPrincipal.addTab("PanelCarrito", panelCarrito);
-      inicializarPanelPerfil();
+      inicializarBotonPerfil();
       panelPrincipal.addTab("Perfil", panelPerfil);
       add(panelPrincipal, BorderLayout.CENTER);
    }
@@ -51,7 +57,6 @@ public class PantallaPrincipal extends JPanel {
 
    private void inicalizarPanelesAdministrador () {
       mostrarSoloPanelesAdmin();
-      dialogAgregarLibro   = new DialogAgregarLibro(evento);//TODO HACER PANEL UN JDIALOG MOSTRADO LUEGO DE ACCIONAR UN BOTON EN PANEL LIBROS
       panelActualizarLibro = new PanelActualizarLibro(evento);//TODO ELIMINAR PANEL
       panelEliminarLibro   = new PanelEliminarLibro(evento);//TODO ELIMINAR PANEL
       panelCrearCuentas    = new PanelCrearCuentas(evento);
@@ -74,8 +79,13 @@ public class PantallaPrincipal extends JPanel {
       panelCarrito = new PanelCarrito(ventanaPrincipal, evento);
    }
 
-   private void inicializarPanelPerfil () {
+   private void inicializarBotonPerfil () {
       panelPerfil = new PanelPerfil(this, evento);
+//      ProfileButton profileButton = new ProfileButton(evento);
+//      profileButton.setActionCommand(Evento.EVENTO.LOGIN_SIGNUP.name());
+//      profileButton.addActionListener(evento);
+
+//      add(profileButton, gbc);
    }
 
    private void inicializarPanelHistorialCompras () {
@@ -91,7 +101,8 @@ public class PantallaPrincipal extends JPanel {
    }
 
    void iniciarSesion (Usuario datosUsuario) {
-      panelPerfil.setDatosUsuario(datosUsuario);
+      this.datosUsuario = datosUsuario;
+      //panelPerfil.setDatosUsuario(datosUsuario);
       ventanaPrincipal.eliminarDialogLoginSignUp();
       agregarPanelesSegunRol(datosUsuario.getTipoUsuario());
    }

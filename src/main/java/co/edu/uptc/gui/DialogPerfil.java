@@ -6,25 +6,30 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 
-public class PanelPerfil extends JPanel {
-   private final Evento            evento;
-   private final PantallaPrincipal pantallaPrincipal;
-   private final JButton           botonVariable          = new JButton("Guardar");
-   private final JTextField        boxNombreCompleto      = new JTextField();
-   private final JTextField        boxCorreo              = new JTextField();
-   private final JTextField        boxDireccion           = new JTextField();
-   private final JTextField        boxTelefono            = new JTextField();
-   private final JLabel            labelTipoUsuarioActual = new JLabel();
-   private final Font              fuenteLabel            = new Font("Lucida Sans Unicode", Font.PLAIN, 20);
-   private final Font              fuenteTextField        = new Font("Times New Roman", Font.PLAIN, 20);
-   private final Font              fuenteBoton            = new Font("Lucida Sans Unicode", Font.BOLD, 20);
-   private final JLabel            mensajeDeError         = new JLabel();
-   private final JPasswordField    boxContrasenaNueva     = new JPasswordField();
-   private       Usuario           datosUsuario           = null;
+public class DialogPerfil extends JDialog {
+   private final  Evento         evento;
+   private final  JButton        botonActualizar        = new JButtonVerde("Guardar");
+   private final  JTextField     boxNombreCompleto      = new JTextField();
+   private final  JTextField     boxCorreo              = new JTextField();
+   private final  JTextField     boxDireccion           = new JTextField();
+   private final  JTextField     boxTelefono            = new JTextField();
+   private final  JLabel         labelTipoUsuarioActual = new JLabel();
+   private final  Font           fuenteLabel            = new Font("Lucida Sans Unicode", Font.PLAIN, 20);
+   private final  Font           fuenteTextField        = new Font("Times New Roman", Font.PLAIN, 20);
+   private final  Font           fuenteBoton            = new Font("Lucida Sans Unicode", Font.BOLD, 20);
+   private final  JLabel         mensajeDeError         = new JLabel();
+   private final  JPasswordField boxContrasenaNueva     = new JPasswordField("");
+   private final  JPasswordField boxContrasenaActual    = new JPasswordField("");
+   private static Usuario        nuevosDatosUsuario     = null;
+   private        Usuario        datosUsuario;
 
-   public PanelPerfil (PantallaPrincipal pantallaPrincipal, Evento evento) {
-      this.evento            = evento;
-      this.pantallaPrincipal = pantallaPrincipal;
+   public DialogPerfil (Evento evento, Usuario datosUsuario) {
+      super(new Frame(), datosUsuario.getNombreCompleto(), true);
+      this.evento = evento;
+      pack();
+      setResizable(false);
+      setLocationRelativeTo(null);
+      setDefaultCloseOperation(DISPOSE_ON_CLOSE);
       inicializarPanelPerfil();
    }
 
@@ -37,25 +42,25 @@ public class PanelPerfil extends JPanel {
    private void inicializarPanelDatosUsuario () {
       //Banners de Datos
       //Banner de Nombre Completo
-      JPanel panelNombreCompleto = new JPanel(new GridLayout(1, 2));
+      JPanel panelNombreCompleto = new JPanel();
       panelNombreCompleto.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Nombre", TitledBorder.CENTER, TitledBorder.TOP, fuenteLabel));
       boxNombreCompleto.setPreferredSize(new Dimension(160, 25));
       panelNombreCompleto.add(boxNombreCompleto);
       add(panelNombreCompleto);
       //Banner de Correo Electronico
-      JPanel panelCorreo = new JPanel(new GridLayout(1, 2));
+      JPanel panelCorreo = new JPanel();
       panelCorreo.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Correo Electronico", TitledBorder.CENTER, TitledBorder.TOP, fuenteLabel));
       boxCorreo.setPreferredSize(new Dimension(160, 25));
       panelCorreo.add(boxCorreo);
       add(panelCorreo);
       //Banner de Direccion
-      JPanel panelDireccion = new JPanel(new GridLayout(1, 2));
+      JPanel panelDireccion = new JPanel();
       panelDireccion.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Dirección", TitledBorder.CENTER, TitledBorder.TOP, fuenteLabel));
       boxDireccion.setPreferredSize(new Dimension(160, 25));
       panelDireccion.add(boxDireccion);
       add(panelDireccion);
       //Banner de Teléfono
-      JPanel panelTelefono = new JPanel(new GridLayout(1, 2));
+      JPanel panelTelefono = new JPanel();
       panelTelefono.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Teléfono", TitledBorder.CENTER, TitledBorder.TOP, fuenteLabel));
       boxTelefono.setPreferredSize(new Dimension(160, 25));
       panelTelefono.add(boxTelefono);
@@ -69,7 +74,7 @@ public class PanelPerfil extends JPanel {
       panelContrasena.add(checkBoxMostrarContrasena);
       add(panelContrasena);
       //Banner de Tipo de Usuario
-      JPanel panelTipoUsuario = new JPanel(new GridLayout(1, 2));
+      JPanel panelTipoUsuario = new JPanel();
       panelTipoUsuario.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Tipo de Usuario", TitledBorder.CENTER, TitledBorder.TOP, fuenteLabel));
       labelTipoUsuarioActual.setHorizontalAlignment(JLabel.CENTER);
       labelTipoUsuarioActual.setFont(new Font("Lucida Sans Unicode", Font.BOLD, 20));
@@ -99,34 +104,29 @@ public class PanelPerfil extends JPanel {
 
    private void inicializarPanelFooter () {
       JPanel panelFooter = new JPanel();
-      if (datosUsuario != null) {
-         panelFooter.setLayout(new GridLayout(2, 1));
-         mensajeDeError.setForeground(Color.RED);
-         mensajeDeError.setFont(new Font("Times New Roman", Font.BOLD, 20));
-         mensajeDeError.setHorizontalAlignment(JLabel.CENTER);
-         panelFooter.add(mensajeDeError);
-         botonVariable.setText("Actualizar Datos");
-         botonVariable.setActionCommand(Evento.EVENTO.ACTUALIZAR_CLIENTE.name());
-         botonVariable.addActionListener(_ -> {
-            mensajeDeError.setText(obtenerMensajeDeError());
-            if (mensajeDeError.getText().isBlank()) {
-               //No encontre otra forma de validar que cuando los campos esten llenos de forma correcta, agregar el listener de la clase Evento. Pero antes, eliminando el
-               // anterior, esto para evitar repeticiones inesperadas al pulsar el boton
-               botonVariable.removeActionListener(evento);
-               botonVariable.addActionListener(evento);
-            }
-         });
-      } else {
-         panelFooter.setLayout(new GridLayout(1, 1));
-         botonVariable.setText("Iniciar Sesión / Crear Cuenta");
-         botonVariable.setActionCommand(Evento.EVENTO.LOGIN_SIGNUP.name());
-         botonVariable.removeActionListener(evento);
-         botonVariable.addActionListener(evento);
-      }
-      botonVariable.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-      panelFooter.add(botonVariable);
+      panelFooter.setLayout(new GridLayout(2, 1));
+      mensajeDeError.setForeground(Color.RED);
+      mensajeDeError.setFont(new Font("Times New Roman", Font.BOLD, 20));
+      mensajeDeError.setHorizontalAlignment(JLabel.CENTER);
+      panelFooter.add(mensajeDeError);
+      botonActualizar.setText("Actualizar Datos");
+      botonActualizar.setAlignmentX(JComponent.CENTER_ALIGNMENT);
       //Asignacion de fuente al boton
-      botonVariable.setFont(fuenteBoton);
+      botonActualizar.setFont(fuenteBoton);
+
+      botonActualizar.setActionCommand(Evento.EVENTO.ACTUALIZAR_CLIENTE.name());
+      botonActualizar.addActionListener(_ -> {
+         mensajeDeError.setText(obtenerMensajeDeError());
+         if (mensajeDeError.getText().isBlank()) {
+            //No encontré otra forma de validar que cuando los campos esten llenos de forma correcta, agregar el listener de la clase Evento. Pero antes, eliminando el
+            // anterior, esto para evitar repeticiones inesperadas al pulsar el botón
+            botonActualizar.removeActionListener(evento);
+            actualizarDatosUsuario();
+            botonActualizar.addActionListener(evento);
+         }
+      });
+
+      panelFooter.add(botonActualizar);
       add(panelFooter);
    }
 
@@ -144,9 +144,6 @@ public class PanelPerfil extends JPanel {
          }
          if (boxTelefono.getText().isBlank()) {
             return "Debe rellenar el campo Teléfono";
-         }
-         if (boxContrasenaNueva.getPassword() == null || boxContrasenaNueva.getPassword().length == 0) {
-            return "Debe rellenar el campo Contraseña";
          }
       }
       //Validacion de Formato Valido
@@ -167,8 +164,8 @@ public class PanelPerfil extends JPanel {
          if (!boxTelefono.getText().matches(regexTelefono)) {
             return "El campo Teléfono tiene un formato inválido";
          }
-         //Validacion de Contraseña
-         if (boxContrasenaNueva.getPassword().length < 8) {
+         //Validacion de Contraseña, si no se ingresa una nueva, no se solicita, solo se hace cambio de contraseña si se ingresa una nueva
+         if (boxContrasenaNueva.getPassword().length > 0 && boxContrasenaNueva.getPassword().length < 8) {
             return "El campo contraseña debe tener mínimo 8 digitos";
          }
       }
@@ -181,25 +178,22 @@ public class PanelPerfil extends JPanel {
       boxCorreo.setText(datosUsuario.getCorreoElectronico());
       boxDireccion.setText(datosUsuario.getDireccionEnvio());
       boxTelefono.setText(String.valueOf(datosUsuario.getTelefonoContacto()));
-      boxContrasenaNueva.setText("");
       labelTipoUsuarioActual.setText(datosUsuario.getTipoUsuario().name());
       inicializarPanelFooter();
    }
 
-   public Usuario getDatosUsuario () {
-      return datosUsuario;
+   private void actualizarDatosUsuario () {
+      nuevosDatosUsuario = new Usuario();
+      nuevosDatosUsuario.setID(datosUsuario.getID());
+      nuevosDatosUsuario.setNombreCompleto(boxNombreCompleto.getText());
+      nuevosDatosUsuario.setCorreoElectronico(boxCorreo.getText());
+      nuevosDatosUsuario.setDireccionEnvio(boxDireccion.getText());
+      nuevosDatosUsuario.setTelefonoContacto(Long.parseLong(boxTelefono.getText()));
+      nuevosDatosUsuario.setTipoUsuario(Usuario.ROLES.valueOf(labelTipoUsuarioActual.getText()));
+      nuevosDatosUsuario.setClaveAcceso(boxContrasenaNueva.getPassword());
    }
 
-   public char[] getContrasenaNueva () {
-      return boxContrasenaNueva.getPassword();
-   }
-
-   public Usuario getDatosUsuarioSeguro () {
-      Usuario usuarioSeguro = null;
-      if (datosUsuario != null) {
-         usuarioSeguro = datosUsuario;
-         usuarioSeguro.setClaveAcceso(new char[0]);
-      }
-      return usuarioSeguro;
+   public static Usuario getNuevosDatosUsuario () {
+      return nuevosDatosUsuario;
    }
 }

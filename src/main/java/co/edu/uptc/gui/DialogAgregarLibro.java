@@ -40,8 +40,8 @@ public class DialogAgregarLibro extends JDialog {
       panelAgregarLibro.add(panelFooter, BorderLayout.SOUTH);
       add(panelAgregarLibro, BorderLayout.CENTER);
       pack();
-      setLocationRelativeTo(null);
       setResizable(false);
+      setLocationRelativeTo(null);
    }
 
    private void inicializarPanelCampos () {
@@ -81,6 +81,7 @@ public class DialogAgregarLibro extends JDialog {
       boxNumPaginas         = new JTextField("1");
       boxPrecioVenta        = new JTextField("1.0");
       boxCantidadInventario = new JTextField("1");
+      //El comboBoxFormato ya esta inicializado
 
       //Asignacion de fuente a cada text field
       boxISBN.setFont(fuenteTextField);
@@ -92,6 +93,7 @@ public class DialogAgregarLibro extends JDialog {
       boxNumPaginas.setFont(fuenteTextField);
       boxPrecioVenta.setFont(fuenteTextField);
       boxCantidadInventario.setFont(fuenteTextField);
+      comboBoxFormato.setFont(fuenteTextField);
 
       //Centrado de JTextFields
       boxISBN.setHorizontalAlignment(JTextField.CENTER);
@@ -103,7 +105,7 @@ public class DialogAgregarLibro extends JDialog {
       boxNumPaginas.setHorizontalAlignment(JTextField.CENTER);
       boxPrecioVenta.setHorizontalAlignment(JTextField.CENTER);
       boxCantidadInventario.setHorizontalAlignment(JTextField.CENTER);
-      comboBoxFormato.setSelectedItem("IMPRESO");
+      comboBoxFormato.setSelectedIndex(1); //Selecciona el formato "IMPRESO" por defecto. [Índice 1 === Segundo elemento]
 
       GridBagConstraints gbc = new GridBagConstraints();
       gbc.insets = new Insets(5, 5, 5, 5);
@@ -201,7 +203,15 @@ public class DialogAgregarLibro extends JDialog {
       gbc.gridy   = 0;
       gbc.weightx = 0.85f;
 
-      JButton botonGuardar = new JButton("Guardar");
+      JButton botonGuardar = getJButtonGuardar();
+      panelBoton.add(botonGuardar, gbc);
+      panelFooter.add(panelBoton);
+      add(panelFooter, BorderLayout.SOUTH);
+   }
+
+   private JButton getJButtonGuardar () {
+      JButton botonGuardar = new JButtonVerde("Guardar");
+
       botonGuardar.setActionCommand(Evento.EVENTO.REGISTRAR_LIBRO.name());
       botonGuardar.addActionListener(_ -> {
          mensajeDeError.setText(obtenerMensajeDeError());
@@ -210,13 +220,8 @@ public class DialogAgregarLibro extends JDialog {
             botonGuardar.addActionListener(evento);
          }
       });
-      botonGuardar.setFont(fuenteBoton);
-      panelBoton.add(botonGuardar, gbc);
-
-      //Asignacion de fuente al boton
-
-      panelFooter.add(panelBoton);
-      add(panelFooter, BorderLayout.SOUTH);
+//      botonGuardar.setFont(fuenteBoton);
+      return botonGuardar;
    }
 
    private String obtenerMensajeDeError () {

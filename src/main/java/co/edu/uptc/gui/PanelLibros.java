@@ -123,9 +123,9 @@ public class PanelLibros extends JPanel {
       gbc.gridy   = 0;
 
       //Creación de botones
-      JButton botonAgregar    = new JButton("Agregar Libro");
-      JButton botonActualizar = new JButton("Actualizar Libro");
-      JButton botonEliminar   = new JButton("Eliminar Libro");
+      JButton botonAgregar    = new JButtonVerde("Agregar Libro");
+      JButton botonActualizar = new JButtonAzul("Actualizar Libro");
+      JButton botonEliminar   = new JButtonRojo("Eliminar Libro");
 
       //Boton Actualizar
       gbc.gridx = 0;

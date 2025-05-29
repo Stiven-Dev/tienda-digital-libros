@@ -246,7 +246,10 @@ public class VentanaPrincipal extends JFrame {
    }
 
    public void actualizarDatosCliente () {
-      //TODO
+      Usuario nuevosDatosUsuario = DialogPerfil.getNuevosDatosUsuario();
+      if (nuevosDatosUsuario != null) {
+         tienda.actualizarDatosUsuario(nuevosDatosUsuario);
+      }
    }
 
    public void cerrarSesion () {
