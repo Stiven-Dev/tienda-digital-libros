@@ -9,16 +9,15 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 public class PanelLibros extends JPanel {
    private final  Evento            evento;
    private final  Font              fuenteCabecera = new Font("Arial", Font.BOLD, 15);
    private final  Font              fuenteCelda    = new Font("Lucida Sans Unicode", Font.PLAIN, 12);
-   private final  Font              fuenteBoton    = new Font("Lucida Sans Unicode", Font.BOLD, 20);
    private final  JPanel            panelBotones   = new JPanel(new GridBagLayout());
    private        DefaultTableModel model;
    private        JTable            tableLibros;
-   private        JButton           botonAgregarCarrito;
    private static Libro             libroSeleccionado;
 
    public PanelLibros (Evento evento) {
@@ -69,23 +68,15 @@ public class PanelLibros extends JPanel {
             return component;
          }
       };
-
       tableLibros.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
       tableLibros.setRowHeight(30);
       tableLibros.getTableHeader().setFont(fuenteCabecera);
       tableLibros.setFont(fuenteCelda);
       formatearColumnas(tableLibros);
       JScrollPane scrollPane = new JScrollPane(tableLibros);
+      scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
       add(scrollPane, BorderLayout.CENTER);
-
-      botonAgregarCarrito = new JButton("Agregar Libro");
-      botonAgregarCarrito.setActionCommand(EVENTO.LIBRO_AL_CARRITO.name());
-      botonAgregarCarrito.addActionListener(evento);
-      //Asignacion de fuente al boton
-      botonAgregarCarrito.setFont(fuenteBoton);
-
-      panelBotones.add(botonAgregarCarrito);
-      add(panelBotones, BorderLayout.SOUTH);
+      modificacionesLibros();
    }
 
    private void formatearColumnas (JTable tableLibros) {
@@ -96,8 +87,22 @@ public class PanelLibros extends JPanel {
       model.setDataVector(ventanaPrincipal.obtenerVectorLibros(), NOMBRE_COLUMNAS.getCabecera());
    }
 
-   public DefaultTableModel getTableModel () {
-      return model;
+   private void modificacionesLibros () {
+      model.addTableModelListener(event -> {
+         int fila    = event.getFirstRow();
+         int columna = event.getColumn();
+         if (columna == 10) {
+            agregarAlCarrito(fila);
+         }
+      });
+   }
+
+   private void agregarAlCarrito (int fila) {
+      final int columnaAgregar = NOMBRE_COLUMNAS.AGREGAR.getIndex();
+      if (!(boolean) model.getValueAt(fila, columnaAgregar)) return;
+      libroSeleccionado = getLibroFila(fila);
+      model.setValueAt(false, fila, columnaAgregar);
+      evento.actionPerformed(new ActionEvent(this, 0, EVENTO.LIBRO_AL_CARRITO.name()));
    }
 
    protected void reasignarFuncionalidadAdmin () {
@@ -105,12 +110,10 @@ public class PanelLibros extends JPanel {
       TableColumnModel columnModel    = tableLibros.getColumnModel();
       columnModel.removeColumn(columnModel.getColumn(columnaAgregar));
       tableLibros.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-      this.remove(botonAgregarCarrito);
-      reasignarPanelBotones();
+      crearPanelBotones();
    }
 
-   private void reasignarPanelBotones () {
-      panelBotones.removeAll();
+   private void crearPanelBotones () {
       //Configuración de GridBagConstraints
       GridBagConstraints gbc = new GridBagConstraints();
       gbc.insets  = new Insets(5, 5, 5, 5);
@@ -176,7 +179,7 @@ public class PanelLibros extends JPanel {
       libro.setNumeroPaginas((int) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.PAGINAS.getIndex()));
       libro.setEditorial((String) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.EDITORIAL.getIndex()));
       libro.setAnioPublicacion((int) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.ANIO.getIndex()));
-      libro.setFORMATO(Libro.FORMATOS.valueOf((String) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.FORMATO.getIndex())));
+      libro.setFORMATO(Libro.FORMATOS.valueOf(String.valueOf(model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.FORMATO.getIndex()))));
       libro.setPrecioVenta((double) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.PRECIO.getIndex()));
       libro.setCantidadDisponible((int) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.CANTIDAD.getIndex()));
       return libro;
@@ -197,7 +200,7 @@ public class PanelLibros extends JPanel {
       FORMATO(7, "Formato"),
       PRECIO(8, "Precio"),
       CANTIDAD(9, "Cantidad"),
-      AGREGAR(10, "+");
+      AGREGAR(10, "Agregar");
       private final int    index;
       private final String name;
 

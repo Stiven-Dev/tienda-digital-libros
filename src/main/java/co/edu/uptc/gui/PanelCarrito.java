@@ -175,6 +175,7 @@ public class PanelCarrito extends JPanel {
             case 8 -> quitarAlCarrito(fila);
             case 9 -> descartarDelCarrito(fila);
             default -> {
+               actualizarDatosCompra();
                return;
             }
          }
@@ -183,7 +184,7 @@ public class PanelCarrito extends JPanel {
    }
 
    private void sumarAlCarrito (int fila) {
-      final int columnaAgregar = NOMBRE_COLUMNAS.AGREGAR.getIndex();
+      final int columnaAgregar = NOMBRE_COLUMNAS.SUMAR.getIndex();
       if (!((boolean) model.getValueAt(fila, columnaAgregar))) {
          return;
       }
@@ -220,7 +221,7 @@ public class PanelCarrito extends JPanel {
    }
 
    private void quitarAlCarrito (int fila) {
-      final int columnaQuitar = NOMBRE_COLUMNAS.QUITAR.getIndex();
+      final int columnaQuitar = NOMBRE_COLUMNAS.RESTAR.getIndex();
       if (!(boolean) model.getValueAt(fila, columnaQuitar)) {
          return;
       }
@@ -275,9 +276,9 @@ public class PanelCarrito extends JPanel {
       datosFila[NOMBRE_COLUMNAS.VALOR_IMPUESTO.getIndex()] = obtenerPrecioImpuesto(ISBN);
       datosFila[NOMBRE_COLUMNAS.CANTIDAD.getIndex()]       = 1;
       datosFila[NOMBRE_COLUMNAS.VALOR_TOTAL.getIndex()]    = libro.getPrecioVenta();
-      datosFila[NOMBRE_COLUMNAS.AGREGAR.getIndex()]        = false;
-      datosFila[NOMBRE_COLUMNAS.QUITAR.getIndex()]         = false;
-      datosFila[NOMBRE_COLUMNAS.DESCARTAR.getIndex()]      = false;
+      datosFila[NOMBRE_COLUMNAS.SUMAR.getIndex()]     = false;
+      datosFila[NOMBRE_COLUMNAS.RESTAR.getIndex()]    = false;
+      datosFila[NOMBRE_COLUMNAS.DESCARTAR.getIndex()] = false;
       model.addRow(datosFila);
    }
 
@@ -349,8 +350,8 @@ public class PanelCarrito extends JPanel {
       VALOR_IMPUESTO(4, "Vlr Impuesto"),
       CANTIDAD(5, "Cantidad"),
       VALOR_TOTAL(6, "Vlr Total"),
-      AGREGAR(7, "+"),
-      QUITAR(8, "-"),
+      SUMAR(7, "+"),
+      RESTAR(8, "-"),
       DESCARTAR(9, "x");
       private final int    index;
       private final String name;
