@@ -14,19 +14,58 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Ventana principal de la aplicación de la tienda digital de libros.
+ * Gestiona la inicialización de la interfaz gráfica y la interacción con la lógica de negocio.
+ */
 public class VentanaPrincipal extends JFrame {
+   /**
+    * Manejador de eventos de la aplicación.
+    */
    private final Evento                 evento;
+   /**
+    * Instancia de la tienda (lógica de negocio).
+    */
    private final Tienda                 tienda;
+   /**
+    * Lista local de libros disponibles.
+    */
    private final ArrayList<Libro>       librosLocales;
+   /**
+    * Lista local de compras realizadas.
+    */
    private final ArrayList<Compra>      compraLocales;
+   /**
+    * Carrito de compras actual del usuario.
+    */
    private final HashMap<Long, Integer> carritoActual;
+   /**
+    * Usuario actualmente autenticado.
+    */
    private final Usuario                usuarioActual;
+   /**
+    * Diálogo de login y registro.
+    */
    private       DialogLoginSignup      dialogLoginSignup;
+   /**
+    * Panel principal de la aplicación.
+    */
    private       PantallaPrincipal      pantallaPrincipal;
+   /**
+    * Método de pago seleccionado.
+    */
    private       Compra.METODO_PAGO     metodoPago;
+   /**
+    * Respuesta de confirmación para ciertas acciones.
+    */
+   private       boolean                respuesta = false;
 
+   /**
+    * Constructor de la ventana principal. Inicializa la tienda y la interfaz gráfica.
+    */
    public VentanaPrincipal () {
       Tienda.agregarLog("-----Iniciando la aplicación-----");
+      Tienda.resetInstance();
       evento        = new Evento(this);
       tienda        = Tienda.getInstance();
       usuarioActual = tienda.getUsuarioActual();
@@ -36,6 +75,9 @@ public class VentanaPrincipal extends JFrame {
       inicializarFrame();
    }
 
+   /**
+    * Inicializa el frame principal y configura el cierre seguro de la aplicación.
+    */
    private void inicializarFrame () {
       setTitle("Tienda Digital de Libros");
       //Esto para que no se cierre la ventana de golpe, sino que primero guarde y luego cierre`
@@ -46,16 +88,23 @@ public class VentanaPrincipal extends JFrame {
          }
       });
       this.pantallaPrincipal = new PantallaPrincipal(this, evento);
-      setSize(1000, 600);
+      setSize(1000, 800);
       setLocationRelativeTo(null);
       setResizable(true);
       setVisible(true);
    }
 
+   /**
+    * Obtiene el diálogo de login y registro.
+    * @return Diálogo de login y registro.
+    */
    public DialogLoginSignup getDialogLoginSignUp () {
       return dialogLoginSignup;
    }
 
+   /**
+    * Valida y registra un nuevo usuario en el sistema.
+    */
    void validarRegistro () {
       Usuario usuarioARegistrar = getDatosSignUp();
       if (tienda.registrarUsuario(usuarioARegistrar)) {
@@ -67,10 +116,17 @@ public class VentanaPrincipal extends JFrame {
       }
    }
 
+   /**
+    * Obtiene los datos de registro del usuario desde el diálogo.
+    * @return Usuario con los datos de registro.
+    */
    private Usuario getDatosSignUp () {
       return getDialogLoginSignUp().getDatosRegistro();
    }
 
+   /**
+    * Agrega un libro seleccionado al carrito de compras.
+    */
    void agregarLibroCarrito () {
       long ISBN = pantallaPrincipal.getPanelLibros().getLibroSeleccionado().getISBN();
       pantallaPrincipal.getPanelCarrito().agregarArticulo(ISBN);
@@ -78,9 +134,11 @@ public class VentanaPrincipal extends JFrame {
       pantallaPrincipal.getCartBooksButton().setText(String.valueOf(cantidadLibros));
    }
 
+   /**
+    * Cierra la aplicación de forma segura, guardando datos y cerrando la conexión a la base de datos.
+    */
    private void salirFormaSegura () {
-      //TODO
-      //pantallaPrincipal.getPanelCarrito().actualizarCarritoArchivo();
+      tienda.guardarDatosLocales();
       dispose();
       try {
          ConnectionToDB.getInstance().closeConnection();
@@ -92,11 +150,17 @@ public class VentanaPrincipal extends JFrame {
       System.exit(0);
    }
 
+   /**
+    * Muestra el diálogo de login y registro.
+    */
    void mostrarPanelLoginSignUp () {
       dialogLoginSignup = new DialogLoginSignup(this, evento);
       dialogLoginSignup.setVisible(true);
    }
 
+   /**
+    * Actualiza los datos de un libro en el sistema.
+    */
    void actualizarLibro () {
       System.out.println("Actualizando libro...");
       final DialogActualizarLibro dialogActualizarLibro = pantallaPrincipal.getPanelLibros().getDialogActualizarLibro();
@@ -115,29 +179,63 @@ public class VentanaPrincipal extends JFrame {
       dialogActualizarLibro.dispose();
    }
 
+   /**
+    * Obtiene el subtotal de la venta actual.
+    * @return Subtotal de la venta.
+    */
    double obtenerSubTotalVenta () {
       return tienda.calcularSubTotalVenta();
    }
 
+   /**
+    * Obtiene el total de la venta actual, incluyendo impuestos y descuentos.
+    * @return Total de la venta.
+    */
    double obtenerTotalVenta () {
       return tienda.calcularTotalVenta();
    }
 
+   /**
+    * Calcula el precio total de un producto, incluyendo impuestos y descuentos.
+    * @param valorUnitario Precio unitario del producto.
+    * @param cantidad Cantidad de productos.
+    * @return Precio total del producto.
+    */
    double obtenerPrecioTotalProducto (double valorUnitario, int cantidad) {
       return tienda.calcularPrecioVentaPorLibro(valorUnitario, cantidad);
    }
 
+   /**
+    * Calcula el valor del impuesto para un precio dado.
+    * @param valorUnitario Precio del producto.
+    * @return Valor del impuesto.
+    */
    double obtenerPrecioImpuesto (double valorUnitario) {
       return tienda.calcularValorImpuesto(valorUnitario);
    }
 
+   /**
+    * Calcula el porcentaje de impuesto para un precio dado.
+    * @param valorUnitario Precio del producto.
+    * @return Porcentaje de impuesto.
+    */
+   double obtenerPorcentajeImpuesto (double valorUnitario) {
+      return tienda.calcularPorcentajeImpuesto(valorUnitario);
+   }
+
+   /**
+    * Elimina el diálogo de login y registro.
+    */
    void eliminarDialogLoginSignUp () {
       dialogLoginSignup.dispose();
    }
 
+   /**
+    * Elimina un libro del sistema.
+    */
    void eliminarLibro () {
       DialogEliminarLibro dialogEliminarLibro = pantallaPrincipal.getPanelLibros().getDialogEliminarLibro();
-      long                ISBN                = dialogEliminarLibro.getLibro().getISBN();
+      long                ISBN                = dialogEliminarLibro.getLibroAEliminar().getISBN();
       if (tienda.comprasAsociadas(ISBN)) {
          Tienda.agregarLog("Intento de eliminar libro con ventas asociadas: " + ISBN);
          JOptionPane.showMessageDialog(this, "No es posible eliminar el libro, tiene ventas asociadas", "Alerta", JOptionPane.INFORMATION_MESSAGE);
@@ -153,6 +251,9 @@ public class VentanaPrincipal extends JFrame {
       dialogEliminarLibro.dispose();
    }
 
+   /**
+    * Crea una cuenta de usuario con los datos proporcionados.
+    */
    void crearCuenta () {
       Usuario datosUsuario = pantallaPrincipal.getPanelCrearCuentas().getDatosUsuario();
       if (tienda.registrarUsuario(datosUsuario)) {
@@ -162,6 +263,9 @@ public class VentanaPrincipal extends JFrame {
       }
    }
 
+   /**
+    * Valida si el correo electrónico proporcionado está disponible para registro.
+    */
    void validarCorreoDisponible () {
       String correo = pantallaPrincipal.getPanelCrearCuentas().getCorreo();
       if (correo.isBlank()) {
@@ -175,23 +279,45 @@ public class VentanaPrincipal extends JFrame {
       pantallaPrincipal.getPanelCrearCuentas().setMensajeDisponible();
    }
 
+   /**
+    * Procesa el pago de la compra actual.
+    */
    void pagar () {
       if (!pantallaPrincipal.getSesionIniciada()) {
          JOptionPane.showMessageDialog(null, "Debe iniciar sesion para pagar", "Alerta", JOptionPane.INFORMATION_MESSAGE);
          return;
       }
-      DialogConfirmarCompra dialogConfirmarCompra = new DialogConfirmarCompra(this, evento, metodoPago, carritoActual);
+      DialogConfirmarCompra dialogConfirmarCompra = new DialogConfirmarCompra(this, carritoActual, metodoPago, tienda.obtenerDescuentoTipoUsuario(usuarioActual.getTipoUsuario()));
       dialogConfirmarCompra.setVisible(true);
-      if (dialogConfirmarCompra.getRespuesta()) {
-         tienda.efectuarCompra(carritoActual, usuarioActual, metodoPago);
-         pantallaPrincipal.getPanelCarrito().vaciarCarrito();
+      if (respuesta) {
+         if (tienda.efectuarCompra(metodoPago)) {
+            pantallaPrincipal.getPanelCarrito().vaciarCarrito();
+         }
+         respuesta = false;
       }
    }
 
+   /**
+    * Calcula el valor con descuento sin incluir IVA.
+    * @param valorBase Valor base del producto.
+    * @param porcentajeDescuento Porcentaje de descuento a aplicar.
+    * @return Valor con descuento sin IVA.
+    */
+   double obtenerValorConDescuentoSinIva (double valorBase, double porcentajeDescuento) {
+      return tienda.obtenerValorConDescuentoSinIva(valorBase, porcentajeDescuento);
+   }
+
+   /**
+    * Obtiene la lista de compras realizadas.
+    * @return Lista de compras.
+    */
    ArrayList<Compra> obtenerListaCompras () {
       return tienda.getComprasLocales();
    }
 
+   /**
+    * Valida y procesa el inicio de sesión de un usuario.
+    */
    void validarInicioSesion () {
       Usuario datosUsuario = getDialogLoginSignUp().getDatosLogin();
       if (datosUsuario.getCorreoElectronico().isBlank() || datosUsuario.getClaveAcceso().length == 0) {
@@ -207,22 +333,44 @@ public class VentanaPrincipal extends JFrame {
       pantallaPrincipal.iniciarSesion();
    }
 
+   /**
+    * Valida las credenciales de inicio de sesión proporcionadas.
+    * @param datosLogin Datos de inicio de sesión.
+    * @return Usuario validado o null si las credenciales son incorrectas.
+    */
    private Usuario validarLogin (Usuario datosLogin) {
       return tienda.validarCredenciales(datosLogin);
    }
 
+   /**
+    * Obtiene el valor total de impuestos para la venta actual.
+    * @return Valor total de impuestos.
+    */
    double obtenerValorTotalImpuesto () {
       return tienda.calcularValorTotalImpuesto();
    }
 
+   /**
+    * Obtiene la cantidad total de libros en el carrito.
+    * @return Cantidad de libros.
+    */
    int obtenerCantidadLibros () {
       return tienda.obtenerCantidadLibros();
    }
 
+   /**
+    * Busca y devuelve un libro mediante su ISBN.
+    * @param ISBN ISBN del libro a buscar.
+    * @return Libro encontrado o null si no existe.
+    */
    Libro obtenerLibroMedianteISBN (long ISBN) {
       return tienda.buscarLibro(ISBN);
    }
 
+   /**
+    * Verifica si el usuario actual está registrado en el sistema.
+    * @return Verdadero si el usuario está registrado, falso en caso contrario.
+    */
    boolean usuarioRegistrado () {
       Usuario usuario = pantallaPrincipal.getDatosUsuario();
       if (usuario == null) {
@@ -231,10 +379,16 @@ public class VentanaPrincipal extends JFrame {
       return usuario.getTipoUsuario() != Usuario.ROLES.ADMIN;
    }
 
+   /**
+    * Muestra el diálogo para agregar un nuevo libro.
+    */
    void dialogAgregarLibro () {
       pantallaPrincipal.mostrarDialogAgregarLibro();
    }
 
+   /**
+    * Actualiza los datos del cliente (usuario) en el sistema.
+    */
    void actualizarDatosCliente () {
       pantallaPrincipal.getDialogPerfil().setMensajeDeError();
       if (!pantallaPrincipal.getDialogPerfil().obtenerMensajeDeError().isBlank()) {
@@ -261,6 +415,9 @@ public class VentanaPrincipal extends JFrame {
       }
    }
 
+   /**
+    * Cierra la sesión actual y reinicia la ventana de la aplicación.
+    */
    void cerrarSesion () {
       dispose();
       new VentanaPrincipal();
@@ -268,6 +425,9 @@ public class VentanaPrincipal extends JFrame {
       repaint();
    }
 
+   /**
+    * Registra un nuevo libro en el sistema.
+    */
    void registrarLibro () {
       DialogAgregarLibro dialogAgregarLibro = pantallaPrincipal.getPanelLibros().getDialogAgregarLibro();
       String             mensajeError       = dialogAgregarLibro.obtenerMensajeDeError();
@@ -285,47 +445,100 @@ public class VentanaPrincipal extends JFrame {
       dialogAgregarLibro.dispose();
    }
 
+   /**
+    * Refresca los datos locales de la tienda.
+    */
    void refrescar () {
       tienda.refrescarDatosLocales();
    }
 
+   /**
+    * Obtiene la lista de libros disponibles en la tienda.
+    * @return Lista de libros.
+    */
    ArrayList<Libro> getLibrosLocales () {
       return librosLocales;
    }
 
+   /**
+    * Obtiene el usuario actualmente autenticado.
+    * @return Usuario actual.
+    */
    Usuario getUsuarioActual () {
       return usuarioActual;
    }
 
+   /**
+    * Obtiene la lista de compras realizadas por el usuario.
+    * @return Lista de compras.
+    */
    ArrayList<Compra> getComprasLocales () {
       return compraLocales;
    }
 
+   /**
+    * Obtiene el carrito de compras actual del usuario.
+    * @return Carrito de compras.
+    */
    HashMap<Long, Integer> getCarritoActual () {
       return carritoActual;
    }
 
+   /**
+    * Muestra los detalles de la compra seleccionada.
+    */
    public void mostrarDetallesCompra () {
       tienda.mostrarFactura(pantallaPrincipal.getCompraSeleccionada());
    }
 
+   /**
+    * Establece la compra seleccionada para ver detalles.
+    * @param compraSeleccionada Compra a establecer como seleccionada.
+    */
    public void setCompraSeleccionada (Compra compraSeleccionada) {
       pantallaPrincipal.setCompraSeleccionada(compraSeleccionada);
    }
 
+   /**
+    * Obtiene la lista de detalles de una compra mediante su ID.
+    * @param IDcompra ID de la compra.
+    * @return Lista de detalles de la compra.
+    */
    public ArrayList<DetalleCompra> obtenerListaDetallesCompraPorID (long IDcompra) {
       return tienda.obtenerDetallesCompraPorID(IDcompra);
    }
 
+   /**
+    * Obtiene la cantidad de unidades disponibles de un libro mediante su ISBN.
+    * @param ISBN ISBN del libro.
+    * @return Cantidad de unidades disponibles.
+    */
    public int unidadesDisponibles (long ISBN) {
       return tienda.unidadesDisponibles(ISBN);
    }
 
+   /**
+    * Elimina un libro del carrito de compras.
+    * @param ISBN ISBN del libro a eliminar.
+    * @param ID ID del detalle de compra asociado.
+    */
    public void eliminarLibroDelCarrito (long ISBN, long ID) {
       tienda.eliminarLibroDelCarrito(ISBN, ID);
    }
 
+   /**
+    * Establece el metodo de pago para la compra actual.
+    * @param metodoPago Metodo de pago a establecer.
+    */
    public void setMetodoPago (Compra.METODO_PAGO metodoPago) {
       this.metodoPago = metodoPago;
+   }
+
+   /**
+    * Establece la respuesta de confirmación para acciones como pago.
+    * @param respuesta Respuesta de confirmación.
+    */
+   public void setRespuesta (boolean respuesta) {
+      this.respuesta = respuesta;
    }
 }
