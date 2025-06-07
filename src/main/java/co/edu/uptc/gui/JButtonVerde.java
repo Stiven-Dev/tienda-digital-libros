@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class JButtonVerde extends JButton {
-   private final Color defaultColor = new Color(120, 200, 120);
+   private final Color defaultColor = new Color(107, 182, 107);
    private final Color pressedColor = new Color(120, 200, 120, 150);
 
    public JButtonVerde (String text) {

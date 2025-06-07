@@ -1,13 +1,15 @@
 package co.edu.uptc.gui;
 
+import co.edu.uptc.entity.Compra;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Evento implements ActionListener {
-   private final VentanaPrincipal ventana;
+   private final VentanaPrincipal ventanaPrincipal;
 
-   public Evento (VentanaPrincipal ventana) {
-      this.ventana = ventana;
+   public Evento (VentanaPrincipal ventanaPrincipal) {
+      this.ventanaPrincipal = ventanaPrincipal;
    }
 
    @Override public void actionPerformed (ActionEvent e) {
@@ -15,23 +17,25 @@ public class Evento implements ActionListener {
       EVENTO nombreEvento  = EVENTO.valueOf(actionCommand);
       switch (nombreEvento) {
          //Eventos para Administradores
-         case MOSTRAR_DIALOG_AGREGAR_LIBRO -> ventana.dialogAgregarLibro();
-         case ACTUALIZAR_LIBRO -> ventana.actualizarLibro();
-         case CREAR_CUENTA -> ventana.crearCuenta();
-         case ELIMINAR_LIBRO -> ventana.eliminarLibro();
-         case REGISTRAR_LIBRO -> ventana.registrarLibro();
-         case VALIDAR_CORREO -> ventana.validarCorreoDisponible();
+         case MOSTRAR_DIALOG_AGREGAR_LIBRO -> ventanaPrincipal.dialogAgregarLibro();
+         case ACTUALIZAR_LIBRO -> ventanaPrincipal.actualizarLibro();
+         case CREAR_CUENTA -> ventanaPrincipal.crearCuenta();
+         case ELIMINAR_LIBRO -> ventanaPrincipal.eliminarLibro();
+         case REGISTRAR_LIBRO -> ventanaPrincipal.registrarLibro();
+         case VALIDAR_CORREO -> ventanaPrincipal.validarCorreoDisponible();
 
          //Eventos para Clientes
-         case ACTUALIZAR_CLIENTE -> ventana.actualizarDatosCliente();
-         case CERRAR_SESION -> ventana.cerrarSesion();
-         case INICIAR_SESION -> ventana.validarInicioSesion();
-         case LIBRO_AL_CARRITO -> ventana.agregarLibroCarrito();
-         case LOGIN_SIGNUP -> ventana.mostrarPanelLoginSignUp();
-         case MOSTRAR_DETALLES_COMPRA -> ventana.mostrarDetallesCompra();
-         case PAGAR_EFECTIVO -> ventana.pagarEfectivo();
-         case PAGAR_TARJETA -> ventana.pagarTarjeta();
-         case REGISTRAR_CLIENTE -> ventana.validarRegistro();
+         case ACTUALIZAR_CLIENTE -> ventanaPrincipal.actualizarDatosCliente();
+         case CERRAR_SESION -> ventanaPrincipal.cerrarSesion();
+         case INICIAR_SESION -> ventanaPrincipal.validarInicioSesion();
+         case LIBRO_AL_CARRITO -> ventanaPrincipal.agregarLibroCarrito();
+         case LOGIN_SIGNUP -> ventanaPrincipal.mostrarPanelLoginSignUp();
+         case MOSTRAR_DETALLES_COMPRA -> ventanaPrincipal.mostrarDetallesCompra();
+         case PAGAR_EFECTIVO, PAGAR_TARJETA_CREDITO, PAGAR_TARJETA_DEBITO -> {
+            ventanaPrincipal.setMetodoPago(Compra.METODO_PAGO.valueOf(actionCommand));
+            ventanaPrincipal.pagar();
+         }
+         case REGISTRAR_CLIENTE -> ventanaPrincipal.validarRegistro();
       }
    }
 
@@ -46,7 +50,8 @@ public class Evento implements ActionListener {
       LIBRO_AL_CARRITO,
       LOGIN_SIGNUP,
       PAGAR_EFECTIVO,
-      PAGAR_TARJETA,
+      PAGAR_TARJETA_DEBITO,
+      PAGAR_TARJETA_CREDITO,
       REGISTRAR_CLIENTE,
       REGISTRAR_LIBRO,
       MOSTRAR_DETALLES_COMPRA,

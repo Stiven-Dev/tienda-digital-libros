@@ -83,7 +83,6 @@ public class Compra {
    }
 
    public enum METODO_PAGO {
-      //TODO: Implementar métodos de pago
       EFECTIVO("Efectivo"),
       TARJETA_DEBITO("Tarjeta Débito"),
       TARJETA_CREDITO("Tarjeta Crédito");

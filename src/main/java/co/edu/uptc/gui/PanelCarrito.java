@@ -1,5 +1,6 @@
 package co.edu.uptc.gui;
 
+import co.edu.uptc.entity.Compra;
 import co.edu.uptc.entity.Libro;
 import co.edu.uptc.entity.Usuario;
 import co.edu.uptc.gui.Evento.EVENTO;
@@ -27,7 +28,7 @@ public class PanelCarrito extends JPanel {
    private final JLabel                 labelCantidad          = new JLabel(String.format("Cantidad de libros: %d", cantidadLibros));
    private final JLabel                 labelImpuesto          = new JLabel(String.format("Impuesto: $%,.2f", valorTotalImpuesto));
    private final JLabel                 labelSubTotal          = new JLabel(String.format("Subtotal: $%,.2f", subTotal));
-   private final JLabel                 labelTotal             = new JLabel(String.format("Total: $%f", total));
+   private final JLabel                 labelTotal             = new JLabel(String.format("$%f", total));
    private       GridBagConstraints     gbc;
    public        DefaultTableModel      model;
    private       HashMap<Long, Integer> carritoDeCompras;
@@ -119,36 +120,52 @@ public class PanelCarrito extends JPanel {
       gbc.weighty = 0.15f;
       add(panelDescripcionCompra, gbc);
 
-      //Footer (incluye el label de precio total)
-      JButton botonPagarEfectivo = new JButtonAzul("Pagar En Efectivo");
-      JButton botonPagarTarjeta  = new JButtonAzul("Pagar Con Tarjeta");
-      botonPagarEfectivo.setActionCommand(EVENTO.PAGAR_EFECTIVO.name());
-      botonPagarTarjeta.setActionCommand(EVENTO.PAGAR_TARJETA.name());
-      botonPagarEfectivo.addActionListener(evento);
-      botonPagarTarjeta.addActionListener(evento);
+      //Footer
+      JPanel             panelFooter = new JPanel(new GridBagLayout());
+      GridBagConstraints gbcFooter   = new GridBagConstraints();
+      gbcFooter.insets  = new Insets(5, 5, 5, 5);
+      gbcFooter.fill    = GridBagConstraints.BOTH;
+      gbcFooter.weightx = 0.5f;
+      gbcFooter.weighty = 1;
+      gbcFooter.gridy   = 0;
 
+      //Panel de valor total de la compra
+      JPanel panelValorTotal = new JPanel(new BorderLayout());
+      panelValorTotal.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Valor Total de la Compra", TitledBorder.CENTER, TitledBorder.TOP, fuenteCabecera));
       labelTotal.setHorizontalAlignment(JLabel.CENTER);
       labelTotal.setFont(new Font("Lucida Sans Typewriter", Font.BOLD, 20));
+      panelValorTotal.add(labelTotal, BorderLayout.CENTER);
+      panelFooter.add(panelValorTotal, gbc);
 
-      GridBagConstraints gbcFooter = new GridBagConstraints();
-      gbcFooter.insets = new Insets(5, 5, 10, 5);
-      gbcFooter.fill   = GridBagConstraints.HORIZONTAL;
-      final float pesoBoton   = 0.15f;
-      JPanel      panelFooter = new JPanel(new GridBagLayout());
-      gbcFooter.gridx   = 0;
-      gbcFooter.weightx = 0.7f;
-      panelFooter.add(labelTotal, gbcFooter);
-      gbcFooter.gridx   = 1;
-      gbcFooter.weightx = pesoBoton;
-      panelFooter.add(botonPagarEfectivo, gbcFooter);
-      gbcFooter.gridx = 2;
-      panelFooter.add(botonPagarTarjeta, gbcFooter);
+      //Panel de botones de pago
+      JPanel panelMediosDePago = new JPanel(new GridLayout(1, 3, 10, 10));
+      panelMediosDePago.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Medios de Pago", TitledBorder.CENTER, TitledBorder.TOP, fuenteCabecera));
+      JButton botonPagarEfectivo       = new JButtonAzul(Compra.METODO_PAGO.EFECTIVO.getName());
+      JButton botonPagarTarjetaDebito  = new JButtonAzul(Compra.METODO_PAGO.TARJETA_DEBITO.getName());
+      JButton botonPagarTarjetaCredito = new JButtonAzul(Compra.METODO_PAGO.TARJETA_CREDITO.getName());
+      botonPagarEfectivo.setActionCommand(EVENTO.PAGAR_EFECTIVO.name());
+      botonPagarTarjetaDebito.setActionCommand(EVENTO.PAGAR_TARJETA_DEBITO.name());
+      botonPagarTarjetaCredito.setActionCommand(EVENTO.PAGAR_TARJETA_CREDITO.name());
+      botonPagarEfectivo.addActionListener(evento);
+      botonPagarTarjetaDebito.addActionListener(evento);
+      botonPagarTarjetaCredito.addActionListener(evento);
+      panelMediosDePago.add(botonPagarEfectivo);
+      panelMediosDePago.add(botonPagarTarjetaDebito);
+      panelMediosDePago.add(botonPagarTarjetaCredito);
+
+      gbcFooter.gridx = 0;
+      panelFooter.add(panelValorTotal, gbcFooter);
+      gbcFooter.gridx++;
+      panelFooter.add(panelMediosDePago, gbcFooter);
       //Asignacion de fuente a cada boton
       botonPagarEfectivo.setFont(fuenteBoton);
-      botonPagarTarjeta.setFont(fuenteBoton);
+      botonPagarTarjetaDebito.setFont(fuenteBoton);
+      botonPagarTarjetaCredito.setFont(fuenteBoton);
 
+      gbc.weightx = 0.1f;
       gbc.gridy   = 2;
-      gbc.weighty = 0.1f;
+      gbc.gridx   = 0;
+
       add(panelFooter, gbc);
 
       actualizarLabelsCompra();
@@ -347,7 +364,7 @@ public class PanelCarrito extends JPanel {
       labelCantidad.setText(String.format("Cantidad de libros: %d", cantidadLibros));
       labelImpuesto.setText(String.format("Impuesto: $%,.2f", valorTotalImpuesto));
       labelSubTotal.setText(String.format("Subtotal: $%,.2f", subTotal));
-      labelTotal.setText(String.format("Total: $%,.2f", total));
+      labelTotal.setText(String.format("$%,.2f", total));
    }
 
    public void refrescarLista (Usuario usuario) {
@@ -392,6 +409,17 @@ public class PanelCarrito extends JPanel {
 
    public int getCantidadLibros () {
       return cantidadLibros;
+   }
+
+   public void vaciarCarrito () {
+      model.setRowCount(0);
+      carritoDeCompras.clear();
+      cantidadLibros     = 0;
+      valorTotalImpuesto = 0;
+      subTotal           = 0;
+      total              = 0;
+      actualizarLabelsCompra();
+      CartBooksButton.setCount(cantidadLibros);
    }
 
    public enum NOMBRE_COLUMNAS {

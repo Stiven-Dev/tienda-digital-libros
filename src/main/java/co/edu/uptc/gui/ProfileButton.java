@@ -33,7 +33,7 @@ public class ProfileButton extends JButton {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       Color backgroundColor = new Color(208, 165, 49, 255);
       g2.setColor(backgroundColor);
-      g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+      g2.fillRoundRect(0, 0, getWidth(), getHeight(), 5, 5);
       g2.setColor(Color.WHITE);
       g2.setFont(new Font("Lucida Sans Unicode", Font.BOLD, 20));
       FontMetrics fontMetrics = g2.getFontMetrics();

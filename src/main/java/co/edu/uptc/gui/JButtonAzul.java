@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class JButtonAzul extends JButton {
-   private final Color defaultColor = new Color(81, 152, 208);
+   private final Color defaultColor = new Color(73, 129, 175);
    private final Color pressedColor = new Color(128, 139, 206, 150);
 
    public JButtonAzul (String text) {

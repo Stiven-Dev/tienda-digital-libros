@@ -23,13 +23,14 @@ public class VentanaPrincipal extends JFrame {
    private final Usuario                usuarioActual;
    private       DialogLoginSignup      dialogLoginSignup;
    private       PantallaPrincipal      pantallaPrincipal;
+   private       Compra.METODO_PAGO     metodoPago;
 
    public VentanaPrincipal () {
       Tienda.agregarLog("-----Iniciando la aplicación-----");
-      evento         = new Evento(this);
-      tienda         = Tienda.getInstance();
-      usuarioActual  = tienda.getUsuarioActual();
-      librosLocales  = tienda.getLibrosLocales();
+      evento        = new Evento(this);
+      tienda        = Tienda.getInstance();
+      usuarioActual = tienda.getUsuarioActual();
+      librosLocales = tienda.getLibrosLocales();
       carritoActual = tienda.getCarritoActual();
       compraLocales = tienda.getComprasLocales();
       inicializarFrame();
@@ -174,22 +175,17 @@ public class VentanaPrincipal extends JFrame {
       pantallaPrincipal.getPanelCrearCuentas().setMensajeDisponible();
    }
 
-   void pagarEfectivo () {
+   void pagar () {
       if (!pantallaPrincipal.getSesionIniciada()) {
          JOptionPane.showMessageDialog(null, "Debe iniciar sesion para pagar", "Alerta", JOptionPane.INFORMATION_MESSAGE);
          return;
       }
-      tienda.efectuarCompraEfectivo(carritoActual, usuarioActual);
-      JOptionPane.showMessageDialog(null, "Pago en efectivo", "Alerta", JOptionPane.INFORMATION_MESSAGE);
-   }
-
-   void pagarTarjeta () {
-      if (usuarioActual.getID() < 1) {
-         JOptionPane.showMessageDialog(null, "Debe iniciar sesion para pagar", "Alerta", JOptionPane.INFORMATION_MESSAGE);
-         return;
+      DialogConfirmarCompra dialogConfirmarCompra = new DialogConfirmarCompra(this, evento, metodoPago, carritoActual);
+      dialogConfirmarCompra.setVisible(true);
+      if (dialogConfirmarCompra.getRespuesta()) {
+         tienda.efectuarCompra(carritoActual, usuarioActual, metodoPago);
+         pantallaPrincipal.getPanelCarrito().vaciarCarrito();
       }
-      //TODO: Implementar la lógica de pago con tarjeta
-      JOptionPane.showMessageDialog(null, "Pago con Tarjeta", "Alerta", JOptionPane.INFORMATION_MESSAGE);
    }
 
    ArrayList<Compra> obtenerListaCompras () {
@@ -327,5 +323,9 @@ public class VentanaPrincipal extends JFrame {
 
    public void eliminarLibroDelCarrito (long ISBN, long ID) {
       tienda.eliminarLibroDelCarrito(ISBN, ID);
+   }
+
+   public void setMetodoPago (Compra.METODO_PAGO metodoPago) {
+      this.metodoPago = metodoPago;
    }
 }

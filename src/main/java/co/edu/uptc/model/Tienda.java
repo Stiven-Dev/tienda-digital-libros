@@ -353,13 +353,13 @@ public class Tienda {
       carritoDAO.eliminarLibroDelCarrito(ISBN, ID);
    }
 
-   public void efectuarCompraEfectivo (HashMap<Long, Integer> carrito, Usuario usuario) {
+   public void efectuarCompra (HashMap<Long, Integer> carrito, Usuario usuario, Compra.METODO_PAGO metodoPago) {
       Compra compra = new Compra();
       compra.setIDasociado(usuario.getID());
       ArrayList<DetalleCompra> listaArticulos = getListaArticulos(carrito);
       compra.setLibrosComprados(listaArticulos);
       compra.setValorCompra(calcularTotalVenta());
-      //Se omite definir el metodo de pago, ya que es Efectivo por defecto
+      compra.setMetodoPago(metodoPago);
       double porcentajeDescuento = obtenerDescuentoTipoUsuario(usuario.getTipoUsuario());
       long   IDcompra            = comprasDAO.registrarCompra(compra, porcentajeDescuento);
       if (IDcompra < 0) {

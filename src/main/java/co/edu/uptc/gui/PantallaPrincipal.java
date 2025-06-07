@@ -15,7 +15,7 @@ public class PantallaPrincipal extends JPanel {
    private final JPanel                 panelHeader     = new JPanel(new GridBagLayout());
    private final GridBagConstraints     gbcMain         = new GridBagConstraints();
    private final JLabel                 labelHeader     = new JLabel("Tienda Digital de Libros");
-   private final Color                  backGroundColor = new Color(97, 158, 210);
+   private final Color                  backGroundColor = new Color(122, 252, 162, 90);
    private       PanelLibros            panelLibros;
    private       PanelCarrito           panelCarrito; //Solo para Usuarios
    private       ProfileButton          profileButton;
@@ -36,10 +36,9 @@ public class PantallaPrincipal extends JPanel {
       this.evento           = evento;
       this.ventanaPrincipal = ventanaPrincipal;
       this.usuarioActual    = ventanaPrincipal.getUsuarioActual();
-      this.librosLocales = ventanaPrincipal.getLibrosLocales();
-      this.compraLocales = ventanaPrincipal.getComprasLocales();
-      this.carritoActual = ventanaPrincipal.getCarritoActual();
-      this.setBackground(backGroundColor);
+      this.librosLocales    = ventanaPrincipal.getLibrosLocales();
+      this.compraLocales    = ventanaPrincipal.getComprasLocales();
+      this.carritoActual    = ventanaPrincipal.getCarritoActual();
       setLayout(new GridBagLayout());
       gbcMain.fill    = GridBagConstraints.BOTH;
       gbcMain.insets  = new Insets(0, 5, 5, 5);
@@ -58,7 +57,7 @@ public class PantallaPrincipal extends JPanel {
       gbcHeader.weightx = 0.7f;
       panelHeader.setBackground(backGroundColor);
       labelHeader.setHorizontalAlignment(JLabel.CENTER);
-      labelHeader.setFont(new Font("Lucida Sans Unicode", Font.BOLD, 25));
+      labelHeader.setFont(new Font("Lucida Sans Unicode", Font.BOLD, 20));
       labelHeader.setForeground(Color.WHITE);
       panelHeader.add(labelHeader, gbcHeader);
 
