@@ -102,8 +102,9 @@ public class PantallaPrincipal extends JPanel {
 
    /**
     * Constructor del panel principal.
+    *
     * @param ventanaPrincipal referencia a la ventana principal
-    * @param evento manejador de eventos
+    * @param evento           manejador de eventos
     */
    public PantallaPrincipal (VentanaPrincipal ventanaPrincipal, Evento evento) {
       this.evento           = evento;
@@ -241,6 +242,7 @@ public class PantallaPrincipal extends JPanel {
 
    /**
     * Retorna el diálogo de historial de compras.
+    *
     * @return diálogo de historial de compras
     */
    public DialogHistorialCompras getDialogHistorialCompras () {
@@ -249,6 +251,7 @@ public class PantallaPrincipal extends JPanel {
 
    /**
     * Retorna el panel de libros.
+    *
     * @return panel de libros
     */
    PanelLibros getPanelLibros () {
@@ -282,6 +285,7 @@ public class PantallaPrincipal extends JPanel {
 
    /**
     * Retorna el panel de carrito de compras.
+    *
     * @return panel de carrito
     */
    PanelCarrito getPanelCarrito () {
@@ -290,6 +294,7 @@ public class PantallaPrincipal extends JPanel {
 
    /**
     * Retorna el panel para crear cuentas.
+    *
     * @return panel de creación de cuentas
     */
    PanelCrearCuentas getPanelCrearCuentas () {
@@ -298,6 +303,7 @@ public class PantallaPrincipal extends JPanel {
 
    /**
     * Retorna el diálogo de perfil de usuario.
+    *
     * @return diálogo de perfil
     */
    DialogPerfil getDialogPerfil () {
@@ -314,6 +320,7 @@ public class PantallaPrincipal extends JPanel {
 
    /**
     * Retorna los datos del usuario actual.
+    *
     * @return usuario actual
     */
    public Usuario getDatosUsuario () {
@@ -322,6 +329,7 @@ public class PantallaPrincipal extends JPanel {
 
    /**
     * Retorna el botón del carrito de compras.
+    *
     * @return botón del carrito
     */
    public CartBooksButton getCartBooksButton () {
@@ -330,6 +338,7 @@ public class PantallaPrincipal extends JPanel {
 
    /**
     * Retorna la lista local de libros.
+    *
     * @return lista de libros
     */
    public ArrayList<Libro> getLibrosLocales () {
@@ -338,6 +347,7 @@ public class PantallaPrincipal extends JPanel {
 
    /**
     * Retorna la compra seleccionada.
+    *
     * @return compra seleccionada
     */
    public Compra getCompraSeleccionada () {
@@ -346,6 +356,7 @@ public class PantallaPrincipal extends JPanel {
 
    /**
     * Establece la compra seleccionada.
+    *
     * @param compraSeleccionada compra a establecer
     */
    public void setCompraSeleccionada (Compra compraSeleccionada) {
@@ -358,12 +369,14 @@ public class PantallaPrincipal extends JPanel {
    public void refrescarInterfaz () {
       int cantidadLibros = ventanaPrincipal.obtenerCantidadLibros();
       CartBooksButton.setCount(cantidadLibros);
+      cartBooksButton.setText(String.valueOf(cantidadLibros));
       revalidate();
       repaint();
    }
 
    /**
     * Indica si la sesión está iniciada.
+    *
     * @return true si la sesión está iniciada, false en caso contrario
     */
    public boolean getSesionIniciada () {

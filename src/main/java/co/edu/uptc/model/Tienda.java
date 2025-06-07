@@ -45,6 +45,10 @@ public class Tienda {
       return instance;
    }
 
+   public static void resetInstance () {
+      instance = null;
+   }
+
    public ArrayList<Libro> getLibrosLocales () {
       return librosLocales;
    }
@@ -353,19 +357,20 @@ public class Tienda {
       carritoDAO.eliminarLibroDelCarrito(ISBN, ID);
    }
 
-   public void efectuarCompra (HashMap<Long, Integer> carrito, Usuario usuario, Compra.METODO_PAGO metodoPago) {
+   public boolean efectuarCompra (Compra.METODO_PAGO metodoPago) {
       Compra compra = new Compra();
-      compra.setIDasociado(usuario.getID());
-      ArrayList<DetalleCompra> listaArticulos = getListaArticulos(carrito);
+      compra.setIDasociado(usuarioActual.getID());
+      ArrayList<DetalleCompra> listaArticulos = getListaArticulos(carritoActual);
       compra.setLibrosComprados(listaArticulos);
       compra.setValorCompra(calcularTotalVenta());
       compra.setMetodoPago(metodoPago);
-      double porcentajeDescuento = obtenerDescuentoTipoUsuario(usuario.getTipoUsuario());
+      double porcentajeDescuento = obtenerDescuentoTipoUsuario(usuarioActual.getTipoUsuario());
       long   IDcompra            = comprasDAO.registrarCompra(compra, porcentajeDescuento);
       if (IDcompra < 0) {
-         return;
+         return false;
       }
       detalleCompraDAO.registrarDetallesCompra(listaArticulos, compra.getIDasociado(), IDcompra);
+      return true;
    }
 
    private ArrayList<DetalleCompra> getListaArticulos (HashMap<Long, Integer> carrito) {
@@ -384,5 +389,9 @@ public class Tienda {
          listaArticulos.add(detalleCompra);
       }
       return listaArticulos;
+   }
+
+   public void guardarDatosLocales () {
+      //TODO: Implementar la lógica para guardar los datos locales
    }
 }

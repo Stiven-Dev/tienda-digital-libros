@@ -145,7 +145,7 @@ public class ComprasDAO {
     */
    public long registrarCompra (Compra compra, double porcentajeDescuento) {
       if (compra.getLibrosComprados().isEmpty()) {
-         Tienda.agregarLog("No se puede registrar una compra sin libros comprados.");
+         Tienda.agregarLog("No se puede registrar una compra sin libros");
          return -1;
       }
       String consultaSQL = "INSERT INTO COMPRAS (ID_asociado, porcentaje_Descuento) VALUES (?, ?)";
