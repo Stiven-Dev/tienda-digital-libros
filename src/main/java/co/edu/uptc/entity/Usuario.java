@@ -1,23 +1,13 @@
 package co.edu.uptc.entity;
 
-import java.util.List;
-
 public class Usuario {
-   private long         ID;
-   private String       nombreCompleto;
-   private String       correoElectronico;
-   private String       direccionEnvio;
-   private long         telefonoContacto;
-   private char[]       claveAcceso;
-   private ROLES        tipoUsuario = ROLES.REGULAR;
-   private Carrito      carrito;
-   private List<Compra> compras;
-
-   public enum ROLES {
-      ADMIN,
-      PREMIUM,
-      REGULAR
-   }
+   private long   ID;
+   private String nombreCompleto;
+   private String correoElectronico;
+   private String direccionEnvio;
+   private long   telefonoContacto;
+   private char[] claveAcceso;
+   private ROLES  tipoUsuario = ROLES.REGULAR;
 
    public Usuario () {}
 
@@ -77,19 +67,9 @@ public class Usuario {
       this.tipoUsuario = tipoUsuario;
    }
 
-   public Carrito getCarrito () {
-      return carrito;
-   }
-
-   public void setCarrito (Carrito carrito) {
-      this.carrito = carrito;
-   }
-
-   public List<Compra> getCompras () {
-      return compras;
-   }
-
-   public void setCompras (List<Compra> compras) {
-      this.compras = compras;
+   public enum ROLES {
+      ADMIN,
+      PREMIUM,
+      REGULAR
    }
 }

@@ -4,41 +4,41 @@ import co.edu.uptc.entity.Usuario;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.ActionEvent;
 import java.util.Arrays;
 
 public class DialogLoginSignup extends JDialog {
-   private final JTabbedPane    panelContenedor;
-   private final Evento         evento;
-   private final Font           fuenteLabel     = new Font("Lucida Sans Unicode", Font.PLAIN, 20);
-   private final Font           fuenteTextField = new Font("Times New Roman", Font.PLAIN, 20);
-   private final Font           fuenteBoton     = new Font("Lucida Sans Unicode", Font.BOLD, 20);
-   private final JLabel         mensajeDeError  = new JLabel();
-   private       JPanel         panelLogin;
-   private       JPanel         panelRegistro;
-   private       JTextField     boxCorreoLogin;
-   private       JPasswordField boxContrasenaLogin;
-   private       JTextField     boxNombreCompleto;
-   private       JTextField     boxCorreo;
-   private       JTextField     boxDireccion;
-   private       JTextField     boxTelefono;
-   private       JPasswordField boxContrasena;
+   private final Evento             evento;
+   private final Font               fuenteLabel     = new Font("Lucida Sans Unicode", Font.BOLD, 20);
+   private final Font               fuenteTextField = new Font("Arial", Font.PLAIN, 20);
+   private final Font               fuenteBoton     = new Font("Lucida Sans Unicode", Font.BOLD, 20);
+   private final JLabel             mensajeDeError  = new JLabel(" ", SwingConstants.CENTER);
+   private       JPanel             panelLogin;
+   private       JPanel             panelRegistro;
+   private       JTextField         boxCorreoLogin;
+   private       JPasswordField     boxContrasenaLogin;
+   private       JTextField         boxNombreCompleto;
+   private       JTextField         boxCorreo;
+   private       JTextField         boxDireccion;
+   private       JTextField         boxTelefono;
+   private       JPasswordField     boxContrasena;
+   private       JButton            botonRegistrar;
+   private       JButton            botonIniciarSesion;
+   private final JPanel             panelCentral    = new JPanel(new CardLayout());
+   private final GridBagConstraints gbcFooter       = new GridBagConstraints();
 
    public DialogLoginSignup (VentanaPrincipal ventanaPrincipal, Evento evento) {
       super(ventanaPrincipal, "Inicio de Sesión / Registro", true);
-      this.evento     = evento;
-      panelContenedor = new JTabbedPane();
-      Font fuentePestania = new Font("Arial", Font.BOLD, 15);
-      panelContenedor.setFont(fuentePestania);
+      this.evento = evento;
       agregarLogin();
       agregarRegistro();
-      panelContenedor.addTab("Login", panelLogin);
-      panelContenedor.addTab("SingUp", panelRegistro);
-      add(panelContenedor);
+      panelCentral.add(panelLogin, "LOGIN");
+      panelCentral.add(panelRegistro, "REGISTRO");
+      add(panelCentral);
       pack();
       setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
       setLocationRelativeTo(this);
+      setResizable(false);
    }
 
    private void agregarLogin () {
@@ -46,13 +46,13 @@ public class DialogLoginSignup extends JDialog {
       panelLogin = new JPanel(new BorderLayout());
       //Campos de Usuario y Contraseña
       JPanel panelLoginDatos = new JPanel(new GridBagLayout());
-      JLabel labelUsuario    = new JLabel("Correo Electronico", SwingConstants.CENTER);
+      JLabel labelUsuario    = new JLabel("Correo Electrónico", SwingConstants.CENTER);
       JLabel labelContrasena = new JLabel("Contraseña", SwingConstants.CENTER);
       //Asignacion de fuente a cada label
       labelUsuario.setFont(fuenteLabel);
       labelContrasena.setFont(fuenteLabel);
-      boxCorreoLogin     = new JTextField("admin1@gmail.com");
-      boxContrasenaLogin = new JPasswordField("admin");
+      boxCorreoLogin     = new JTextField("regular1@gmail.com");
+      boxContrasenaLogin = new JPasswordField("regular1");
       //Asignacion de fuente a cada text field
       boxCorreoLogin.setFont(fuenteTextField);
       boxContrasenaLogin.setFont(fuenteTextField);
@@ -79,6 +79,43 @@ public class DialogLoginSignup extends JDialog {
       panelLoginDatos.add(boxContrasenaLogin, gbc);
       //Fila 4, columna 0=> CheckBox Mostrar Contraseña
       gbc.gridy = 4;
+      JCheckBox checkBoxMostrarContrasena = getCheckBoxMostrarContrasena();
+      panelLoginDatos.add(checkBoxMostrarContrasena, gbc);
+      //Botones
+      JPanel panelBotonesLogin = new JPanel(new GridBagLayout());
+      gbcFooter.insets   = new Insets(10, 10, 10, 10);
+      gbcFooter.fill     = GridBagConstraints.BOTH;
+      gbcFooter.weightx  = 0.9f;
+      gbcFooter.weighty  = 0.9f;
+      gbcFooter.gridx    = 0;
+      gbcFooter.gridy    = 0;
+      botonIniciarSesion = new JButtonVerde("Iniciar Sesión");
+      botonIniciarSesion.setActionCommand(Evento.EVENTO.INICIAR_SESION.name());
+      botonIniciarSesion.addActionListener(evento);
+      panelBotonesLogin.add(botonIniciarSesion, gbcFooter);
+      gbcFooter.gridy = 1;
+      JButton linkRegistrarse = new JButtonAzul("");
+      linkRegistrarse.setAction(new AbstractAction() {
+         @Override public void actionPerformed (ActionEvent e) {
+            CardLayout cardLayout = (CardLayout) panelCentral.getLayout();
+            cardLayout.show(panelCentral, "REGISTRO");
+            getRootPane().setDefaultButton(botonRegistrar);
+            pack();
+            revalidate();
+            repaint();
+         }
+      });
+      linkRegistrarse.setText("Crear Una Cuenta");
+      panelBotonesLogin.add(linkRegistrarse, gbcFooter);
+      //Asignacion de fuente a cada boton
+      botonIniciarSesion.setFont(fuenteBoton);
+      linkRegistrarse.setFont(fuenteBoton);
+      panelLogin.add(panelLoginDatos, BorderLayout.CENTER);
+      panelLogin.add(panelBotonesLogin, BorderLayout.SOUTH);
+      getRootPane().setDefaultButton(botonIniciarSesion);
+   }
+
+   private JCheckBox getCheckBoxMostrarContrasena () {
       JCheckBox checkBoxMostrarContrasena = new JCheckBox("Mostrar Contraseña");
       checkBoxMostrarContrasena.setSelected(false);
       checkBoxMostrarContrasena.setHorizontalAlignment(JCheckBox.CENTER);
@@ -89,28 +126,8 @@ public class DialogLoginSignup extends JDialog {
             boxContrasenaLogin.setEchoChar('•');
          }
       });
-      panelLoginDatos.add(checkBoxMostrarContrasena, gbc);
-      //Botones
-      JPanel  panelBotones       = new JPanel(new GridLayout(2, 1));
-      JButton botonIniciarSesion = new JButton("Iniciar Sesión");
-      botonIniciarSesion.setActionCommand(Evento.EVENTO.INICIAR_SESION.name());
-      botonIniciarSesion.addActionListener(evento);
-      panelBotones.add(botonIniciarSesion, gbc);
-      JLabel linkRegistrarse = new JLabel("Registrarse");
-      linkRegistrarse.setForeground(Color.GRAY);
-      linkRegistrarse.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-      linkRegistrarse.setHorizontalAlignment(JLabel.CENTER);
-      linkRegistrarse.addMouseListener(new MouseAdapter() {
-         @Override public void mouseClicked (MouseEvent e) {
-            panelContenedor.setSelectedComponent(panelRegistro);
-         }
-      });
-      panelBotones.add(linkRegistrarse, gbc);
-      //Asignacion de fuente a cada boton
-      botonIniciarSesion.setFont(fuenteBoton);
-      linkRegistrarse.setFont(fuenteBoton);
-      panelLogin.add(panelLoginDatos, BorderLayout.CENTER);
-      panelLogin.add(panelBotones, BorderLayout.SOUTH);
+      checkBoxMostrarContrasena.setFont(fuenteTextField);
+      return checkBoxMostrarContrasena;
    }
 
    private void agregarRegistro () {
@@ -118,9 +135,9 @@ public class DialogLoginSignup extends JDialog {
       panelRegistro = new JPanel(new BorderLayout());
       //Labels
       JLabel labelNombreCompleto = new JLabel("*Nombre Completo", SwingConstants.CENTER);
-      JLabel labelCorreo         = new JLabel("*Correo Electronico", SwingConstants.CENTER);
-      JLabel labelDireccion      = new JLabel("*Direccion", SwingConstants.CENTER);
-      JLabel labelTelefono       = new JLabel("*Teléfono", SwingConstants.CENTER);
+      JLabel labelCorreo         = new JLabel("*Correo Electrónico", SwingConstants.CENTER);
+      JLabel labelDireccion      = new JLabel("Dirección", SwingConstants.CENTER);
+      JLabel labelTelefono       = new JLabel("Teléfono", SwingConstants.CENTER);
       JLabel labelContrasena     = new JLabel("*Contraseña", SwingConstants.CENTER);
       //Asignacion de fuente a cada label
       labelNombreCompleto.setFont(fuenteLabel);
@@ -199,37 +216,48 @@ public class DialogLoginSignup extends JDialog {
       panelRegistroDatos.add(boxContrasena, gbc);
       gbc.gridx = 1;
       panelRegistroDatos.add(checkBoxMostrarContrasena, gbc);
-      JPanel panelBotones = new JPanel(new GridLayout(3, 1));
+
+      JPanel panelFooterRegistro = new JPanel(new GridBagLayout());
+      gbcFooter.insets  = new Insets(5, 5, 5, 5);
+      gbcFooter.weighty = 0.35f;
+      gbcFooter.weightx = 0.9f;
+      gbcFooter.gridy   = 0;
       mensajeDeError.setForeground(Color.RED);
       mensajeDeError.setFont(new Font("Arial", Font.BOLD, 20));
-      mensajeDeError.setHorizontalAlignment(JLabel.CENTER);
-      panelBotones.add(mensajeDeError);
-      JButton botonRegistrar = new JButton("Crear Cuenta");
+      panelFooterRegistro.add(mensajeDeError, gbcFooter);
+
+      gbcFooter.gridy = 1;
+      botonRegistrar  = new JButtonVerde("Crear Cuenta");
+      botonRegistrar.setActionCommand(Evento.EVENTO.REGISTRAR_CLIENTE.name());
       botonRegistrar.addActionListener(_ -> {
          mensajeDeError.setText(obtenerMensajeDeError());
-         botonRegistrar.setActionCommand(Evento.EVENTO.REGISTRAR.name());
          if (mensajeDeError.getText().isEmpty()) {
             botonRegistrar.removeActionListener(evento);
             botonRegistrar.addActionListener(evento);
          }
       });
-      panelBotones.add(botonRegistrar, gbc);
-      JLabel linkIniciarSesion = new JLabel("Iniciar Sesión");
-      linkIniciarSesion.setForeground(Color.GRAY);
-      linkIniciarSesion.setHorizontalAlignment(JLabel.CENTER);
-      linkIniciarSesion.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-      linkIniciarSesion.addMouseListener(new MouseAdapter() {
-         @Override public void mouseClicked (MouseEvent e) {
-            panelContenedor.setSelectedComponent(panelLogin);
+      panelFooterRegistro.add(botonRegistrar, gbcFooter);
+
+      gbcFooter.gridy = 2;
+      JButton linkIniciarSesion = new JButtonAzul("");
+      linkIniciarSesion.setAction(new AbstractAction() {
+         @Override public void actionPerformed (ActionEvent e) {
+            CardLayout cardLayout = (CardLayout) panelCentral.getLayout();
+            cardLayout.show(panelCentral, "LOGIN");
+            getRootPane().setDefaultButton(botonIniciarSesion);
+            pack();
+            revalidate();
+            repaint();
          }
       });
-      panelBotones.add(linkIniciarSesion, gbc);
+      linkIniciarSesion.setText("Ya tengo una Cuenta");
+      panelFooterRegistro.add(linkIniciarSesion, gbcFooter);
       //Asignacion de fuente a cada boton
       botonRegistrar.setFont(fuenteBoton);
       linkIniciarSesion.setFont(fuenteBoton);
       //Se agrega el panel de datos y de botones
       panelRegistro.add(panelRegistroDatos, BorderLayout.CENTER);
-      panelRegistro.add(panelBotones, BorderLayout.SOUTH);
+      panelRegistro.add(panelFooterRegistro, BorderLayout.SOUTH);
    }
 
    private String obtenerMensajeDeError () {
@@ -239,30 +267,29 @@ public class DialogLoginSignup extends JDialog {
             return "Debe rellenar el campo Nombre Completo";
          }
          if (boxCorreo.getText().isEmpty()) {
-            return "Debe rellenar el campo Correo Electronico";
-         }
-         if (boxDireccion.getText().isEmpty()) {
-            return "Debe rellenar el campo Direccion";
-         }
-         if (boxTelefono.getText().isEmpty()) {
-            return "Debe rellenar el campo Teléfono";
+            return "Debe rellenar el campo Correo Electrónico";
          }
          if (Arrays.toString(boxContrasena.getPassword()).isEmpty()) {
             return "Debe rellenar el campo Contraseña";
          }
       }
       //Validar tamaño y formato de los campos
-      if (boxTelefono.getText().length() != 10) {
-         return "El campo Teléfono debe tener 10 caracteres";
+      if (!boxTelefono.getText().isBlank()) {
+         if (boxTelefono.getText().length() != 10) {
+            return "El campo Teléfono debe tener 10 caracteres numéricos";
+         }
+         if (!boxTelefono.getText().matches("3[0-9]{9}")) {
+            return "El campo Teléfono debe empezar por 3 y tener 10 caracteres numéricos";
+         }
       }
-      if (!boxTelefono.getText().matches("3[0-9]{9}")) {
-         return "El campo Teléfono debe tener 10 caracteres numéricos";
+
+      if (!boxDireccion.getText().isBlank()) {
+         final String regexDireccion = "^(Calle|Carrera|Avenida|Diagonal|Transversal|Circunvalar)\\s\\d+\\s*#\\s*\\d+(-\\d+)?(\\s*,\\s*[\\w\\s]+)?$\n";
+         if (!boxDireccion.getText().matches(regexDireccion)) {
+            return "El campo Dirección debe tener la siguiente forma: Calle 15 # 15 - 15, Indicaciones Adicionales";
+         }
       }
-      final String regexDireccion = "^(Calle|Carrera|Avenida|Diagonal|Transversal|Circunvalar)\\s\\d+\\s*(#|No\\.)\\s*\\d+(-\\d+)?(\\s*,\\s*[\\w\\s]+)?$\n";
-      if (!boxDireccion.getText().matches(regexDireccion)) {
-         return "El campo Dirección debe tener la siguiente forma: (Calle, Carrera, Avenida, Diagonal, Transversal, Circunvalar) número (# No.) número - " +
-                "numero, Texto Adicional";
-      }
+
       return "";
    }
 
@@ -271,7 +298,11 @@ public class DialogLoginSignup extends JDialog {
       usuario.setNombreCompleto(boxNombreCompleto.getText());
       usuario.setCorreoElectronico(boxCorreo.getText());
       usuario.setDireccionEnvio(boxDireccion.getText());
-      usuario.setTelefonoContacto(Long.parseLong(boxTelefono.getText()));
+      if (boxTelefono.getText().isBlank()) {
+         usuario.setTelefonoContacto(0L);
+      } else {
+         usuario.setTelefonoContacto(Long.parseLong(boxTelefono.getText()));
+      }
       usuario.setClaveAcceso(boxContrasena.getPassword());
       return usuario;
    }
@@ -291,7 +322,7 @@ public class DialogLoginSignup extends JDialog {
             if (texto.matches(regexCorreo)) {
                return true;
             }
-            JOptionPane.showMessageDialog(null, "El correo electronico no es valido", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "El correo Electrónico no es valido", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
          }
       });

@@ -1,5 +1,7 @@
 package co.edu.uptc.util;
 
+import co.edu.uptc.model.Tienda;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -17,10 +19,10 @@ public class ConnectionToDB {
          Class.forName("org.mariadb.jdbc.Driver");
          connection = DriverManager.getConnection(URL, USER, PASS);
          if (connection != null) {
-            System.out.println("Conección a base de datos " + DB + " OK");
+            Tienda.agregarLog("Conexión a base de datos " + DB + " OK");
          }
       } catch (SQLException | ClassNotFoundException e) {
-         System.out.println(e.getMessage());
+         Tienda.agregarLog(e.getMessage());
       }
    }
 
@@ -38,9 +40,9 @@ public class ConnectionToDB {
    public void closeConnection () throws SQLException {
       if (connection != null && !connection.isClosed()) {
          connection.close();
-         System.out.println("Conexión cerrada correctamente");
+         Tienda.agregarLog("Conexión cerrada correctamente");
       } else {
-         System.out.println("La conexión ya está cerrada o es nula");
+         Tienda.agregarLog("La conexión ya está cerrada o es nula");
       }
    }
 }

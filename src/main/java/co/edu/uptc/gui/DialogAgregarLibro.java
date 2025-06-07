@@ -1,5 +1,6 @@
 package co.edu.uptc.gui;
 
+import co.edu.uptc.entity.Libro;
 import co.edu.uptc.entity.Libro.FORMATOS;
 
 import javax.swing.*;
@@ -7,7 +8,7 @@ import java.awt.*;
 
 public class DialogAgregarLibro extends JDialog {
    private final Evento              evento;
-   private final JButton             botonGuardar    = new JButton("Guardar");
+   private final JButton             botonGuardar    = new JButtonVerde("Guardar");
    private final Font                fuenteLabel     = new Font("Lucida Sans Unicode", Font.PLAIN, 20);
    private final Font                fuenteTextField = new Font("Times New Roman", Font.PLAIN, 20);
    private final Font                fuenteBoton     = new Font("Lucida Sans Unicode", Font.BOLD, 20);
@@ -30,6 +31,10 @@ public class DialogAgregarLibro extends JDialog {
       this.evento = evento;
       setLayout(new BorderLayout());
       inicializarPanel();
+      pack();
+      setResizable(false);
+      setLocationRelativeTo(null);
+      setDefaultCloseOperation(DISPOSE_ON_CLOSE);
    }
 
    private void inicializarPanel () {
@@ -39,9 +44,6 @@ public class DialogAgregarLibro extends JDialog {
       panelAgregarLibro.add(panelCampos, BorderLayout.CENTER);
       panelAgregarLibro.add(panelFooter, BorderLayout.SOUTH);
       add(panelAgregarLibro, BorderLayout.CENTER);
-      pack();
-      setResizable(false);
-      setLocationRelativeTo(null);
    }
 
    private void inicializarPanelCampos () {
@@ -203,28 +205,22 @@ public class DialogAgregarLibro extends JDialog {
       gbc.gridy   = 0;
       gbc.weightx = 0.85f;
 
-      JButton botonGuardar = getJButtonGuardar();
-      panelBoton.add(botonGuardar, gbc);
+      JButton botonRegistrar = getJButtonRegistrar();
+      panelBoton.add(botonRegistrar, gbc);
       panelFooter.add(panelBoton);
       add(panelFooter, BorderLayout.SOUTH);
+      getRootPane().setDefaultButton(botonRegistrar);
    }
 
-   private JButton getJButtonGuardar () {
-      JButton botonGuardar = new JButtonVerde("Guardar");
-
-      botonGuardar.setActionCommand(Evento.EVENTO.REGISTRAR_LIBRO.name());
-      botonGuardar.addActionListener(_ -> {
-         mensajeDeError.setText(obtenerMensajeDeError());
-         if (mensajeDeError.getText().isBlank()) {
-            botonGuardar.removeActionListener(evento);
-            botonGuardar.addActionListener(evento);
-         }
-      });
-//      botonGuardar.setFont(fuenteBoton);
-      return botonGuardar;
+   private JButton getJButtonRegistrar () {
+      JButton botonRegistrar = new JButtonVerde("Registrar Libro");
+      botonRegistrar.setActionCommand(Evento.EVENTO.REGISTRAR_LIBRO.name());
+      botonRegistrar.addActionListener(evento);
+      botonRegistrar.setFont(fuenteBoton);
+      return botonRegistrar;
    }
 
-   private String obtenerMensajeDeError () {
+   public String obtenerMensajeDeError () {
       //Validacion de Campos Vacios
       {
          if (boxISBN.getText().isEmpty()) {
@@ -299,29 +295,25 @@ public class DialogAgregarLibro extends JDialog {
             return "El campo Cantidad de Inventario debe ser un número entero";
          }
       }
-
       return "";
    }
 
-   Object[] getDatosLibro () {
-      Object[] datos = new Object[10];
-      datos[0] = Long.parseLong(boxISBN.getText());
-      datos[1] = boxTitulo.getText();
-      datos[2] = boxAutor.getText();
-      datos[3] = Integer.parseInt(boxAnioPublicacion.getText());
-      datos[4] = boxCategoria.getText();
-      datos[5] = boxEditorial.getText();
-      datos[6] = Integer.parseInt(boxNumPaginas.getText());
-      datos[7] = Double.parseDouble(boxPrecioVenta.getText());
-      datos[8] = Integer.parseInt(boxCantidadInventario.getText());
-      datos[9] = comboBoxFormato.getSelectedItem().toString(); //Se entiende que siempre tendra un elemento seleccionado
-      return datos;
+   public Libro getDatosLibro () {
+      Libro libro = new Libro();
+      libro.setISBN(Long.parseLong(boxISBN.getText()));
+      libro.setTitulo(boxTitulo.getText());
+      libro.setAutores(boxAutor.getText());
+      libro.setAnioPublicacion(Integer.parseInt(boxAnioPublicacion.getText()));
+      libro.setGenero(boxCategoria.getText());
+      libro.setEditorial(boxEditorial.getText());
+      libro.setNumeroPaginas(Integer.parseInt(boxNumPaginas.getText()));
+      libro.setPrecioVenta(Double.parseDouble(boxPrecioVenta.getText()));
+      libro.setCantidadDisponible(Integer.parseInt(boxCantidadInventario.getText()));
+      libro.setFORMATO(FORMATOS.valueOf(comboBoxFormato.getSelectedItem().toString()));
+      return libro;
    }
 
-   void validarSesionIniciada () {
-      if (mensajeDeError.getText().isBlank()) {
-         botonGuardar.setActionCommand(Evento.EVENTO.AGREGAR_LIBRO.name());
-         botonGuardar.addActionListener(evento);
-      }
+   public void setMensajeDeError () {
+      mensajeDeError.setText(obtenerMensajeDeError());
    }
 }

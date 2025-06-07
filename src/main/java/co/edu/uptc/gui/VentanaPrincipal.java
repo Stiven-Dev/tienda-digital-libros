@@ -1,33 +1,43 @@
 package co.edu.uptc.gui;
 
+import co.edu.uptc.entity.Compra;
+import co.edu.uptc.entity.DetalleCompra;
 import co.edu.uptc.entity.Libro;
 import co.edu.uptc.entity.Usuario;
 import co.edu.uptc.model.Tienda;
 import co.edu.uptc.util.ConnectionToDB;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class VentanaPrincipal extends JFrame {
-   private final Evento            evento;
-   private final Tienda            tienda;
-   private       DialogLoginSignup dialogLoginSignup;
-   private       PantallaPrincipal pantallaPrincipal;
+   private final Evento                 evento;
+   private final Tienda                 tienda;
+   private final ArrayList<Libro>       librosLocales;
+   private final ArrayList<Compra>      compraLocales;
+   private final HashMap<Long, Integer> carritoActual;
+   private final Usuario                usuarioActual;
+   private       DialogLoginSignup      dialogLoginSignup;
+   private       PantallaPrincipal      pantallaPrincipal;
 
    public VentanaPrincipal () {
-      evento = new Evento(this);
-      tienda = new Tienda();
+      Tienda.agregarLog("-----Iniciando la aplicación-----");
+      evento         = new Evento(this);
+      tienda         = Tienda.getInstance();
+      usuarioActual  = tienda.getUsuarioActual();
+      librosLocales  = tienda.getLibrosLocales();
+      carritoActual = tienda.getCarritoActual();
+      compraLocales = tienda.getComprasLocales();
       inicializarFrame();
    }
 
    private void inicializarFrame () {
       setTitle("Tienda Digital de Libros");
       //Esto para que no se cierre la ventana de golpe, sino que primero guarde y luego cierre`
-
       setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
       addWindowListener(new WindowAdapter() {
          @Override public void windowClosing (WindowEvent e) {
@@ -38,7 +48,6 @@ public class VentanaPrincipal extends JFrame {
       setSize(1000, 600);
       setLocationRelativeTo(null);
       setResizable(true);
-
       setVisible(true);
    }
 
@@ -48,32 +57,24 @@ public class VentanaPrincipal extends JFrame {
 
    void validarRegistro () {
       Usuario usuarioARegistrar = getDatosSignUp();
-      String  correoElectronico = usuarioARegistrar.getCorreoElectronico();
-      if (obtenerUsuarioMedianteCorreo(correoElectronico) != null) {
-         JOptionPane.showMessageDialog(this, "Ya existe un usuario con ese correo", "Alerta", JOptionPane.INFORMATION_MESSAGE);
-         return;
+      if (tienda.registrarUsuario(usuarioARegistrar)) {
+         JOptionPane.showMessageDialog(this, "Usuario registrado correctamente", "Información", JOptionPane.INFORMATION_MESSAGE);
+         refrescar();
+         pantallaPrincipal.iniciarSesion();
+      } else {
+         JOptionPane.showMessageDialog(this, "Error al registrar el usuario", "Error", JOptionPane.ERROR_MESSAGE);
       }
-      tienda.crearCuenta(usuarioARegistrar);
-      pantallaPrincipal.iniciarSesion(usuarioARegistrar);
    }
 
    private Usuario getDatosSignUp () {
       return getDialogLoginSignUp().getDatosRegistro();
    }
 
-   Object[][] obtenerVectorLibros () {
-      return tienda.getDataVectorLibros();
-   }
-
    void agregarLibroCarrito () {
-      HashMap<Long, Integer> carritoDeCompras = pantallaPrincipal.getPanelCarrito().getCarritoDeComprasTemporal();
-
-      long ISBN = PanelLibros.getLibroSeleccionado().getISBN();
-      if (!carritoDeCompras.containsKey(ISBN)) {
-         pantallaPrincipal.getPanelCarrito().agregarArticulo(ISBN);
-      } else {
-         pantallaPrincipal.getPanelCarrito().aumentarCantidad(ISBN);
-      }
+      long ISBN = pantallaPrincipal.getPanelLibros().getLibroSeleccionado().getISBN();
+      pantallaPrincipal.getPanelCarrito().agregarArticulo(ISBN);
+      final int cantidadLibros = pantallaPrincipal.getPanelCarrito().getCantidadLibros();
+      pantallaPrincipal.getCartBooksButton().setText(String.valueOf(cantidadLibros));
    }
 
    private void salirFormaSegura () {
@@ -82,10 +83,11 @@ public class VentanaPrincipal extends JFrame {
       dispose();
       try {
          ConnectionToDB.getInstance().closeConnection();
+         Tienda.agregarLog("Conexión a la base de datos cerrada correctamente");
       } catch (SQLException e) {
-         System.err.println("Error al cerrar la conexión a la base de datos: " + e.getMessage());
+         Tienda.agregarLog("Error al cerrar la conexión a la base de datos");
       }
-
+      Tienda.agregarLog("-----Saliendo de la aplicación-----");
       System.exit(0);
    }
 
@@ -94,47 +96,34 @@ public class VentanaPrincipal extends JFrame {
       dialogLoginSignup.setVisible(true);
    }
 
-   void buscarLibroParaPanelModificaciones (JPanel panel) {
-      long                  ISBN;
-      PanelLibroModificable panelLibroModificable;
-      switch (panel.getName()) {
-         case "PanelEliminarLibro" -> {
-            ISBN                  = pantallaPrincipal.getPanelEliminarLibro().getISBN();
-            panelLibroModificable = pantallaPrincipal.getPanelEliminarLibro();
-         }
-         case "PanelActualizarLibro" -> {
-            ISBN                  = pantallaPrincipal.getPanelActualizarLibro().getISBN();
-            panelLibroModificable = pantallaPrincipal.getPanelActualizarLibro();
-         }
-         default -> {
-            return;
-         }
-      }
-      Libro libro = tienda.buscarLibro(ISBN);
-      if (libro != null) {
-         panelLibroModificable.setDatosLibro(libro);
-      }
-   }
-
    void actualizarLibro () {
-      Libro datos = pantallaPrincipal.getPanelActualizarLibro().getDatosLibro();
-      if (tienda.actualizarLibro(datos)) {
-         JOptionPane.showMessageDialog(this, "Libro actualizado correctamente", "Alerta", JOptionPane.INFORMATION_MESSAGE);
-      } else {
-         JOptionPane.showMessageDialog(this, "Libro no actualizado", "Alerta", JOptionPane.INFORMATION_MESSAGE);
+      System.out.println("Actualizando libro...");
+      final DialogActualizarLibro dialogActualizarLibro = pantallaPrincipal.getPanelLibros().getDialogActualizarLibro();
+      final String                mensajeError          = dialogActualizarLibro.obtenerMensajeDeError();
+      if (!mensajeError.isBlank()) {
+         return;
       }
+
+      Libro libro = dialogActualizarLibro.getDatosLibro();
+      if (tienda.actualizarLibro(libro)) {
+         JOptionPane.showMessageDialog(this, "Libro actualizado correctamente", "Alerta", JOptionPane.INFORMATION_MESSAGE);
+         refrescar();
+      } else {
+         JOptionPane.showMessageDialog(this, "No fue posible actualizar el Libro", "Alerta", JOptionPane.INFORMATION_MESSAGE);
+      }
+      dialogActualizarLibro.dispose();
    }
 
-   double obtenerSubTotalVenta (DefaultTableModel model) {
-      return tienda.calcularSubTotalVenta(model);
+   double obtenerSubTotalVenta () {
+      return tienda.calcularSubTotalVenta();
    }
 
-   double obtenerTotalVenta (double subTotal) {
-      return tienda.calcularTotalVenta(subTotal, pantallaPrincipal.getPanelPerfil().getDatosUsuario().getTipoUsuario());
+   double obtenerTotalVenta () {
+      return tienda.calcularTotalVenta();
    }
 
    double obtenerPrecioTotalProducto (double valorUnitario, int cantidad) {
-      return tienda.calcularPrecioVenta(valorUnitario, cantidad);
+      return tienda.calcularPrecioVentaPorLibro(valorUnitario, cantidad);
    }
 
    double obtenerPrecioImpuesto (double valorUnitario) {
@@ -146,18 +135,26 @@ public class VentanaPrincipal extends JFrame {
    }
 
    void eliminarLibro () {
-      long ISBN = pantallaPrincipal.getPanelEliminarLibro().getISBN();
-      if (tienda.ventasAsociadas(ISBN)) {
-         JOptionPane.showMessageDialog(this, "No es posible eliminar el libro", "Alerta", JOptionPane.INFORMATION_MESSAGE);
+      DialogEliminarLibro dialogEliminarLibro = pantallaPrincipal.getPanelLibros().getDialogEliminarLibro();
+      long                ISBN                = dialogEliminarLibro.getLibro().getISBN();
+      if (tienda.comprasAsociadas(ISBN)) {
+         Tienda.agregarLog("Intento de eliminar libro con ventas asociadas: " + ISBN);
+         JOptionPane.showMessageDialog(this, "No es posible eliminar el libro, tiene ventas asociadas", "Alerta", JOptionPane.INFORMATION_MESSAGE);
+         dialogEliminarLibro.dispose();
          return;
       }
-      tienda.eliminarLibro(ISBN);
-      JOptionPane.showMessageDialog(this, "Libro eliminado correctamente", "Alerta", JOptionPane.INFORMATION_MESSAGE);
+      if (tienda.eliminarLibro(ISBN)) {
+         JOptionPane.showMessageDialog(this, "Libro eliminado correctamente", "Alerta", JOptionPane.INFORMATION_MESSAGE);
+         refrescar();
+      } else {
+         JOptionPane.showMessageDialog(this, "Ocurrió un error al eliminar el Libro", "Alerta", JOptionPane.INFORMATION_MESSAGE);
+      }
+      dialogEliminarLibro.dispose();
    }
 
    void crearCuenta () {
       Usuario datosUsuario = pantallaPrincipal.getPanelCrearCuentas().getDatosUsuario();
-      if (tienda.crearCuenta(datosUsuario)) {
+      if (tienda.registrarUsuario(datosUsuario)) {
          JOptionPane.showMessageDialog(this, "Cuenta creada correctamente", "Información", JOptionPane.INFORMATION_MESSAGE);
       } else {
          JOptionPane.showMessageDialog(this, "Error al crear la cuenta", "Error", JOptionPane.ERROR_MESSAGE);
@@ -178,85 +175,157 @@ public class VentanaPrincipal extends JFrame {
    }
 
    void pagarEfectivo () {
-      if (pantallaPrincipal.getPanelPerfil().getDatosUsuario() == null) {
+      if (!pantallaPrincipal.getSesionIniciada()) {
          JOptionPane.showMessageDialog(null, "Debe iniciar sesion para pagar", "Alerta", JOptionPane.INFORMATION_MESSAGE);
          return;
       }
+      tienda.efectuarCompraEfectivo(carritoActual, usuarioActual);
       JOptionPane.showMessageDialog(null, "Pago en efectivo", "Alerta", JOptionPane.INFORMATION_MESSAGE);
-      //TODO
    }
 
    void pagarTarjeta () {
-      if (pantallaPrincipal.getPanelPerfil().getDatosUsuario() == null) {
+      if (usuarioActual.getID() < 1) {
          JOptionPane.showMessageDialog(null, "Debe iniciar sesion para pagar", "Alerta", JOptionPane.INFORMATION_MESSAGE);
          return;
       }
+      //TODO: Implementar la lógica de pago con tarjeta
       JOptionPane.showMessageDialog(null, "Pago con Tarjeta", "Alerta", JOptionPane.INFORMATION_MESSAGE);
-      //TODO
    }
 
-   Object[][] obtenerListaCompras () {
-      long ID = pantallaPrincipal.getPanelPerfil().getDatosUsuario().getID();
-      return tienda.getDataVectorCompras(ID);
+   ArrayList<Compra> obtenerListaCompras () {
+      return tienda.getComprasLocales();
    }
 
    void validarInicioSesion () {
-      Usuario usuario = getDialogLoginSignUp().getDatosLogin();
-      if (usuario.getCorreoElectronico().isBlank() || usuario.getClaveAcceso().length == 0) {
+      Usuario datosUsuario = getDialogLoginSignUp().getDatosLogin();
+      if (datosUsuario.getCorreoElectronico().isBlank() || datosUsuario.getClaveAcceso().length == 0) {
          JOptionPane.showMessageDialog(this, "Debe rellenar todos los campos", "Alerta", JOptionPane.INFORMATION_MESSAGE);
          return;
       }
-      usuario = validarLogin(usuario);
+      Usuario usuario = validarLogin(datosUsuario);
       if (usuario == null) {
+         JOptionPane.showMessageDialog(this, "Correo o clave incorrectos", "Alerta", JOptionPane.INFORMATION_MESSAGE);
          return;
       }
-      pantallaPrincipal.iniciarSesion(usuario);
+      tienda.setUsuarioActual(usuario);
+      pantallaPrincipal.iniciarSesion();
    }
 
    private Usuario validarLogin (Usuario datosLogin) {
-      return tienda.validarDatosLogin(datosLogin);
+      return tienda.validarCredenciales(datosLogin);
    }
 
-   private Usuario obtenerUsuarioMedianteCorreo (String correoElectronico) {
-      return tienda.obtenerUsuarioMedianteCorreo(correoElectronico);
+   double obtenerValorTotalImpuesto () {
+      return tienda.calcularValorTotalImpuesto();
    }
 
-   double obtenerValorTotalImpuesto (DefaultTableModel model) {
-      return tienda.calcularValorTotalImpuesto(model);
+   int obtenerCantidadLibros () {
+      return tienda.obtenerCantidadLibros();
    }
 
-   public int obtenerCantidadLibros (DefaultTableModel model) {
-      return tienda.obtenerCantidadLibros(model);
-   }
-
-   public Libro obtenerLibroMedianteISBN (long ISBN) {
+   Libro obtenerLibroMedianteISBN (long ISBN) {
       return tienda.buscarLibro(ISBN);
    }
 
-   public boolean usuarioRegistrado () {
-      Usuario usuario = pantallaPrincipal.getPanelPerfil().getDatosUsuario();
+   boolean usuarioRegistrado () {
+      Usuario usuario = pantallaPrincipal.getDatosUsuario();
       if (usuario == null) {
          return false;
       }
       return usuario.getTipoUsuario() != Usuario.ROLES.ADMIN;
    }
 
-   public void agregarLibro () {
+   void dialogAgregarLibro () {
       pantallaPrincipal.mostrarDialogAgregarLibro();
    }
 
-   public void actualizarDatosCliente () {
-      Usuario nuevosDatosUsuario = DialogPerfil.getNuevosDatosUsuario();
-      if (nuevosDatosUsuario != null) {
-         tienda.actualizarDatosUsuario(nuevosDatosUsuario);
+   void actualizarDatosCliente () {
+      pantallaPrincipal.getDialogPerfil().setMensajeDeError();
+      if (!pantallaPrincipal.getDialogPerfil().obtenerMensajeDeError().isBlank()) {
+         return;
+      }
+      String clave = JOptionPane.showInputDialog(this, "Ingrese su contraseña Actual", "Confirmación de contraseña", javax.swing.JOptionPane.QUESTION_MESSAGE);
+      if (clave == null || clave.isBlank()) {
+         JOptionPane.showMessageDialog(this, "Contraseña Incorrecta", "Alerta", JOptionPane.INFORMATION_MESSAGE);
+         return;
+      }
+      Usuario usuarioAValidar = new Usuario();
+      usuarioAValidar.setCorreoElectronico(usuarioActual.getCorreoElectronico());
+      usuarioAValidar.setClaveAcceso(clave.toCharArray());
+      if (tienda.validarCredenciales(usuarioAValidar) == null) {
+         JOptionPane.showMessageDialog(this, "Contraseña Incorrecta", "Contraseña Incorrecta", JOptionPane.ERROR_MESSAGE);
+         return;
+      }
+      Usuario nuevosDatosUsuario = pantallaPrincipal.getDialogPerfil().getNuevosDatosUsuario();
+      if (tienda.actualizarDatosUsuario(nuevosDatosUsuario) != null) {
+         tienda.setUsuarioActual(nuevosDatosUsuario);
+         pantallaPrincipal.getDialogPerfil().dispose();
+         JOptionPane.showMessageDialog(this, "Datos actualizados correctamente", "Información", JOptionPane.INFORMATION_MESSAGE);
+         refrescar();
       }
    }
 
-   public void cerrarSesion () {
-      //TODO
+   void cerrarSesion () {
+      dispose();
+      new VentanaPrincipal();
+      revalidate();
+      repaint();
    }
 
-   public void registrarLibro () {
-      //TODO
+   void registrarLibro () {
+      DialogAgregarLibro dialogAgregarLibro = pantallaPrincipal.getPanelLibros().getDialogAgregarLibro();
+      String             mensajeError       = dialogAgregarLibro.obtenerMensajeDeError();
+      dialogAgregarLibro.setMensajeDeError();
+      if (!mensajeError.isBlank()) {
+         return;
+      }
+      Libro libro = dialogAgregarLibro.getDatosLibro();
+      if (tienda.agregarLibro(libro)) {
+         JOptionPane.showMessageDialog(this, "Libro registrado correctamente", "Alerta", JOptionPane.INFORMATION_MESSAGE);
+         refrescar();
+      } else {
+         JOptionPane.showMessageDialog(this, "Error al registrar el libro", "Alerta", JOptionPane.ERROR_MESSAGE);
+      }
+      dialogAgregarLibro.dispose();
+   }
+
+   void refrescar () {
+      tienda.refrescarDatosLocales();
+   }
+
+   ArrayList<Libro> getLibrosLocales () {
+      return librosLocales;
+   }
+
+   Usuario getUsuarioActual () {
+      return usuarioActual;
+   }
+
+   ArrayList<Compra> getComprasLocales () {
+      return compraLocales;
+   }
+
+   HashMap<Long, Integer> getCarritoActual () {
+      return carritoActual;
+   }
+
+   public void mostrarDetallesCompra () {
+      tienda.mostrarFactura(pantallaPrincipal.getCompraSeleccionada());
+   }
+
+   public void setCompraSeleccionada (Compra compraSeleccionada) {
+      pantallaPrincipal.setCompraSeleccionada(compraSeleccionada);
+   }
+
+   public ArrayList<DetalleCompra> obtenerListaDetallesCompraPorID (long IDcompra) {
+      return tienda.obtenerDetallesCompraPorID(IDcompra);
+   }
+
+   public int unidadesDisponibles (long ISBN) {
+      return tienda.unidadesDisponibles(ISBN);
+   }
+
+   public void eliminarLibroDelCarrito (long ISBN, long ID) {
+      tienda.eliminarLibroDelCarrito(ISBN, ID);
    }
 }

@@ -5,32 +5,38 @@ import co.edu.uptc.entity.Libro;
 import javax.swing.*;
 import java.awt.*;
 
-public class PanelActualizarLibro extends JPanel implements PanelLibroModificable {
+public class DialogActualizarLibro extends JDialog {
    private final Evento            evento;
-   private final JButton           botonBuscar     = new JButton("Buscar");
-   private final JButton           botonGuardar    = new JButton("Guardar");
+   private final JButton           botonActualizar = new JButtonAzul("Actualizar Libro");
    private final Font              fuenteLabel     = new Font("Lucida Sans Unicode", Font.PLAIN, 20);
    private final Font              fuenteTextField = new Font("Times New Roman", Font.PLAIN, 20);
    private final Font              fuenteBoton     = new Font("Lucida Sans Unicode", Font.BOLD, 20);
    private final JComboBox<String> comboBoxFormato = new JComboBox<>(new String[] {"DIGITAL", "IMPRESO"});
-   private final JLabel            mensajeDeError  = new JLabel();
-   private       Libro             libro           = new Libro();
+   private final JLabel            mensajeDeError  = new JLabel(" ", SwingConstants.CENTER);
+   private final Libro             libro;
    private       JPanel            panelCampos;
    private       JPanel            panelFooter;
    private       JTextField        boxISBN;
    private       JTextField        boxTitulo;
    private       JTextField        boxAutor;
    private       JTextField        boxAnioPublicacion;
-   private       JTextField        boxCategoria;
+   private       JTextField        boxGenero;
    private       JTextField        boxEditorial;
    private       JTextField        boxNumPaginas;
    private       JTextField        boxPrecioVenta;
    private       JTextField        boxCantidadInventario;
 
-   public PanelActualizarLibro (Evento evento) {
+   public DialogActualizarLibro (Evento evento, Libro libro) {
+      super(new JFrame(), "Actualizar Libro", true);
       this.evento = evento;
+      this.libro  = libro;
       setLayout(new BorderLayout());
       inicializarPanel();
+      pack();
+      setResizable(false);
+      setLocationRelativeTo(null);
+      setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+      actualizarDatosLibro();
    }
 
    private void inicializarPanel () {
@@ -42,18 +48,17 @@ public class PanelActualizarLibro extends JPanel implements PanelLibroModificabl
 
    private void inicializarPanelCampos () {
       panelCampos = new JPanel(new GridBagLayout());
-
       //Creacion de Labels y centrado de cada uno
       JLabel labelISBN               = new JLabel("*ISBN", SwingConstants.CENTER);
-      JLabel labelTitulo             = new JLabel("**Titulo", SwingConstants.CENTER);
-      JLabel labelAutor              = new JLabel("**Autor(es)", SwingConstants.CENTER);
-      JLabel labelAnioPublicacion    = new JLabel("**Año de Publicación", SwingConstants.CENTER);
-      JLabel labelCategoria          = new JLabel("**Género", SwingConstants.CENTER);
-      JLabel labelEditorial          = new JLabel("**Editorial", SwingConstants.CENTER);
-      JLabel labelNumPaginas         = new JLabel("**Número de Páginas", SwingConstants.CENTER);
-      JLabel labelPrecioVenta        = new JLabel("Precio de Venta", SwingConstants.CENTER);
-      JLabel labelCantidadInventario = new JLabel("Cantidad de Inventario", SwingConstants.CENTER);
-      JLabel labelFormato            = new JLabel("Formato", SwingConstants.CENTER);
+      JLabel labelTitulo             = new JLabel("*Titulo", SwingConstants.CENTER);
+      JLabel labelAutor              = new JLabel("*Autor(es)", SwingConstants.CENTER);
+      JLabel labelAnioPublicacion    = new JLabel("*Año de Publicación", SwingConstants.CENTER);
+      JLabel labelCategoria          = new JLabel("*Género", SwingConstants.CENTER);
+      JLabel labelEditorial          = new JLabel("*Editorial", SwingConstants.CENTER);
+      JLabel labelNumPaginas         = new JLabel("*Número de Páginas", SwingConstants.CENTER);
+      JLabel labelPrecioVenta        = new JLabel("*Precio de Venta", SwingConstants.CENTER);
+      JLabel labelCantidadInventario = new JLabel("*Cantidad de Inventario", SwingConstants.CENTER);
+      JLabel labelFormato            = new JLabel("*Formato", SwingConstants.CENTER);
 
       //Asignacion de fuente a cada label
       labelISBN.setFont(fuenteLabel);
@@ -72,7 +77,7 @@ public class PanelActualizarLibro extends JPanel implements PanelLibroModificabl
       boxTitulo             = new JTextField();
       boxAutor              = new JTextField();
       boxAnioPublicacion    = new JTextField();
-      boxCategoria          = new JTextField();
+      boxGenero             = new JTextField();
       boxEditorial          = new JTextField();
       boxNumPaginas         = new JTextField();
       boxPrecioVenta        = new JTextField();
@@ -83,7 +88,7 @@ public class PanelActualizarLibro extends JPanel implements PanelLibroModificabl
       boxTitulo.setHorizontalAlignment(JTextField.CENTER);
       boxAutor.setHorizontalAlignment(JTextField.CENTER);
       boxAnioPublicacion.setHorizontalAlignment(JTextField.CENTER);
-      boxCategoria.setHorizontalAlignment(JTextField.CENTER);
+      boxGenero.setHorizontalAlignment(JTextField.CENTER);
       boxEditorial.setHorizontalAlignment(JTextField.CENTER);
       boxNumPaginas.setHorizontalAlignment(JTextField.CENTER);
       boxPrecioVenta.setHorizontalAlignment(JTextField.CENTER);
@@ -95,7 +100,7 @@ public class PanelActualizarLibro extends JPanel implements PanelLibroModificabl
       boxTitulo.setFont(fuenteTextField);
       boxAutor.setFont(fuenteTextField);
       boxAnioPublicacion.setFont(fuenteTextField);
-      boxCategoria.setFont(fuenteTextField);
+      boxGenero.setFont(fuenteTextField);
       boxEditorial.setFont(fuenteTextField);
       boxNumPaginas.setFont(fuenteTextField);
       boxPrecioVenta.setFont(fuenteTextField);
@@ -146,7 +151,7 @@ public class PanelActualizarLibro extends JPanel implements PanelLibroModificabl
       //Fila 5, Columna 0 y 1 => Box Género y Editorial
       gbc.gridy = 5;
       gbc.gridx = 0;
-      panelCampos.add(boxCategoria, gbc);
+      panelCampos.add(boxGenero, gbc);
       gbc.gridx = 1;
       panelCampos.add(boxEditorial, gbc);
 
@@ -180,36 +185,20 @@ public class PanelActualizarLibro extends JPanel implements PanelLibroModificabl
    }
 
    private void inicializarPanelFooter () {
-      panelFooter = new JPanel(new GridLayout(3, 1));
-
+      panelFooter = new JPanel(new GridLayout(2, 1));
       mensajeDeError.setForeground(Color.RED);
       mensajeDeError.setFont(new Font("Arial", Font.BOLD, 20));
-      mensajeDeError.setHorizontalAlignment(JLabel.CENTER);
       panelFooter.add(mensajeDeError);
-
-      botonBuscar.setActionCommand(Evento.EVENTO.BUSCAR_LIBRO.name());
-      botonBuscar.putClientProperty("Panel", this);
-      botonBuscar.addActionListener(_ -> {
-         mensajeDeError.setText(obtenerMensajeDeError());
-         if (mensajeDeError.getText().isEmpty()) {
-            botonBuscar.removeActionListener(evento);
-            botonBuscar.addActionListener(evento);
-         }
-      });
-      botonGuardar.addActionListener(e -> {
-         mensajeDeError.setText(obtenerMensajeDeError());
-      });
-      panelFooter.add(botonBuscar);
-      panelFooter.add(botonGuardar);
-
-      //Asignacion de fuente a cada boton
-      botonBuscar.setFont(fuenteBoton);
-      botonGuardar.setFont(fuenteBoton);
+      botonActualizar.setActionCommand(Evento.EVENTO.ACTUALIZAR_LIBRO.name());
+      botonActualizar.addActionListener(evento);
+      panelFooter.add(botonActualizar);
+      //Asignacion de fuente al boton
+      botonActualizar.setFont(fuenteBoton);
+      getRootPane().setDefaultButton(botonActualizar);
    }
 
-   private String obtenerMensajeDeError () {
+   public String obtenerMensajeDeError () {
       //Validacion de Campos Vacios
-      mensajeDeError.setForeground(Color.RED);
       {
          if (boxISBN.getText().isEmpty()) {
             return "Debe rellenar el campo ISBN";
@@ -220,7 +209,7 @@ public class PanelActualizarLibro extends JPanel implements PanelLibroModificabl
          if (boxAnioPublicacion.getText().isEmpty()) {
             return "Debe rellenar el campo Año de Publicación";
          }
-         if (boxCategoria.getText().isEmpty()) {
+         if (boxGenero.getText().isEmpty()) {
             return "Debe rellenar el campo Género";
          }
          if (boxEditorial.getText().isEmpty()) {
@@ -286,44 +275,36 @@ public class PanelActualizarLibro extends JPanel implements PanelLibroModificabl
       return "";
    }
 
-   public long getISBN () {
-      if (boxISBN.getText().isEmpty()) {
-         return -1;
-      }
-      return Long.parseLong(boxISBN.getText());
-   }
-
    public Libro getDatosLibro () {
-      return libro;
-   }
-
-   @Override public void setDatosLibro (Libro libro) {
-      this.libro = libro;
-      actualizarDatosLibro();
-   }
-
-   @Override public void setMensajeError () {
-      mensajeDeError.setForeground(Color.RED);
-      mensajeDeError.setText("Libro no encontrado");
-   }
-
-   @Override public void setMensajeConfirmacion (String mensajeConfirmacion) {
-      mensajeDeError.setForeground(Color.GREEN);
-      mensajeDeError.setText(mensajeConfirmacion);
+      Libro libroModificado = new Libro();
+      libroModificado.setISBN(Long.parseLong(boxISBN.getText()));
+      libroModificado.setTitulo(boxTitulo.getText());
+      libroModificado.setAutores(boxAutor.getText());
+      libroModificado.setAnioPublicacion(Integer.parseInt(boxAnioPublicacion.getText()));
+      libroModificado.setGenero(boxGenero.getText());
+      libroModificado.setEditorial(boxEditorial.getText());
+      libroModificado.setNumeroPaginas(Integer.parseInt(boxNumPaginas.getText()));
+      libroModificado.setPrecioVenta(Double.parseDouble(boxPrecioVenta.getText()));
+      libroModificado.setCantidadDisponible(Integer.parseInt(boxCantidadInventario.getText()));
+      libroModificado.setFORMATO(Libro.FORMATOS.valueOf((String) comboBoxFormato.getSelectedItem()));
+      return libroModificado;
    }
 
    private void actualizarDatosLibro () {
       boxISBN.setText(String.valueOf(libro.getISBN()));
+      boxISBN.setEditable(false); // El ISBN no se puede editar
       boxTitulo.setText(libro.getTitulo());
       boxAutor.setText(libro.getAutores());
       boxAnioPublicacion.setText(String.valueOf(libro.getAnioPublicacion()));
-      boxCategoria.setText(libro.getGenero());
-      boxEditorial.setText(libro.getGenero());
+      boxGenero.setText(libro.getGenero());
+      boxEditorial.setText(libro.getEditorial());
       boxNumPaginas.setText(String.valueOf(libro.getNumeroPaginas()));
       boxPrecioVenta.setText(String.valueOf(libro.getPrecioVenta()));
       boxCantidadInventario.setText(String.valueOf(libro.getCantidadDisponible()));
       comboBoxFormato.setSelectedItem(libro.getFORMATO());
-      mensajeDeError.setForeground(Color.GREEN);
-      mensajeDeError.setText("Libro encontrado");
+   }
+
+   public void setMensajeDeError (String mensaje) {
+      mensajeDeError.setText(mensaje);
    }
 }

@@ -2,39 +2,44 @@ package co.edu.uptc.entity;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 public class Compra {
-   private       long              ID_Compra;
-   private       int               ID_Asociado;
-   private       LocalDateTime     fechaCompra;
-   private       double            valorCompra;
-   private       int               cantidadCompra;
-   private final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MMMM/yyyy HH:mm");
+   //PK
+   private             long                     IDcompra;
+   private             long                     IDasociado; //No se muestra al Usuario
+   private             LocalDateTime            fechaCompra;
+   private             double                   porcentajeDescuento;
+   private             METODO_PAGO              metodoPago;
+   private             double                   valorCompra; //No existe en la base de datos, se calcula en el código
+   private             int                      cantidadCompra; //No existe en la base de datos, se calcula en el código
+   private             ArrayList<DetalleCompra> librosComprados;
+   public static final DateTimeFormatter        FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MMMM/yyyy HH:mm");
 
    public Compra () {}
 
-   public long getID_Compra () {
-      return ID_Compra;
+   public long getIDcompra () {
+      return IDcompra;
    }
 
-   public void setID_Compra (long ID_Compra) {
-      this.ID_Compra = ID_Compra;
+   public void setIDcompra (long IDcompra) {
+      this.IDcompra = IDcompra;
    }
 
-   public int getID_Asociado () {
-      return ID_Asociado;
+   public long getIDasociado () {
+      return IDasociado;
    }
 
-   public void setID_Asociado (int ID_Asociado) {
-      this.ID_Asociado = ID_Asociado;
+   public void setIDasociado (long IDasociado) {
+      this.IDasociado = IDasociado;
+   }
+
+   public String getFechaCompra () {
+      return fechaCompra.format(FORMATO_FECHA);
    }
 
    public void setFechaCompra (LocalDateTime fechaCompra) {
       this.fechaCompra = fechaCompra;
-   }
-
-   public LocalDateTime getFechaCompra () {
-      return fechaCompra;
    }
 
    public double getValorCompra () {
@@ -53,8 +58,43 @@ public class Compra {
       this.cantidadCompra = cantidadCompra;
    }
 
-   //Metodo auxiliar para mostrar la fecha en un formato especifico
-   public String getFechaCompraString () {
-      return fechaCompra.format(FORMATO_FECHA);
+   public ArrayList<DetalleCompra> getLibrosComprados () {
+      return librosComprados;
+   }
+
+   public void setLibrosComprados (ArrayList<DetalleCompra> librosComprados) {
+      this.librosComprados = librosComprados;
+   }
+
+   public double getPorcentajeDescuento () {
+      return porcentajeDescuento;
+   }
+
+   public void setPorcentajeDescuento (double porcentajeDescuento) {
+      this.porcentajeDescuento = porcentajeDescuento;
+   }
+
+   public METODO_PAGO getMetodoPago () {
+      return metodoPago;
+   }
+
+   public void setMetodoPago (METODO_PAGO metodoPago) {
+      this.metodoPago = metodoPago;
+   }
+
+   public enum METODO_PAGO {
+      //TODO: Implementar métodos de pago
+      EFECTIVO("Efectivo"),
+      TARJETA_DEBITO("Tarjeta Débito"),
+      TARJETA_CREDITO("Tarjeta Crédito");
+      private final String name;
+
+      METODO_PAGO (String name) {
+         this.name = name;
+      }
+
+      public String getName () {
+         return name;
+      }
    }
 }

@@ -5,14 +5,13 @@ import co.edu.uptc.entity.Libro;
 import javax.swing.*;
 import java.awt.*;
 
-public class PanelEliminarLibro extends JPanel implements PanelLibroModificable {
+public class DialogEliminarLibro extends JDialog {
    private final Evento     evento;
-   private final JButton    botonEliminar   = new JButton("Eliminar");
+   private final JButton    botonEliminar   = new JButtonRojo("Eliminar");
    private final Font       fuenteLabel     = new Font("Lucida Sans Unicode", Font.PLAIN, 20);
    private final Font       fuenteTextField = new Font("Times New Roman", Font.PLAIN, 20);
    private final Font       fuenteBoton     = new Font("Lucida Sans Unicode", Font.BOLD, 20);
-   private final JLabel     mensajeDeError  = new JLabel();
-   private       Libro      libro           = null;
+   private       Libro      libro;
    private       JPanel     panelCampos;
    private       JPanel     panelFooter;
    private       JTextField boxISBN;
@@ -22,10 +21,17 @@ public class PanelEliminarLibro extends JPanel implements PanelLibroModificable 
    private       JTextField boxCategoria;
    private       JTextField boxEditorial;
 
-   public PanelEliminarLibro (Evento evento) {
+   public DialogEliminarLibro (Evento evento, Libro libroSeleccionado) {
+      super(new JFrame(), "Eliminar Libro", true);
       this.evento = evento;
+      this.libro  = libroSeleccionado;
       setLayout(new BorderLayout());
       inicializarPanel();
+      pack();
+      setResizable(false);
+      setLocationRelativeTo(null);
+      setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+      actualizadDatosLibro();
    }
 
    private void inicializarPanel () {
@@ -137,88 +143,32 @@ public class PanelEliminarLibro extends JPanel implements PanelLibroModificable 
    }
 
    private void inicializarPanelFooter () {
-      panelFooter = new JPanel(new GridLayout(2, 1));
-      JButton botonBuscar = new JButton("Buscar");
-      botonBuscar.setActionCommand(Evento.EVENTO.BUSCAR_LIBRO.name());
-      botonBuscar.putClientProperty("Panel", this);
-      botonBuscar.addActionListener(_ -> {
-         mensajeDeError.setText(obtenerMensajeDeError());
-         if (mensajeDeError.getText().isBlank()) {
-            botonBuscar.removeActionListener(evento);
-            botonBuscar.addActionListener(evento);
-         }
-      });
-      botonBuscar.addActionListener(evento);
-
-      JButton botonEliminar = new JButton("Eliminar");
+      panelFooter = new JPanel(new GridLayout(1, 1));
       botonEliminar.setActionCommand(Evento.EVENTO.ELIMINAR_LIBRO.name());
-      botonEliminar.addActionListener(_ -> {
-         mensajeDeError.setText(obtenerMensajeDeError());
-         if (mensajeDeError.getText().isBlank()) {
-            botonEliminar.removeActionListener(evento);
-            botonEliminar.addActionListener(evento);
-         }
-      });
-
+      botonEliminar.addActionListener(evento);
       //Asignacion de fuente al boton
-      botonBuscar.setFont(fuenteBoton);
       botonEliminar.setFont(fuenteBoton);
-
-      panelFooter.add(botonBuscar);
       panelFooter.add(botonEliminar);
-
-      mensajeDeError.setForeground(Color.RED);
-      mensajeDeError.setFont(new Font("Arial", Font.BOLD, 20));
-      mensajeDeError.setHorizontalAlignment(JLabel.CENTER);
-      panelFooter.add(mensajeDeError);
-
       add(panelFooter, BorderLayout.SOUTH);
-   }
-
-   private String obtenerMensajeDeError () {
-      //Validacion de Campo Vacio del ISBN
-      if (boxISBN.getText().isEmpty()) {
-         return "Debe rellenar el campo ISBN";
-      }
-
-      //Validacion de ISBN
-      if (!boxISBN.getText().matches("^[0-9]{10,13}$")) {
-         return "El campo ISBN debe tener de 10 a 13 caracteres numéricos";
-      }
-
-      return "";
-   }
-
-   long getISBN () {
-      if (boxISBN.getText().isEmpty()) {
-         return -1;
-      }
-      return Long.parseLong(boxISBN.getText());
-   }
-
-   @Override public void setDatosLibro (Libro libro) {
-      this.libro = libro;
-      actualizadDatosLibro();
-   }
-
-   @Override public void setMensajeError () {
-      mensajeDeError.setForeground(Color.RED);
-      mensajeDeError.setText("Libro no encontrado / no apto para eliminar");
-   }
-
-   @Override public void setMensajeConfirmacion (String mensajeConfirmacion) {
-      mensajeDeError.setForeground(Color.GREEN);
-      mensajeDeError.setText(mensajeConfirmacion);
+      getRootPane().setDefaultButton(botonEliminar);
    }
 
    private void actualizadDatosLibro () {
-      mensajeDeError.setForeground(Color.GREEN);
-      mensajeDeError.setText("Libro encontrado");
-
+      boxISBN.setText(String.valueOf(libro.getISBN()));
       boxTitulo.setText(libro.getTitulo());
       boxAutor.setText(libro.getAutores());
       boxAnioPublicacion.setText(String.valueOf(libro.getAnioPublicacion()));
       boxCategoria.setText(libro.getGenero());
       boxEditorial.setText(libro.getGenero());
+      boxISBN.setEditable(false);
+      boxTitulo.setEditable(false);
+      boxAutor.setEditable(false);
+      boxAnioPublicacion.setEditable(false);
+      boxCategoria.setEditable(false);
+      boxEditorial.setEditable(false);
+   }
+
+   public Libro getLibro () {
+      return libro;
    }
 }

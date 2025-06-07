@@ -6,22 +6,27 @@ import co.edu.uptc.gui.Evento.EVENTO;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 
 public class PanelLibros extends JPanel {
-   private final  Evento            evento;
-   private final  Font              fuenteCabecera = new Font("Arial", Font.BOLD, 15);
-   private final  Font              fuenteCelda    = new Font("Lucida Sans Unicode", Font.PLAIN, 12);
-   private final  JPanel            panelBotones   = new JPanel(new GridBagLayout());
-   private        DefaultTableModel model;
-   private        JTable            tableLibros;
-   private static Libro             libroSeleccionado;
+   private final Evento                evento;
+   private final Font                  fuenteCabecera     = new Font("Arial", Font.BOLD, 15);
+   private final Font                  fuenteCelda        = new Font("Lucida Sans Unicode", Font.PLAIN, 12);
+   private final JPanel                panelBotones       = new JPanel(new GridBagLayout());
+   private       ArrayList<Libro>      listaLibros;
+   private       DefaultTableModel     model;
+   private       JTable                tableLibros;
+   private       Libro                 libroSeleccionado;
+   private       DialogAgregarLibro    dialogAgregarLibro = null;
+   private       DialogActualizarLibro dialogActualizarLibro;
+   private       DialogEliminarLibro   dialogEliminarLibro;
 
-   public PanelLibros (Evento evento) {
-      this.evento = evento;
+   public PanelLibros (PantallaPrincipal pantallaPrincipal, Evento evento) {
+      this.evento      = evento;
+      this.listaLibros = pantallaPrincipal.getLibrosLocales();
       inicializarPanelLibros();
    }
 
@@ -57,24 +62,13 @@ public class PanelLibros extends JPanel {
    private void inicializarPanelLibros () {
       setLayout(new BorderLayout());
       model       = getDefaultTableModel();
-      tableLibros = new JTable(model) {
-         @Override public Component prepareRenderer (TableCellRenderer renderer, int row, int column) {
-            Component component = super.prepareRenderer(renderer, row, column);
-            if (!isRowSelected(row)) {
-               component.setBackground(row % 2 == 0 ? Color.WHITE : new Color(220, 220, 220));
-            } else {
-               component.setBackground(Color.ORANGE);
-            }
-            return component;
-         }
-      };
+      tableLibros = new JTable(model);
       tableLibros.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
       tableLibros.setRowHeight(30);
       tableLibros.getTableHeader().setFont(fuenteCabecera);
       tableLibros.setFont(fuenteCelda);
       formatearColumnas(tableLibros);
       JScrollPane scrollPane = new JScrollPane(tableLibros);
-      scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
       add(scrollPane, BorderLayout.CENTER);
       modificacionesLibros();
    }
@@ -84,28 +78,49 @@ public class PanelLibros extends JPanel {
    }
 
    void refrescarLista (VentanaPrincipal ventanaPrincipal) {
-      model.setDataVector(ventanaPrincipal.obtenerVectorLibros(), NOMBRE_COLUMNAS.getCabecera());
+      ventanaPrincipal.refrescar();
+      listaLibros = ventanaPrincipal.getLibrosLocales();
+      if (listaLibros.isEmpty()) return;
+      model.setRowCount(0); // Limpiar el modelo antes de agregar nuevos datos
+      for (Libro libro : listaLibros) {
+         Object[] dataLibro = new Object[11];
+         //Se valida que el libro tenga suficientes unidades para ser mostrado al público
+         if (libro.getCantidadDisponible() < 1) continue;
+         dataLibro[NOMBRE_COLUMNAS.ISBN.getIndex()]      = libro.getISBN();
+         dataLibro[NOMBRE_COLUMNAS.TITULO.getIndex()]    = libro.getTitulo();
+         dataLibro[NOMBRE_COLUMNAS.AUTORES.getIndex()]   = libro.getAutores();
+         dataLibro[NOMBRE_COLUMNAS.GENERO.getIndex()]    = libro.getGenero();
+         dataLibro[NOMBRE_COLUMNAS.PAGINAS.getIndex()]   = libro.getNumeroPaginas();
+         dataLibro[NOMBRE_COLUMNAS.EDITORIAL.getIndex()] = libro.getEditorial();
+         dataLibro[NOMBRE_COLUMNAS.ANIO.getIndex()]      = libro.getAnioPublicacion();
+         dataLibro[NOMBRE_COLUMNAS.FORMATO.getIndex()]   = libro.getFORMATO();
+         dataLibro[NOMBRE_COLUMNAS.PRECIO.getIndex()]    = libro.getPrecioVenta();
+         dataLibro[NOMBRE_COLUMNAS.CANTIDAD.getIndex()]  = libro.getCantidadDisponible();
+         dataLibro[NOMBRE_COLUMNAS.AGREGAR.getIndex()]   = false;
+         model.addRow(dataLibro);
+      }
    }
 
    private void modificacionesLibros () {
       model.addTableModelListener(event -> {
-         int fila    = event.getFirstRow();
-         int columna = event.getColumn();
-         if (columna == 10) {
-            agregarAlCarrito(fila);
+         if (event.getColumn() == 10) {
+            agregarAlCarrito(event.getFirstRow());
          }
       });
    }
 
-   private void agregarAlCarrito (int fila) {
+   private void agregarAlCarrito (int filaEvento) {
       final int columnaAgregar = NOMBRE_COLUMNAS.AGREGAR.getIndex();
-      if (!(boolean) model.getValueAt(fila, columnaAgregar)) return;
-      libroSeleccionado = getLibroFila(fila);
-      model.setValueAt(false, fila, columnaAgregar);
+      if (!(boolean) model.getValueAt(filaEvento, columnaAgregar)) return;
+      libroSeleccionado = getLibroFila(filaEvento);
+      model.setValueAt(false, filaEvento, columnaAgregar);
       evento.actionPerformed(new ActionEvent(this, 0, EVENTO.LIBRO_AL_CARRITO.name()));
    }
 
    protected void reasignarFuncionalidadAdmin () {
+      if (tableLibros.getColumnCount() < 11) {
+         return; // Ya se ha reasignado la funcionalidad
+      }
       int              columnaAgregar = NOMBRE_COLUMNAS.AGREGAR.getIndex();
       TableColumnModel columnModel    = tableLibros.getColumnModel();
       columnModel.removeColumn(columnModel.getColumn(columnaAgregar));
@@ -144,28 +159,28 @@ public class PanelLibros extends JPanel {
 
    private void agregarFuncionalidadBotones (JButton botonAgregar, JButton botonActualizar, JButton botonEliminar) {
       //Boton Agregar
-      botonAgregar.setActionCommand(EVENTO.AGREGAR_LIBRO.name());
-      botonAgregar.addActionListener(evento);
+      botonAgregar.addActionListener(_ -> {
+         this.dialogAgregarLibro = new DialogAgregarLibro(evento);
+         dialogAgregarLibro.setVisible(true);
+      });
 
       //Boton Actualizar
-      botonActualizar.setActionCommand(EVENTO.ACTUALIZAR_LIBRO.name());
       botonActualizar.addActionListener(_ -> {
          int filaSeleccionada = tableLibros.getSelectedRow();
          if (filaSeleccionada >= 0) {
-            libroSeleccionado = getLibroFila(filaSeleccionada);
-            botonActualizar.removeActionListener(evento);
-            botonActualizar.addActionListener(evento);
+            libroSeleccionado     = getLibroFila(filaSeleccionada);
+            dialogActualizarLibro = new DialogActualizarLibro(evento, libroSeleccionado);
+            dialogActualizarLibro.setVisible(true);
          }
       });
 
       //Boton Eliminar
-      botonEliminar.setActionCommand(EVENTO.ELIMINAR_LIBRO.name());
       botonEliminar.addActionListener(_ -> {
          int filaSeleccionada = tableLibros.getSelectedRow();
          if (filaSeleccionada >= 0) {
-            libroSeleccionado = getLibroFila(filaSeleccionada);
-            botonEliminar.removeActionListener(evento);
-            botonEliminar.addActionListener(evento);
+            libroSeleccionado   = getLibroFila(filaSeleccionada);
+            dialogEliminarLibro = new DialogEliminarLibro(evento, libroSeleccionado);
+            dialogEliminarLibro.setVisible(true);
          }
       });
    }
@@ -185,8 +200,20 @@ public class PanelLibros extends JPanel {
       return libro;
    }
 
-   public static Libro getLibroSeleccionado () {
+   public Libro getLibroSeleccionado () {
       return libroSeleccionado;
+   }
+
+   public DialogActualizarLibro getDialogActualizarLibro () {
+      return dialogActualizarLibro;
+   }
+
+   public DialogEliminarLibro getDialogEliminarLibro () {
+      return dialogEliminarLibro;
+   }
+
+   public DialogAgregarLibro getDialogAgregarLibro () {
+      return dialogAgregarLibro;
    }
 
    public enum NOMBRE_COLUMNAS {

@@ -3,34 +3,26 @@ package co.edu.uptc.entity;
 import java.util.HashMap;
 
 public class Carrito {
-   private long                 IDAsociado = 0;
-   private Usuario              usuario;
-   private HashMap<Long, Libro> articulos;
+   private long                   ID;
+   //<ISBN del libro, cantidad en Carrito>
+   private HashMap<Long, Integer> articulos;
 
    public Carrito () {
    }
 
    public void setIDAsociado (long IDAsociado) {
-      this.IDAsociado = IDAsociado;
+      this.ID = IDAsociado;
    }
 
    public long getIDAsociado () {
-      return IDAsociado;
+      return ID;
    }
 
-   public void setUsuario (Usuario usuario) {
-      this.usuario = usuario;
-   }
-
-   public Usuario getUsuario () {
-      return usuario;
-   }
-
-   public void setArticulos (HashMap<Long, Libro> articulos) {
+   public void setArticulos (HashMap<Long, Integer> articulos) {
       this.articulos = articulos;
    }
 
-   public HashMap<Long, Libro> getArticulos () {
+   public HashMap<Long, Integer> getArticulos () {
       return articulos;
    }
 }
