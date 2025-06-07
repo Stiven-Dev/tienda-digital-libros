@@ -39,8 +39,9 @@ public class PanelCarrito extends JPanel {
 
    /**
     * Constructor del panel de carrito.
+    *
     * @param ventanaPrincipal referencia a la ventana principal
-    * @param evento manejador de eventos
+    * @param evento           manejador de eventos
     */
    public PanelCarrito (VentanaPrincipal ventanaPrincipal, Evento evento) {
       this.evento           = evento;
@@ -53,6 +54,7 @@ public class PanelCarrito extends JPanel {
 
    /**
     * Crea y retorna el modelo de tabla para el carrito.
+    *
     * @return DefaultTableModel configurado
     */
    public DefaultTableModel getDefaultTableModel () {
@@ -76,6 +78,7 @@ public class PanelCarrito extends JPanel {
 
    /**
     * Renderizador personalizado para formatear celdas de tipo double como moneda.
+    *
     * @return DefaultTableCellRenderer personalizado
     */
    private DefaultTableCellRenderer celdasFormateadas () {
@@ -115,6 +118,7 @@ public class PanelCarrito extends JPanel {
 
    /**
     * Aplica el renderizador personalizado a las columnas de la tabla.
+    *
     * @param tableCarrito tabla a formatear
     */
    private void formatearColumnas (JTable tableCarrito) {
@@ -220,6 +224,7 @@ public class PanelCarrito extends JPanel {
 
    /**
     * Suma una unidad del libro seleccionado al carrito.
+    *
     * @param fila fila de la tabla
     */
    private void sumarAlCarrito (int fila) {
@@ -263,7 +268,9 @@ public class PanelCarrito extends JPanel {
 
    /**
     * Obtiene el libro correspondiente a una fila del modelo.
+    *
     * @param fila fila de la tabla
+    *
     * @return libro correspondiente
     */
    private Libro obtenerLibroModel (int fila) {
@@ -274,6 +281,7 @@ public class PanelCarrito extends JPanel {
 
    /**
     * Resta una unidad del libro seleccionado del carrito.
+    *
     * @param fila fila de la tabla
     */
    private void quitarAlCarrito (int fila) {
@@ -297,12 +305,13 @@ public class PanelCarrito extends JPanel {
          model.removeRow(fila);
          carritoDeCompras.remove(ISBN);
       } catch (NullPointerException e) {
-         System.err.println(e.getMessage());
+         Tienda.agregarLog(e.getMessage());
       }
    }
 
    /**
     * Elimina completamente un libro del carrito.
+    *
     * @param fila fila de la tabla
     */
    private void descartarDelCarrito (int fila) {
@@ -314,6 +323,7 @@ public class PanelCarrito extends JPanel {
 
    /**
     * Agrega un libro al carrito por su ISBN.
+    *
     * @param ISBN identificador del libro
     */
    void agregarArticulo (long ISBN) {
@@ -340,7 +350,8 @@ public class PanelCarrito extends JPanel {
 
    /**
     * Rellena la fila de la tabla con los datos del libro y la cantidad.
-    * @param libro libro a agregar
+    *
+    * @param libro    libro a agregar
     * @param cantidad cantidad seleccionada
     */
    private void rellenarDatosFilaLibro (Libro libro, int cantidad) {
@@ -354,7 +365,7 @@ public class PanelCarrito extends JPanel {
       double valorImpuesto   = obtenerValorImpuesto(ISBN);
       datosFila[NOMBRE_COLUMNAS.VALOR_SIN_IVA.getIndex()]      = valorBaseSinIVA;
       datosFila[NOMBRE_COLUMNAS.VALOR_IMPUESTO.getIndex()]     = valorImpuesto;
-      datosFila[NOMBRE_COLUMNAS.VALOR_IVA_INCLUIDO.getIndex()] = valorUnitario;
+      datosFila[NOMBRE_COLUMNAS.VALOR_IVA_INCLUIDO.getIndex()] = valorBaseSinIVA + valorImpuesto;
       datosFila[NOMBRE_COLUMNAS.CANTIDAD.getIndex()]           = cantidad;
       datosFila[NOMBRE_COLUMNAS.VALOR_TOTAL.getIndex()]        = valorUnitario * cantidad;
       datosFila[NOMBRE_COLUMNAS.SUMAR.getIndex()]              = false;
@@ -365,6 +376,7 @@ public class PanelCarrito extends JPanel {
 
    /**
     * Aumenta la cantidad de un libro en el carrito.
+    *
     * @param ISBN identificador del libro
     */
    void aumentarCantidad (long ISBN) {
@@ -398,7 +410,8 @@ public class PanelCarrito extends JPanel {
 
    /**
     * Actualiza el precio total de un libro en la tabla.
-    * @param ISBN identificador del libro
+    *
+    * @param ISBN      identificador del libro
     * @param filaModel fila de la tabla
     */
    private void actualizarPrecioVenta (long ISBN, int filaModel) {
@@ -411,7 +424,9 @@ public class PanelCarrito extends JPanel {
 
    /**
     * Obtiene el valor del impuesto para un libro por su ISBN.
+    *
     * @param ISBN identificador del libro
+    *
     * @return valor del impuesto
     */
    private double obtenerValorImpuesto (long ISBN) {
@@ -446,6 +461,7 @@ public class PanelCarrito extends JPanel {
 
    /**
     * Refresca la lista de libros en el carrito según el usuario.
+    *
     * @param usuario usuario actual
     */
    public void refrescarLista (Usuario usuario) {
@@ -480,6 +496,7 @@ public class PanelCarrito extends JPanel {
 
    /**
     * Agrega un libro al carrito y actualiza el contador.
+    *
     * @param ISBN identificador del libro
     */
    private void agregarLibroAlCarrito (long ISBN) {
@@ -494,6 +511,7 @@ public class PanelCarrito extends JPanel {
 
    /**
     * Obtiene la cantidad total de libros en el carrito.
+    *
     * @return cantidad de libros
     */
    public int getCantidadLibros () {
