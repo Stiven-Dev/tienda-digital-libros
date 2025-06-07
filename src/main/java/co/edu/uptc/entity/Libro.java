@@ -1,21 +1,49 @@
 package co.edu.uptc.entity;
 
+/**
+ * Entidad que representa un libro en la tienda digital.
+ */
 public class Libro {
+   /**
+    * ISBN único del libro. PK (Primary Key).
+    */
    private long     ISBN;
+   /**
+    * Título del libro.
+    */
    private String   titulo;
+   /**
+    * Autores del libro.
+    */
    private String   autores;
+   /**
+    * Año de publicación del libro.
+    */
    private int      anioPublicacion;
+   /**
+    * Género literario del libro.
+    */
    private String   genero;
+   /**
+    * Editorial del libro.
+    */
    private String   editorial;
+   /**
+    * Número de páginas del libro.
+    */
    private int      numeroPaginas;
+   /**
+    * Precio de venta del libro.
+    */
    private double   precioVenta;
+   /**
+    * Cantidad disponible en inventario.
+    */
    private int      cantidadDisponible;
+   /**
+    * Formato del libro (DIGITAL o IMPRESO).
+    */
    private FORMATOS FORMATO;
-
-   public enum FORMATOS {
-      DIGITAL,
-      IMPRESO
-   }
 
    public Libro () {
    }
@@ -98,5 +126,13 @@ public class Libro {
 
    public void setFORMATO (FORMATOS FORMATOS) {
       this.FORMATO = FORMATOS;
+   }
+
+   /**
+    * Enum que representa los formatos posibles de un libro.
+    */
+   public enum FORMATOS {
+      DIGITAL,
+      IMPRESO
    }
 }

@@ -5,22 +5,74 @@ import co.edu.uptc.entity.Libro;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Diálogo para confirmar la eliminación de un libro del sistema.
+ * Muestra los datos del libro y permite al usuario confirmar o cancelar la eliminación.
+ */
 public class DialogEliminarLibro extends JDialog {
+   /**
+    * Referencia al manejador de eventos de la aplicación.
+    */
    private final Evento     evento;
+   /**
+    * Botón para confirmar la eliminación del libro.
+    */
    private final JButton    botonEliminar   = new JButtonRojo("Eliminar");
+   /**
+    * Fuente utilizada para los labels.
+    */
    private final Font       fuenteLabel     = new Font("Lucida Sans Unicode", Font.PLAIN, 20);
+   /**
+    * Fuente utilizada para los campos de texto.
+    */
    private final Font       fuenteTextField = new Font("Times New Roman", Font.PLAIN, 20);
+   /**
+    * Fuente utilizada para el botón de eliminar.
+    */
    private final Font       fuenteBoton     = new Font("Lucida Sans Unicode", Font.BOLD, 20);
+   /**
+    * Libro que se va a eliminar.
+    */
    private       Libro      libro;
+   /**
+    * Panel que contiene los campos de información del libro.
+    */
    private       JPanel     panelCampos;
+   /**
+    * Panel que contiene el botón de eliminar.
+    */
    private       JPanel     panelFooter;
+   /**
+    * Campo de texto para mostrar el ISBN del libro.
+    */
    private       JTextField boxISBN;
+   /**
+    * Campo de texto para mostrar el título del libro.
+    */
    private       JTextField boxTitulo;
+   /**
+    * Campo de texto para mostrar el/los autor(es) del libro.
+    */
    private       JTextField boxAutor;
+   /**
+    * Campo de texto para mostrar el año de publicación del libro.
+    */
    private       JTextField boxAnioPublicacion;
+   /**
+    * Campo de texto para mostrar el género del libro.
+    */
    private       JTextField boxCategoria;
+   /**
+    * Campo de texto para mostrar la editorial del libro.
+    */
    private       JTextField boxEditorial;
 
+   /**
+    * Constructor del diálogo de eliminación de libro.
+    *
+    * @param evento            manejador de eventos
+    * @param libroSeleccionado libro a eliminar
+    */
    public DialogEliminarLibro (Evento evento, Libro libroSeleccionado) {
       super(new JFrame(), "Eliminar Libro", true);
       this.evento = evento;
@@ -34,6 +86,9 @@ public class DialogEliminarLibro extends JDialog {
       actualizadDatosLibro();
    }
 
+   /**
+    * Inicializa los paneles principales del diálogo.
+    */
    private void inicializarPanel () {
       inicializarPanelCampos();
       inicializarPanelFooter();
@@ -41,6 +96,9 @@ public class DialogEliminarLibro extends JDialog {
       add(panelFooter, BorderLayout.SOUTH);
    }
 
+   /**
+    * Inicializa el panel de campos de texto con los datos del libro.
+    */
    private void inicializarPanelCampos () {
       panelCampos = new JPanel(new GridBagLayout());
       //Creacion de Labels y centrado de cada uno
@@ -142,6 +200,9 @@ public class DialogEliminarLibro extends JDialog {
       add(panelCampos, BorderLayout.CENTER);
    }
 
+   /**
+    * Inicializa el panel inferior con el botón de eliminar.
+    */
    private void inicializarPanelFooter () {
       panelFooter = new JPanel(new GridLayout(1, 1));
       botonEliminar.setActionCommand(Evento.EVENTO.ELIMINAR_LIBRO.name());
@@ -153,6 +214,9 @@ public class DialogEliminarLibro extends JDialog {
       getRootPane().setDefaultButton(botonEliminar);
    }
 
+   /**
+    * Actualiza los campos del formulario con los datos del libro seleccionado.
+    */
    private void actualizadDatosLibro () {
       boxISBN.setText(String.valueOf(libro.getISBN()));
       boxTitulo.setText(libro.getTitulo());
@@ -168,7 +232,12 @@ public class DialogEliminarLibro extends JDialog {
       boxEditorial.setEditable(false);
    }
 
-   public Libro getLibro () {
+   /**
+    * Retorna el libro que se va a eliminar.
+    *
+    * @return libro a eliminar
+    */
+   public Libro getLibroAEliminar () {
       return libro;
    }
 }

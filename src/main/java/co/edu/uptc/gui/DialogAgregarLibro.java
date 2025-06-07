@@ -6,14 +6,24 @@ import co.edu.uptc.entity.Libro.FORMATOS;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Diálogo para agregar un nuevo libro al sistema.
+ * Permite ingresar los datos requeridos y valida la información antes de registrar el libro.
+ */
 public class DialogAgregarLibro extends JDialog {
+   // Referencia al manejador de eventos
    private final Evento              evento;
+   // Botón para guardar el libro
    private final JButton             botonGuardar    = new JButtonVerde("Guardar");
+   // Fuentes para los componentes
    private final Font                fuenteLabel     = new Font("Lucida Sans Unicode", Font.PLAIN, 20);
    private final Font                fuenteTextField = new Font("Times New Roman", Font.PLAIN, 20);
    private final Font                fuenteBoton     = new Font("Lucida Sans Unicode", Font.BOLD, 20);
+   // ComboBox para seleccionar el formato del libro
    private final JComboBox<FORMATOS> comboBoxFormato = new JComboBox<>(FORMATOS.values());
+   // Etiqueta para mostrar mensajes de error
    private final JLabel              mensajeDeError  = new JLabel();
+   // Paneles y campos de texto
    private       JPanel              panelCampos;
    private       JPanel              panelFooter;
    private       JTextField          boxISBN;
@@ -26,6 +36,10 @@ public class DialogAgregarLibro extends JDialog {
    private       JTextField          boxPrecioVenta;
    private       JTextField          boxCantidadInventario;
 
+   /**
+    * Constructor del diálogo para agregar un libro.
+    * @param evento manejador de eventos
+    */
    public DialogAgregarLibro (Evento evento) {
       super(new JFrame(), "Agregar Libro", true);
       this.evento = evento;
@@ -37,6 +51,9 @@ public class DialogAgregarLibro extends JDialog {
       setDefaultCloseOperation(DISPOSE_ON_CLOSE);
    }
 
+   /**
+    * Inicializa los paneles principales del diálogo.
+    */
    private void inicializarPanel () {
       inicializarPanelCampos();
       inicializarPanelFooter();
@@ -46,6 +63,9 @@ public class DialogAgregarLibro extends JDialog {
       add(panelAgregarLibro, BorderLayout.CENTER);
    }
 
+   /**
+    * Inicializa el panel de campos de texto para ingresar los datos del libro.
+    */
    private void inicializarPanelCampos () {
       panelCampos = new JPanel(new GridBagLayout());
 
@@ -189,6 +209,9 @@ public class DialogAgregarLibro extends JDialog {
       add(panelCampos, BorderLayout.CENTER);
    }
 
+   /**
+    * Inicializa el panel inferior con el botón de registrar y el mensaje de error.
+    */
    private void inicializarPanelFooter () {
       panelFooter = new JPanel(new GridLayout(2, 1));
 
@@ -212,6 +235,10 @@ public class DialogAgregarLibro extends JDialog {
       getRootPane().setDefaultButton(botonRegistrar);
    }
 
+   /**
+    * Crea y retorna el botón para registrar el libro.
+    * @return JButton configurado para registrar el libro
+    */
    private JButton getJButtonRegistrar () {
       JButton botonRegistrar = new JButtonVerde("Registrar Libro");
       botonRegistrar.setActionCommand(Evento.EVENTO.REGISTRAR_LIBRO.name());
@@ -220,6 +247,10 @@ public class DialogAgregarLibro extends JDialog {
       return botonRegistrar;
    }
 
+   /**
+    * Valida los campos del formulario y retorna un mensaje de error si hay algún problema.
+    * @return mensaje de error o cadena vacía si no hay errores
+    */
    public String obtenerMensajeDeError () {
       //Validacion de Campos Vacios
       {
@@ -298,6 +329,10 @@ public class DialogAgregarLibro extends JDialog {
       return "";
    }
 
+   /**
+    * Obtiene los datos del libro a partir de los campos del formulario.
+    * @return objeto Libro con los datos ingresados
+    */
    public Libro getDatosLibro () {
       Libro libro = new Libro();
       libro.setISBN(Long.parseLong(boxISBN.getText()));
@@ -313,6 +348,9 @@ public class DialogAgregarLibro extends JDialog {
       return libro;
    }
 
+   /**
+    * Establece el mensaje de error en la etiqueta correspondiente.
+    */
    public void setMensajeDeError () {
       mensajeDeError.setText(obtenerMensajeDeError());
    }

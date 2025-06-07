@@ -4,17 +4,46 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+/**
+ * Entidad que representa una compra realizada por un usuario.
+ */
 public class Compra {
-   //PK
-   private             long                     IDcompra;
-   private             long                     IDasociado; //No se muestra al Usuario
-   private             LocalDateTime            fechaCompra;
-   private             double                   porcentajeDescuento;
-   private             METODO_PAGO              metodoPago;
-   private             double                   valorCompra; //No existe en la base de datos, se calcula en el código
-   private             int                      cantidadCompra; //No existe en la base de datos, se calcula en el código
-   private             ArrayList<DetalleCompra> librosComprados;
-   public static final DateTimeFormatter        FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MMMM/yyyy HH:mm");
+   /**
+    * Formato estándar para mostrar la fecha de la compra.
+    */
+   public static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MMMM/yyyy HH:mm");
+   /**
+    * ID único de la compra. PK (Primary Key).
+    */
+   private long IDcompra;
+   /**
+    * ID del usuario asociado a la compra (FK).
+    */
+   private long IDasociado;
+   /**
+    * Fecha y hora en que se realizó la compra.
+    */
+   private LocalDateTime fechaCompra;
+   /**
+    * Porcentaje de descuento aplicado a la compra.
+    */
+   private double porcentajeDescuento;
+   /**
+    * Método de pago utilizado en la compra.
+    */
+   private METODO_PAGO metodoPago;
+   /**
+    * Valor total de la compra (calculado en código, no en BD).
+    */
+   private double valorCompra;
+   /**
+    * Cantidad total de libros comprados (calculado en código, no en BD).
+    */
+   private int cantidadCompra;
+   /**
+    * Lista de detalles de los libros comprados.
+    */
+   private ArrayList<DetalleCompra> librosComprados;
 
    public Compra () {}
 
@@ -82,6 +111,9 @@ public class Compra {
       this.metodoPago = metodoPago;
    }
 
+   /**
+    * Enum que representa los métodos de pago disponibles.
+    */
    public enum METODO_PAGO {
       EFECTIVO("Efectivo"),
       TARJETA_DEBITO("Tarjeta Débito"),

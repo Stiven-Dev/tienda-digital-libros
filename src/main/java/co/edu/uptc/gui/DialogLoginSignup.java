@@ -7,26 +7,90 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 
+/**
+ * Diálogo para el inicio de sesión y registro de usuarios.
+ * Permite alternar entre los formularios de login y registro, mostrando mensajes de error y validando campos.
+ */
 public class DialogLoginSignup extends JDialog {
+   /**
+    * Referencia al manejador de eventos de la aplicación.
+    */
    private final Evento             evento;
+   /**
+    * Fuente utilizada para los labels.
+    */
    private final Font               fuenteLabel     = new Font("Lucida Sans Unicode", Font.BOLD, 20);
+   /**
+    * Fuente utilizada para los campos de texto.
+    */
    private final Font               fuenteTextField = new Font("Arial", Font.PLAIN, 20);
+   /**
+    * Fuente utilizada para los botones.
+    */
    private final Font               fuenteBoton     = new Font("Lucida Sans Unicode", Font.BOLD, 20);
+   /**
+    * Etiqueta para mostrar mensajes de error.
+    */
    private final JLabel             mensajeDeError  = new JLabel(" ", SwingConstants.CENTER);
-   private       JPanel             panelLogin;
-   private       JPanel             panelRegistro;
-   private       JTextField         boxCorreoLogin;
-   private       JPasswordField     boxContrasenaLogin;
-   private       JTextField         boxNombreCompleto;
-   private       JTextField         boxCorreo;
-   private       JTextField         boxDireccion;
-   private       JTextField         boxTelefono;
-   private       JPasswordField     boxContrasena;
-   private       JButton            botonRegistrar;
-   private       JButton            botonIniciarSesion;
+   /**
+    * Panel central que contiene los formularios de login y registro.
+    */
    private final JPanel             panelCentral    = new JPanel(new CardLayout());
+   /**
+    * Restricciones de layout para el footer.
+    */
    private final GridBagConstraints gbcFooter       = new GridBagConstraints();
+   /**
+    * Panel del formulario de login.
+    */
+   private       JPanel             panelLogin;
+   /**
+    * Panel del formulario de registro.
+    */
+   private       JPanel             panelRegistro;
+   /**
+    * Campo de texto para el correo en login.
+    */
+   private       JTextField         boxCorreoLogin;
+   /**
+    * Campo de contraseña para login.
+    */
+   private       JPasswordField     boxContrasenaLogin;
+   /**
+    * Campo de texto para el nombre completo en registro.
+    */
+   private       JTextField         boxNombreCompleto;
+   /**
+    * Campo de texto para el correo en registro.
+    */
+   private       JTextField         boxCorreo;
+   /**
+    * Campo de texto para la dirección en registro.
+    */
+   private       JTextField         boxDireccion;
+   /**
+    * Campo de texto para el teléfono en registro.
+    */
+   private       JTextField         boxTelefono;
+   /**
+    * Campo de contraseña para registro.
+    */
+   private       JPasswordField     boxContrasena;
+   /**
+    * Botón para registrar usuario.
+    */
+   private       JButton            botonRegistrar;
+   /**
+    * Botón para iniciar sesión.
+    */
+   private       JButton            botonIniciarSesion;
 
+   /**
+    * Constructor del diálogo de login y registro.
+    *
+    * @param ventanaPrincipal referencia a la ventana principal
+    * @param evento           manejador de eventos
+    */
    public DialogLoginSignup (VentanaPrincipal ventanaPrincipal, Evento evento) {
       super(ventanaPrincipal, "Inicio de Sesión / Registro", true);
       this.evento = evento;
@@ -41,6 +105,9 @@ public class DialogLoginSignup extends JDialog {
       setResizable(false);
    }
 
+   /**
+    * Agrega y configura el panel de inicio de sesión.
+    */
    private void agregarLogin () {
       //Panel de Login
       panelLogin = new JPanel(new BorderLayout());
@@ -94,7 +161,7 @@ public class DialogLoginSignup extends JDialog {
       botonIniciarSesion.addActionListener(evento);
       panelBotonesLogin.add(botonIniciarSesion, gbcFooter);
       gbcFooter.gridy = 1;
-      JButton linkRegistrarse = new JButtonAzul("");
+      JButton linkRegistrarse = new JButtonAzul("Crear Cuenta");
       linkRegistrarse.setAction(new AbstractAction() {
          @Override public void actionPerformed (ActionEvent e) {
             CardLayout cardLayout = (CardLayout) panelCentral.getLayout();
@@ -105,7 +172,6 @@ public class DialogLoginSignup extends JDialog {
             repaint();
          }
       });
-      linkRegistrarse.setText("Crear Una Cuenta");
       panelBotonesLogin.add(linkRegistrarse, gbcFooter);
       //Asignacion de fuente a cada boton
       botonIniciarSesion.setFont(fuenteBoton);
@@ -115,6 +181,11 @@ public class DialogLoginSignup extends JDialog {
       getRootPane().setDefaultButton(botonIniciarSesion);
    }
 
+   /**
+    * Crea y retorna el checkbox para mostrar/ocultar la contraseña en el login.
+    *
+    * @return JCheckBox configurado para mostrar/ocultar contraseña
+    */
    private JCheckBox getCheckBoxMostrarContrasena () {
       JCheckBox checkBoxMostrarContrasena = new JCheckBox("Mostrar Contraseña");
       checkBoxMostrarContrasena.setSelected(false);
@@ -130,6 +201,9 @@ public class DialogLoginSignup extends JDialog {
       return checkBoxMostrarContrasena;
    }
 
+   /**
+    * Agrega y configura el panel de registro de usuario.
+    */
    private void agregarRegistro () {
       //Panel SignUp
       panelRegistro = new JPanel(new BorderLayout());
@@ -239,7 +313,7 @@ public class DialogLoginSignup extends JDialog {
       panelFooterRegistro.add(botonRegistrar, gbcFooter);
 
       gbcFooter.gridy = 2;
-      JButton linkIniciarSesion = new JButtonAzul("");
+      JButton linkIniciarSesion = new JButtonAzul("Ya tengo una Cuenta");
       linkIniciarSesion.setAction(new AbstractAction() {
          @Override public void actionPerformed (ActionEvent e) {
             CardLayout cardLayout = (CardLayout) panelCentral.getLayout();
@@ -250,7 +324,6 @@ public class DialogLoginSignup extends JDialog {
             repaint();
          }
       });
-      linkIniciarSesion.setText("Ya tengo una Cuenta");
       panelFooterRegistro.add(linkIniciarSesion, gbcFooter);
       //Asignacion de fuente a cada boton
       botonRegistrar.setFont(fuenteBoton);
@@ -260,6 +333,11 @@ public class DialogLoginSignup extends JDialog {
       panelRegistro.add(panelFooterRegistro, BorderLayout.SOUTH);
    }
 
+   /**
+    * Valida los campos del formulario de registro y retorna un mensaje de error si hay algún problema.
+    *
+    * @return mensaje de error o cadena vacía si no hay errores
+    */
    private String obtenerMensajeDeError () {
       //Validacion de Campos Vacios
       {
@@ -293,6 +371,11 @@ public class DialogLoginSignup extends JDialog {
       return "";
    }
 
+   /**
+    * Obtiene los datos ingresados en el formulario de registro y los retorna como un objeto Usuario.
+    *
+    * @return Usuario con los datos del registro
+    */
    public Usuario getDatosRegistro () {
       Usuario usuario = new Usuario();
       usuario.setNombreCompleto(boxNombreCompleto.getText());
@@ -307,6 +390,11 @@ public class DialogLoginSignup extends JDialog {
       return usuario;
    }
 
+   /**
+    * Obtiene los datos ingresados en el formulario de login y los retorna como un objeto Usuario.
+    *
+    * @return Usuario con los datos del login
+    */
    public Usuario getDatosLogin () {
       Usuario usuario = new Usuario();
       usuario.setCorreoElectronico(boxCorreoLogin.getText());
@@ -314,6 +402,11 @@ public class DialogLoginSignup extends JDialog {
       return usuario;
    }
 
+   /**
+    * Asigna un validador de formato de correo electrónico a un campo de texto.
+    *
+    * @param boxCorreo campo de texto a validar
+    */
    private void validarCampoCorreo (JTextField boxCorreo) {
       boxCorreo.setInputVerifier(new InputVerifier() {
          @Override public boolean verify (JComponent input) {

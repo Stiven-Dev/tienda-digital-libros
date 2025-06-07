@@ -11,6 +11,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
+/**
+ * Panel que muestra la lista de libros disponibles en la tienda.
+ * Permite a los usuarios agregar libros al carrito y a los administradores gestionar los libros (agregar, actualizar, eliminar).
+ */
 public class PanelLibros extends JPanel {
    private final Evento                evento;
    private final Font                  fuenteCabecera     = new Font("Arial", Font.BOLD, 15);
@@ -24,30 +28,43 @@ public class PanelLibros extends JPanel {
    private       DialogActualizarLibro dialogActualizarLibro;
    private       DialogEliminarLibro   dialogEliminarLibro;
 
+   /**
+    * Constructor del panel de libros.
+    * @param pantallaPrincipal referencia a la pantalla principal
+    * @param evento manejador de eventos
+    */
    public PanelLibros (PantallaPrincipal pantallaPrincipal, Evento evento) {
       this.evento      = evento;
       this.listaLibros = pantallaPrincipal.getLibrosLocales();
       inicializarPanelLibros();
    }
 
+   /**
+    * Crea y retorna el modelo de tabla para los libros.
+    * @return DefaultTableModel configurado
+    */
    private DefaultTableModel getDefaultTableModel () {
       return new DefaultTableModel(NOMBRE_COLUMNAS.getCabecera(), 0) {
          @Override public boolean isCellEditable (int row, int column) {
-            return column == 10;
+            return column == NOMBRE_COLUMNAS.AGREGAR.getIndex();
          }
 
          @Override public Class<?> getColumnClass (int columnIndex) {
-            return switch (columnIndex) {
-               case 0 -> long.class;
-               case 4, 9 -> int.class;
-               case 8 -> double.class;
-               case 10 -> Boolean.class;
+            return switch (NOMBRE_COLUMNAS.values()[columnIndex]) {
+               case ISBN -> long.class;
+               case PAGINAS, CANTIDAD -> int.class;
+               case PRECIO -> double.class;
+               case AGREGAR -> Boolean.class;
                default -> String.class;
             };
          }
       };
    }
 
+   /**
+    * Renderizador personalizado para formatear celdas de tipo double como moneda.
+    * @return DefaultTableCellRenderer personalizado
+    */
    private DefaultTableCellRenderer celdasDoubleFormateadas () {
       return new DefaultTableCellRenderer() {
          @Override public Component getTableCellRendererComponent (JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -59,6 +76,9 @@ public class PanelLibros extends JPanel {
       };
    }
 
+   /**
+    * Inicializa el panel principal con la tabla de libros.
+    */
    private void inicializarPanelLibros () {
       setLayout(new BorderLayout());
       model       = getDefaultTableModel();
@@ -73,17 +93,25 @@ public class PanelLibros extends JPanel {
       modificacionesLibros();
    }
 
+   /**
+    * Aplica el renderizador personalizado a las columnas de la tabla.
+    * @param tableLibros tabla a formatear
+    */
    private void formatearColumnas (JTable tableLibros) {
       tableLibros.setDefaultRenderer(Object.class, celdasDoubleFormateadas());
    }
 
+   /**
+    * Refresca la lista de libros mostrados en la tabla.
+    * @param ventanaPrincipal referencia a la ventana principal
+    */
    void refrescarLista (VentanaPrincipal ventanaPrincipal) {
       ventanaPrincipal.refrescar();
       listaLibros = ventanaPrincipal.getLibrosLocales();
       if (listaLibros.isEmpty()) return;
       model.setRowCount(0); // Limpiar el modelo antes de agregar nuevos datos
       for (Libro libro : listaLibros) {
-         Object[] dataLibro = new Object[11];
+         Object[] dataLibro = new Object[NOMBRE_COLUMNAS.values().length];
          //Se valida que el libro tenga suficientes unidades para ser mostrado al público
          if (libro.getCantidadDisponible() < 1) continue;
          dataLibro[NOMBRE_COLUMNAS.ISBN.getIndex()]      = libro.getISBN();
@@ -101,6 +129,9 @@ public class PanelLibros extends JPanel {
       }
    }
 
+   /**
+    * Añade listeners para modificar la tabla de libros (agregar al carrito).
+    */
    private void modificacionesLibros () {
       model.addTableModelListener(event -> {
          if (event.getColumn() == 10) {
@@ -109,6 +140,10 @@ public class PanelLibros extends JPanel {
       });
    }
 
+   /**
+    * Agrega el libro seleccionado al carrito.
+    * @param filaEvento fila seleccionada en la tabla
+    */
    private void agregarAlCarrito (int filaEvento) {
       final int columnaAgregar = NOMBRE_COLUMNAS.AGREGAR.getIndex();
       if (!(boolean) model.getValueAt(filaEvento, columnaAgregar)) return;
@@ -117,6 +152,9 @@ public class PanelLibros extends JPanel {
       evento.actionPerformed(new ActionEvent(this, 0, EVENTO.LIBRO_AL_CARRITO.name()));
    }
 
+   /**
+    * Reasigna la funcionalidad del panel para el modo administrador (elimina la columna de agregar y muestra botones de gestión).
+    */
    protected void reasignarFuncionalidadAdmin () {
       if (tableLibros.getColumnCount() < 11) {
          return; // Ya se ha reasignado la funcionalidad
@@ -128,6 +166,9 @@ public class PanelLibros extends JPanel {
       crearPanelBotones();
    }
 
+   /**
+    * Crea el panel de botones para agregar, actualizar y eliminar libros (modo administrador).
+    */
    private void crearPanelBotones () {
       //Configuración de GridBagConstraints
       GridBagConstraints gbc = new GridBagConstraints();
@@ -157,6 +198,12 @@ public class PanelLibros extends JPanel {
       this.add(panelBotones, BorderLayout.SOUTH);
    }
 
+   /**
+    * Asigna la funcionalidad a los botones de gestión de libros.
+    * @param botonAgregar botón para agregar libro
+    * @param botonActualizar botón para actualizar libro
+    * @param botonEliminar botón para eliminar libro
+    */
    private void agregarFuncionalidadBotones (JButton botonAgregar, JButton botonActualizar, JButton botonEliminar) {
       //Boton Agregar
       botonAgregar.addActionListener(_ -> {
@@ -185,6 +232,11 @@ public class PanelLibros extends JPanel {
       });
    }
 
+   /**
+    * Obtiene el objeto Libro correspondiente a una fila de la tabla.
+    * @param filaSeleccionada fila seleccionada
+    * @return objeto Libro correspondiente
+    */
    private Libro getLibroFila (int filaSeleccionada) {
       Libro libro = new Libro();
       libro.setISBN((long) model.getValueAt(filaSeleccionada, NOMBRE_COLUMNAS.ISBN.getIndex()));
@@ -200,22 +252,41 @@ public class PanelLibros extends JPanel {
       return libro;
    }
 
+   /**
+    * Retorna el libro actualmente seleccionado en la tabla.
+    * @return libro seleccionado
+    */
    public Libro getLibroSeleccionado () {
       return libroSeleccionado;
    }
 
+   /**
+    * Retorna el diálogo para actualizar libro.
+    * @return DialogActualizarLibro
+    */
    public DialogActualizarLibro getDialogActualizarLibro () {
       return dialogActualizarLibro;
    }
 
+   /**
+    * Retorna el diálogo para eliminar libro.
+    * @return DialogEliminarLibro
+    */
    public DialogEliminarLibro getDialogEliminarLibro () {
       return dialogEliminarLibro;
    }
 
+   /**
+    * Retorna el diálogo para agregar libro.
+    * @return DialogAgregarLibro
+    */
    public DialogAgregarLibro getDialogAgregarLibro () {
       return dialogAgregarLibro;
    }
 
+   /**
+    * Enum que define los nombres y el orden de las columnas de la tabla de libros.
+    */
    public enum NOMBRE_COLUMNAS {
       ISBN(0, "ISBN"),
       TITULO(1, "Título"),
@@ -236,20 +307,20 @@ public class PanelLibros extends JPanel {
          this.name  = name;
       }
 
-      public int getIndex () {
-         return index;
-      }
-
-      String getName () {
-         return name;
-      }
-
       static String[] getCabecera () {
          String[] cabecera = new String[NOMBRE_COLUMNAS.values().length];
          for (NOMBRE_COLUMNAS columna : NOMBRE_COLUMNAS.values()) {
             cabecera[columna.getIndex()] = columna.getName();
          }
          return cabecera;
+      }
+
+      public int getIndex () {
+         return index;
+      }
+
+      String getName () {
+         return name;
       }
    }
 }

@@ -6,15 +6,37 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
+/**
+ * Botón personalizado para mostrar el perfil del usuario y acceder a opciones de cuenta.
+ * Permite ver el perfil, historial de compras y cerrar sesión.
+ */
 public class ProfileButton extends JButton {
+   /**
+    * Referencia al manejador de eventos de la aplicación.
+    */
    private final Evento                 evento;
+   /**
+    * Referencia a la ventana principal.
+    */
    private final VentanaPrincipal       ventanaPrincipal;
+   /**
+    * Iniciales del usuario mostradas en el botón.
+    */
    private       String                 initials = "N/R";
+   /**
+    * Diálogo para visualizar y actualizar el perfil.
+    */
    private       DialogPerfil           dialogPerfil;
+   /**
+    * Diálogo para mostrar el historial de compras.
+    */
    private       DialogHistorialCompras dialogHistorialCompras;
 
-   //TODO generar el evento para que al ser clickeado muestre el Dialog de Iniciar Sesión/Registro. Pero que si ya se inició sesión, muestre el menú desplegable con las opciones
-   // de perfil
+   /**
+    * Constructor del botón de perfil.
+    * @param ventanaPrincipal referencia a la ventana principal
+    * @param evento manejador de eventos
+    */
    public ProfileButton (VentanaPrincipal ventanaPrincipal, Evento evento) {
       this.evento           = evento;
       this.ventanaPrincipal = ventanaPrincipal;
@@ -28,6 +50,10 @@ public class ProfileButton extends JButton {
       setOpaque(false);
    }
 
+   /**
+    * Dibuja el botón con las iniciales del usuario y el color personalizado.
+    * @param g contexto gráfico
+    */
    @Override protected void paintComponent (Graphics g) {
       Graphics2D g2 = (Graphics2D) g.create();
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -46,6 +72,10 @@ public class ProfileButton extends JButton {
       super.paintComponent(g);
    }
 
+   /**
+    * Inicia la sesión del usuario, muestra las iniciales y habilita el menú de opciones.
+    * @param usuario usuario autenticado
+    */
    public void iniciarSesion (Usuario usuario) {
       removeActionListener(evento);
       String nombreUsuario = usuario.getNombreCompleto();
@@ -98,6 +128,9 @@ public class ProfileButton extends JButton {
       this.addActionListener(_ -> popupMenu.show(this, 0, this.getHeight()));
    }
 
+   /**
+    * Muestra el diálogo para confirmar el cierre de sesión.
+    */
    private void mostrarDialogoCerrarSesion () {
       JDialog dialogCerrarSesion = new JDialog(new JFrame(), "¿Cerrar Sesión?", true);
       dialogCerrarSesion.setLayout(new BorderLayout());
@@ -141,6 +174,10 @@ public class ProfileButton extends JButton {
       dialogCerrarSesion.setVisible(true);
    }
 
+   /**
+    * Retorna el diálogo de perfil asociado al botón.
+    * @return diálogo de perfil
+    */
    public DialogPerfil getDialogPerfil () {
       return dialogPerfil;
    }

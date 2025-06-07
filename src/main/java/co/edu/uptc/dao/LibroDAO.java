@@ -9,8 +9,69 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
+/**
+ * DAO para operaciones relacionadas con los libros en la base de datos.
+ */
 public class LibroDAO {
+   /**
+    * Metodo privado para obtener un PreparedStatement a partir de una consulta SQL.
+    * @param consultaSQL Consulta SQL a preparar.
+    * @return PreparedStatement listo para usar.
+    * @throws SQLException Si ocurre un error de conexión o SQL.
+    */
+   private static PreparedStatement getPreparedStatement (String consultaSQL) throws SQLException {
+      Connection connection = ConnectionToDB.getInstance().getConnection();
+      return connection.prepareStatement(consultaSQL);
+   }
+
+   /**
+    * Metodo que descuenta unidades de libros en la base de datos según la lista de artículos.
+    * @param listaArticulos HashMap con ISBN como clave y cantidad a descontar como valor.
+    */
+   public void descontarUnidadesLibro (HashMap<Long, Integer> listaArticulos) {
+      String consultaSQL = "UPDATE libro SET cantidad_Disponible = cantidad_Disponible - ? WHERE ISBN = ? AND cantidad_Disponible >= ?";
+      try (PreparedStatement preparedStatement = getPreparedStatement(consultaSQL)) {
+         for (Long ISBN : listaArticulos.keySet()) {
+            int cantidadADescontar = listaArticulos.get(ISBN);
+            preparedStatement.setInt(1, cantidadADescontar);
+            preparedStatement.setLong(2, ISBN);
+            preparedStatement.setInt(3, cantidadADescontar);
+            preparedStatement.addBatch();
+         }
+         preparedStatement.executeBatch();
+         Tienda.agregarLog("Unidades descontadas correctamente");
+      } catch (SQLException e) {
+         Tienda.agregarLog(e.getMessage());
+      }
+   }
+
+   /**
+    * Metodo que reintegra unidades de libros en la base de datos según la lista de artículos.
+    * @param mapArticulos HashMap con ISBN como clave y cantidad a reintegrar como valor.
+    */
+   public void reintegrarUnidadesLibro (HashMap<Long, Integer> mapArticulos) {
+      String consultaSQL = "UPDATE libro SET cantidad_Disponible = cantidad_Disponible + ? WHERE ISBN = ? ";
+      try (PreparedStatement preparedStatement = getPreparedStatement(consultaSQL)) {
+         for (Long ISBN : mapArticulos.keySet()) {
+            int cantidadADescontar = mapArticulos.get(ISBN);
+            preparedStatement.setInt(1, cantidadADescontar);
+            preparedStatement.setLong(2, ISBN);
+            preparedStatement.addBatch();
+         }
+         preparedStatement.executeBatch();
+         Tienda.agregarLog("Unidades reintegradas correctamente");
+      } catch (SQLException e) {
+         Tienda.agregarLog(e.getMessage());
+      }
+   }
+
+   /**
+    * Metodo que agrega un libro a la base de datos.
+    * @param libro Objeto Libro a agregar.
+    * @return true si el libro fue agregado correctamente, false en caso contrario.
+    */
    public boolean agregarLibro (Libro libro) {
       String consultSQL = "INSERT INTO LIBRO (ISBN, titulo, autores, anio_Publicacion, genero, editorial, numero_Paginas, precio_Venta, cantidad_Disponible, formato) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       try (PreparedStatement preparedStatement = getPreparedStatement(consultSQL)) {
@@ -24,20 +85,20 @@ public class LibroDAO {
          preparedStatement.setDouble(8, libro.getPrecioVenta());
          preparedStatement.setInt(9, libro.getCantidadDisponible());
          preparedStatement.setString(10, libro.getFORMATO().name());
-         int filasAfectadas = preparedStatement.executeUpdate();
-         if (filasAfectadas > 0) {
-            Tienda.agregarLog("Libro agregado correctamente: " + libro.getTitulo());
-            return true;
-         } else {
-            Tienda.agregarLog("No se pudo agregar el libro: " + libro.getTitulo());
-            return false;
-         }
+         preparedStatement.executeUpdate();
+         Tienda.agregarLog("Libro agregado correctamente: " + libro.getTitulo());
+         return true;
       } catch (Exception e) {
          Tienda.agregarLog(e.getMessage());
       }
       return false;
    }
 
+   /**
+    * Metodo que actualiza los datos de un libro en la base de datos.
+    * @param datosLibro Objeto Libro con los datos actualizados.
+    * @return true si el libro fue actualizado correctamente, false en caso contrario.
+    */
    public boolean actualizarLibro (Libro datosLibro) {
       String consultaSQL = "UPDATE LIBRO SET titulo = ?, autores = ?, anio_Publicacion = ?, genero = ?, editorial = ?, numero_Paginas = ?, precio_Venta = ?, cantidad_Disponible = ?, formato = ? WHERE ISBN = ?";
       try (PreparedStatement preparedStatement = getPreparedStatement(consultaSQL)) {
@@ -65,6 +126,11 @@ public class LibroDAO {
       return false;
    }
 
+   /**
+    * Metodo que busca un libro por su ISBN en la base de datos.
+    * @param ISBN ISBN del libro a buscar.
+    * @return Objeto Libro si se encuentra, null en caso contrario.
+    */
    public Libro buscarLibroISBN (long ISBN) {
       Libro  libro       = null;
       String consultaSQL = "SELECT * FROM libro WHERE ISBN = ?";
@@ -90,6 +156,11 @@ public class LibroDAO {
       return libro;
    }
 
+   /**
+    * Metodo que elimina un libro de la base de datos por su ISBN.
+    * @param ISBN ISBN del libro a eliminar.
+    * @return true si el libro fue eliminado correctamente, false en caso contrario.
+    */
    public boolean eliminarLibro (long ISBN) {
       String consultaSQL = "DELETE FROM libro WHERE ISBN = ?";
       try (PreparedStatement preparedStatement = getPreparedStatement(consultaSQL)) {
@@ -108,6 +179,10 @@ public class LibroDAO {
       return false;
    }
 
+   /**
+    * Metodo que obtiene la lista de todos los libros en la base de datos.
+    * @return ArrayList de objetos Libro.
+    */
    public ArrayList<Libro> obtenerListaLibros () {
       String           consultaSQL = "SELECT * FROM libro";
       ArrayList<Libro> listaLibros = new ArrayList<>();
@@ -136,6 +211,11 @@ public class LibroDAO {
       return listaLibros;
    }
 
+   /**
+    * Metodo que verifica si existen ventas asociadas a un libro por su ISBN.
+    * @param IBSN ISBN del libro a verificar.
+    * @return true si existen ventas asociadas, false en caso contrario.
+    */
    public boolean isVentasAsociadas (long IBSN) {
       boolean compraAsociada = false;
       String  consultaSQL    = "SELECT EXISTS(SELECT 1 FROM compras WHERE ISBN_asociado = ? LIMIT 1) AS compra_asociada";
@@ -155,11 +235,11 @@ public class LibroDAO {
       return compraAsociada;
    }
 
-   private static PreparedStatement getPreparedStatement (String consultaSQL) throws SQLException {
-      Connection connection = ConnectionToDB.getInstance().getConnection();
-      return connection.prepareStatement(consultaSQL);
-   }
-
+   /**
+    * Metodo que obtiene la cantidad de unidades disponibles de un libro por su ISBN.
+    * @param ISBN ISBN del libro.
+    * @return Número de unidades disponibles.
+    */
    public int obtenerUnidadesDisponibles (long ISBN) {
       int    unidadesDisponibles = 0;
       String consultaSQL         = "SELECT cantidad_Disponible FROM libro WHERE ISBN = ?";

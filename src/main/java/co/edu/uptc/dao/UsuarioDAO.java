@@ -11,11 +11,35 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 
+/**
+ * DAO para operaciones relacionadas con los usuarios en la base de datos.
+ */
 public class UsuarioDAO {
+   /**
+    * Metodo privado para obtener un PreparedStatement a partir de una consulta SQL.
+    * @param consultaSQL Consulta SQL a preparar.
+    * @return PreparedStatement listo para usar.
+    * @throws SQLException Si ocurre un error de conexión o SQL.
+    */
+   private static PreparedStatement getPreparedStatement (String consultaSQL) throws SQLException {
+      Connection connection = ConnectionToDB.getInstance().getConnection();
+      return connection.prepareStatement(consultaSQL);
+   }
+
+   /**
+    * Metodo que obtiene el porcentaje de descuento según el rol del usuario.
+    * @param rol Rol del usuario.
+    * @return Porcentaje de descuento (0.15 para PREMIUM, 0 para otros).
+    */
    public float obtenerDescuentoTipoUsuario (Usuario.ROLES rol) {
       return rol == Usuario.ROLES.PREMIUM ? 0.15f : 0;
    }
 
+   /**
+    * Metodo que registra un usuario en la base de datos.
+    * @param usuario Objeto Usuario a registrar.
+    * @return true si el usuario fue registrado correctamente, false en caso contrario.
+    */
    public boolean registrarUsuario (Usuario usuario) {
       String consultaSQL = "INSERT INTO USUARIO (nombre_Completo, correo_Electronico, direccion_Envio, telefono_Contacto, clave_Acceso, tipoUsuario) VALUES (?, ?, ?, ?, ?, ?)";
       try {
@@ -42,6 +66,11 @@ public class UsuarioDAO {
       return true;
    }
 
+   /**
+    * Metodo que obtiene un usuario mediante su correo electrónico.
+    * @param correoElectronico Correo electrónico del usuario.
+    * @return Objeto Usuario si se encuentra, null en caso contrario.
+    */
    public Usuario obtenerUsuarioMedianteCorreo (String correoElectronico) {
       Usuario usuario     = null;
       String  consultaSQL = "SELECT * FROM USUARIO WHERE correo_Electronico = ?";
@@ -67,6 +96,11 @@ public class UsuarioDAO {
       return usuario;
    }
 
+   /**
+    * Metodo que valida si un usuario puede ser registrado (correo no repetido) y lo registra si es válido.
+    * @param usuario Objeto Usuario a validar y registrar.
+    * @return true si el usuario fue registrado correctamente, false en caso contrario.
+    */
    public boolean validarRegistro (Usuario usuario) {
       if (obtenerUsuarioMedianteCorreo(usuario.getCorreoElectronico()) != null) {
          Tienda.agregarLog("Registro fallido: " + usuario.getCorreoElectronico() + " ya está registrado.");
@@ -76,6 +110,11 @@ public class UsuarioDAO {
       return registrarUsuario(usuario);
    }
 
+   /**
+    * Metodo que actualiza los datos de un usuario en la base de datos.
+    * @param nuevosDatosUsuario Objeto Usuario con los nuevos datos.
+    * @return true si los datos fueron actualizados correctamente, false en caso contrario.
+    */
    public boolean actualizarDatosUsuario (Usuario nuevosDatosUsuario) {
       StringBuilder consultaSQL         = new StringBuilder("UPDATE USUARIO SET nombre_Completo = ?, correo_Electronico = ?");
       boolean       actualizarDireccion = nuevosDatosUsuario.getDireccionEnvio() != null && !nuevosDatosUsuario.getDireccionEnvio().isBlank();
@@ -124,16 +163,16 @@ public class UsuarioDAO {
       return false;
    }
 
+   /**
+    * Metodo que valida las credenciales de login de un usuario.
+    * @param datosUsuario Objeto Usuario con los datos de login.
+    * @return Objeto Usuario si las credenciales son correctas, null en caso contrario.
+    */
    public Usuario validarCredencialesLogin (Usuario datosUsuario) {
       Usuario usuario = obtenerUsuarioMedianteCorreo(datosUsuario.getCorreoElectronico());
       if (usuario == null) {
          return null;
       }
       return Arrays.equals(usuario.getClaveAcceso(), datosUsuario.getClaveAcceso()) ? usuario : null;
-   }
-
-   private static PreparedStatement getPreparedStatement (String consultaSQL) throws SQLException {
-      Connection connection = ConnectionToDB.getInstance().getConnection();
-      return connection.prepareStatement(consultaSQL);
    }
 }

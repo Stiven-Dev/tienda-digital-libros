@@ -9,9 +9,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
+/**
+ * DAO para operaciones relacionadas con los detalles de compra en la base de datos.
+ */
 public class DetalleCompraDAO {
+   /**
+    * Constructor por defecto de DetalleCompraDAO.
+    */
    public DetalleCompraDAO () {}
 
+   /**
+    * Metodo que obtiene los detalles de una compra por su ID.
+    * @param IDcompra ID de la compra.
+    * @return ArrayList de objetos DetalleCompra, o null si hay error.
+    */
    public ArrayList<DetalleCompra> obtenerDetallesCompraPorID (long IDcompra) {
       String consultaSQL = "SELECT * FROM DETALLE_COMPRA WHERE ID_compra = ?";
       try (PreparedStatement preparedStatement = getPreparedStatement(consultaSQL)) {
@@ -36,6 +47,12 @@ public class DetalleCompraDAO {
       return null;
    }
 
+   /**
+    * Metodo que registra los detalles de una compra en la base de datos.
+    * @param listaArticulos Lista de detalles de compra a registrar.
+    * @param IDasociado ID del usuario asociado a la compra.
+    * @param IDcompra ID de la compra.
+    */
    public void registrarDetallesCompra (ArrayList<DetalleCompra> listaArticulos, long IDasociado, long IDcompra) {
       String consultaSQL = "INSERT INTO DETALLE_COMPRA (ID_compra, ISBN_asociado, titulo, cantidad, valor_unitario) VALUES (?, ?, ?, ?, ?)";
       try (PreparedStatement preparedStatement = getPreparedStatement(consultaSQL)) {
@@ -53,6 +70,12 @@ public class DetalleCompraDAO {
       }
    }
 
+   /**
+    * Metodo privado para obtener un PreparedStatement a partir de una consulta SQL.
+    * @param consultaSQL Consulta SQL a preparar.
+    * @return PreparedStatement listo para usar.
+    * @throws Exception Si ocurre un error de conexión o SQL.
+    */
    private PreparedStatement getPreparedStatement (String consultaSQL) throws Exception {
       Connection connection = ConnectionToDB.getInstance().getConnection();
       return connection.prepareStatement(consultaSQL);

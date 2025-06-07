@@ -1,22 +1,46 @@
 package co.edu.uptc.entity;
 
+/**
+ * Entidad que representa un usuario del sistema.
+ */
 public class Usuario {
+   /**
+    * ID único del usuario.
+    */
    private long   ID;
+   /**
+    * Nombre completo del usuario.
+    */
    private String nombreCompleto;
+   /**
+    * Correo electrónico del usuario.
+    */
    private String correoElectronico;
+   /**
+    * Dirección de envío del usuario.
+    */
    private String direccionEnvio;
+   /**
+    * Teléfono de contacto del usuario.
+    */
    private long   telefonoContacto;
+   /**
+    * Clave de acceso del usuario (encriptada o en texto plano).
+    */
    private char[] claveAcceso;
+   /**
+    * Rol del usuario (ADMIN, PREMIUM, REGULAR).
+    */
    private ROLES  tipoUsuario = ROLES.REGULAR;
 
    public Usuario () {}
 
-   public void setID (long ID) {
-      this.ID = ID;
-   }
-
    public long getID () {
       return ID;
+   }
+
+   public void setID (long ID) {
+      this.ID = ID;
    }
 
    public String getNombreCompleto () {
@@ -67,6 +91,9 @@ public class Usuario {
       this.tipoUsuario = tipoUsuario;
    }
 
+   /**
+    * Enum que representa los roles posibles de un usuario.
+    */
    public enum ROLES {
       ADMIN,
       PREMIUM,

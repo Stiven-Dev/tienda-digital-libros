@@ -5,13 +5,28 @@ import co.edu.uptc.entity.Compra;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Clase que gestiona los eventos de la interfaz gráfica.
+ * Implementa ActionListener y centraliza el manejo de acciones de usuario.
+ */
 public class Evento implements ActionListener {
+   /**
+    * Referencia a la ventana principal de la aplicación.
+    */
    private final VentanaPrincipal ventanaPrincipal;
 
+   /**
+    * Constructor que recibe la ventana principal para delegar acciones.
+    * @param ventanaPrincipal ventana principal de la aplicación
+    */
    public Evento (VentanaPrincipal ventanaPrincipal) {
       this.ventanaPrincipal = ventanaPrincipal;
    }
 
+   /**
+    * Maneja los eventos de acción generados por la interfaz gráfica.
+    * @param e evento de acción
+    */
    @Override public void actionPerformed (ActionEvent e) {
       String actionCommand = e.getActionCommand();
       EVENTO nombreEvento  = EVENTO.valueOf(actionCommand);
@@ -31,7 +46,7 @@ public class Evento implements ActionListener {
          case LIBRO_AL_CARRITO -> ventanaPrincipal.agregarLibroCarrito();
          case LOGIN_SIGNUP -> ventanaPrincipal.mostrarPanelLoginSignUp();
          case MOSTRAR_DETALLES_COMPRA -> ventanaPrincipal.mostrarDetallesCompra();
-         case PAGAR_EFECTIVO, PAGAR_TARJETA_CREDITO, PAGAR_TARJETA_DEBITO -> {
+         case EFECTIVO, TARJETA_CREDITO, TARJETA_DEBITO -> {
             ventanaPrincipal.setMetodoPago(Compra.METODO_PAGO.valueOf(actionCommand));
             ventanaPrincipal.pagar();
          }
@@ -39,22 +54,25 @@ public class Evento implements ActionListener {
       }
    }
 
+   /**
+    * Enum que define todos los eventos posibles en la aplicación.
+    */
    public enum EVENTO {
-      ACTUALIZAR_LIBRO,
-      ACTUALIZAR_CLIENTE,
-      MOSTRAR_DIALOG_AGREGAR_LIBRO,
-      CERRAR_SESION,
-      CREAR_CUENTA,
-      ELIMINAR_LIBRO,
-      INICIAR_SESION,
-      LIBRO_AL_CARRITO,
-      LOGIN_SIGNUP,
-      PAGAR_EFECTIVO,
-      PAGAR_TARJETA_DEBITO,
-      PAGAR_TARJETA_CREDITO,
-      REGISTRAR_CLIENTE,
-      REGISTRAR_LIBRO,
-      MOSTRAR_DETALLES_COMPRA,
-      VALIDAR_CORREO
+      ACTUALIZAR_LIBRO,           // Actualizar información de un libro
+      ACTUALIZAR_CLIENTE,         // Actualizar datos de un cliente
+      MOSTRAR_DIALOG_AGREGAR_LIBRO, // Mostrar diálogo para agregar libro
+      CERRAR_SESION,              // Cerrar sesión de usuario
+      CREAR_CUENTA,               // Crear una nueva cuenta
+      ELIMINAR_LIBRO,             // Eliminar un libro
+      INICIAR_SESION,             // Iniciar sesión de usuario
+      LIBRO_AL_CARRITO,           // Agregar libro al carrito
+      LOGIN_SIGNUP,               // Mostrar panel de login/registro
+      EFECTIVO,                   // Selección de pago en efectivo
+      TARJETA_DEBITO,             // Selección de pago con tarjeta débito
+      TARJETA_CREDITO,            // Selección de pago con tarjeta crédito
+      REGISTRAR_CLIENTE,          // Registrar un nuevo cliente
+      REGISTRAR_LIBRO,            // Registrar un nuevo libro
+      MOSTRAR_DETALLES_COMPRA,    // Mostrar detalles de una compra
+      VALIDAR_CORREO              // Validar disponibilidad de correo
    }
 }

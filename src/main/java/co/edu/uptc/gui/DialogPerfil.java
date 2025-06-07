@@ -6,22 +6,73 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 
+/**
+ * Diálogo para visualizar y actualizar el perfil de usuario.
+ * Permite modificar datos personales, dirección, teléfono y contraseña.
+ */
 public class DialogPerfil extends JDialog {
+   /**
+    * Referencia al manejador de eventos de la aplicación.
+    */
    private final Evento         evento;
+   /**
+    * Botón para guardar los cambios del perfil.
+    */
    private final JButton        botonActualizar        = new JButtonVerde("Guardar");
+   /**
+    * Campo de texto para el nombre completo del usuario.
+    */
    private final JTextField     boxNombreCompleto      = new JTextField();
+   /**
+    * Campo de texto para el correo electrónico del usuario.
+    */
    private final JTextField     boxCorreo              = new JTextField();
+   /**
+    * Campo de texto para la dirección del usuario.
+    */
    private final JTextField     boxDireccion           = new JTextField("");
+   /**
+    * Campo de texto para el teléfono del usuario.
+    */
    private final JTextField     boxTelefono            = new JTextField("");
+   /**
+    * Etiqueta que muestra el tipo de usuario actual.
+    */
    private final JLabel         labelTipoUsuarioActual = new JLabel();
+   /**
+    * Fuente utilizada para los labels.
+    */
    private final Font           fuenteLabel            = new Font("Lucida Sans Unicode", Font.PLAIN, 20);
+   /**
+    * Fuente utilizada para los campos de texto.
+    */
    private final Font           fuenteTextField        = new Font("Times New Roman", Font.PLAIN, 20);
+   /**
+    * Fuente utilizada para el botón de guardar.
+    */
    private final Font           fuenteBoton            = new Font("Lucida Sans Unicode", Font.BOLD, 20);
+   /**
+    * Etiqueta para mostrar mensajes de error.
+    */
    private final JLabel         mensajeDeError         = new JLabel();
+   /**
+    * Campo de contraseña para la nueva contraseña del usuario.
+    */
    private final JPasswordField boxContrasenaNueva     = new JPasswordField("");
+   /**
+    * Objeto Usuario con los nuevos datos ingresados.
+    */
    private       Usuario        nuevosDatosUsuario     = null;
+   /**
+    * Objeto Usuario con los datos actuales del usuario.
+    */
    private       Usuario        datosUsuario;
 
+   /**
+    * Constructor del diálogo de perfil de usuario.
+    * @param evento manejador de eventos
+    * @param datosUsuario datos actuales del usuario
+    */
    public DialogPerfil (Evento evento, Usuario datosUsuario) {
       super(new Frame(), datosUsuario.getNombreCompleto(), true);
       this.evento       = evento;
@@ -33,12 +84,18 @@ public class DialogPerfil extends JDialog {
       setLocationRelativeTo(null);
    }
 
+   /**
+    * Inicializa los componentes gráficos del diálogo.
+    */
    private void initComponents () {
       setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
       inicializarPanelDatosUsuario();
       inicializarPanelFooter();
    }
 
+   /**
+    * Inicializa el panel con los datos del usuario.
+    */
    private void inicializarPanelDatosUsuario () {
       //Banners de Datos
       //Banner de Nombre Completo
@@ -96,6 +153,10 @@ public class DialogPerfil extends JDialog {
       labelTipoUsuarioActual.setText(datosUsuario.getTipoUsuario().name());
    }
 
+   /**
+    * Crea y retorna el checkbox para mostrar/ocultar la contraseña nueva.
+    * @return JCheckBox configurado
+    */
    private JCheckBox getCheckBoxMostrarContrasena () {
       JCheckBox checkBoxMostrarContrasena = new JCheckBox("Mostrar Contraseña");
       checkBoxMostrarContrasena.setSelected(false);
@@ -110,6 +171,9 @@ public class DialogPerfil extends JDialog {
       return checkBoxMostrarContrasena;
    }
 
+   /**
+    * Inicializa el panel inferior con el botón de guardar y el mensaje de error.
+    */
    private void inicializarPanelFooter () {
       JPanel panelFooter = new JPanel(new GridLayout(2, 1));
       mensajeDeError.setForeground(Color.RED);
@@ -129,6 +193,10 @@ public class DialogPerfil extends JDialog {
       getRootPane().setDefaultButton(botonActualizar);
    }
 
+   /**
+    * Valida los campos del formulario y retorna un mensaje de error si hay algún problema.
+    * @return mensaje de error o cadena vacía si no hay errores
+    */
    public String obtenerMensajeDeError () {
       //Validacion de Campos Vacios
       {
@@ -170,10 +238,16 @@ public class DialogPerfil extends JDialog {
       return " ";
    }
 
+   /**
+    * Establece el mensaje de error en la interfaz.
+    */
    public void setMensajeDeError () {
       mensajeDeError.setText(obtenerMensajeDeError());
    }
 
+   /**
+    * Actualiza el objeto Usuario con los nuevos datos ingresados en el formulario.
+    */
    private void actualizarNuevosDatosUsuario () {
       nuevosDatosUsuario = new Usuario();
       nuevosDatosUsuario.setID(datosUsuario.getID());
@@ -189,11 +263,19 @@ public class DialogPerfil extends JDialog {
       nuevosDatosUsuario.setClaveAcceso(boxContrasenaNueva.getPassword());
    }
 
+   /**
+    * Retorna el objeto Usuario con los nuevos datos ingresados.
+    * @return Usuario actualizado
+    */
    public Usuario getNuevosDatosUsuario () {
       actualizarNuevosDatosUsuario();
       return nuevosDatosUsuario;
    }
 
+   /**
+    * Refresca los datos mostrados en el formulario con los datos actualizados del usuario.
+    * @param usuarioActualizado usuario actualizado
+    */
    public void refrescarDatosUsuario (Usuario usuarioActualizado) {
       datosUsuario = usuarioActualizado;
       boxNombreCompleto.setText(usuarioActualizado.getNombreCompleto());

@@ -10,15 +10,45 @@ import java.awt.event.ActionEvent;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+/**
+ * Diálogo que muestra el historial de compras del usuario.
+ * Permite visualizar las compras realizadas y seleccionar una para ver detalles o factura.
+ */
 public class DialogHistorialCompras extends JDialog {
-   private final VentanaPrincipal   ventanaPrincipal;
-   private final Font               fuenteCabecera = new Font("Arial", Font.BOLD, 15);
-   private final Font               fuenteCelda    = new Font("Lucida Sans Unicode", Font.PLAIN, 15);
+   /**
+    * Referencia a la ventana principal de la aplicación.
+    */
+   private final VentanaPrincipal  ventanaPrincipal;
+   /**
+    * Fuente utilizada para los encabezados de la tabla.
+    */
+   private final Font              fuenteCabecera = new Font("Arial", Font.BOLD, 15);
+   /**
+    * Fuente utilizada para las celdas de la tabla.
+    */
+   private final Font              fuenteCelda    = new Font("Lucida Sans Unicode", Font.PLAIN, 15);
+   /**
+    * Referencia al manejador de eventos de la aplicación.
+    */
    private final Evento            evento;
+   /**
+    * Lista local de compras del usuario.
+    */
    private       ArrayList<Compra> compraLocales;
+   /**
+    * Modelo de la tabla de compras.
+    */
    private       DefaultTableModel model;
+   /**
+    * Compra actualmente seleccionada en la tabla.
+    */
    private       Compra            compraSeleccionada;
 
+   /**
+    * Constructor del diálogo de historial de compras.
+    * @param ventanaPrincipal referencia a la ventana principal
+    * @param evento manejador de eventos
+    */
    public DialogHistorialCompras (VentanaPrincipal ventanaPrincipal, Evento evento) {
       super(new Frame(), "Historial de Compras", true);
       this.ventanaPrincipal = ventanaPrincipal;
@@ -31,6 +61,9 @@ public class DialogHistorialCompras extends JDialog {
       setDefaultCloseOperation(DISPOSE_ON_CLOSE);
    }
 
+   /**
+    * Inicializa el panel principal con la tabla de compras.
+    */
    private void inicializarPanel () {
       model = getDefaultTableModel();
       rellenarTablaCompras();
@@ -43,6 +76,10 @@ public class DialogHistorialCompras extends JDialog {
       modificacionesCompras();
    }
 
+   /**
+    * Crea y retorna el modelo de tabla para las compras.
+    * @return DefaultTableModel configurado
+    */
    private DefaultTableModel getDefaultTableModel () {
       return new DefaultTableModel(NOMBRE_COLUMNAS.getCabecera(), 0) {
          @Override public boolean isCellEditable (int row, int column) {
@@ -72,6 +109,9 @@ public class DialogHistorialCompras extends JDialog {
       };
    }
 
+   /**
+    * Rellena la tabla de compras con los datos actuales de las compras del usuario.
+    */
    private void rellenarTablaCompras () {
       ventanaPrincipal.refrescar();
       compraLocales = ventanaPrincipal.obtenerListaCompras();
@@ -87,6 +127,9 @@ public class DialogHistorialCompras extends JDialog {
       }
    }
 
+   /**
+    * Configura las modificaciones a la lista de compras, incluyendo la acción de ver detalles.
+    */
    private void modificacionesCompras () {
       model.addTableModelListener(event -> {
          if (event.getColumn() == 4) {
@@ -95,6 +138,10 @@ public class DialogHistorialCompras extends JDialog {
       });
    }
 
+   /**
+    * Muestra los detalles de la compra seleccionada en la fila del evento.
+    * @param filaEvento fila donde ocurrió el evento
+    */
    private void verDetalles (int filaEvento) {
       final int columnaVerDetalles = NOMBRE_COLUMNAS.VER_DETALLES.getIndex();
       if (!(Boolean) model.getValueAt(filaEvento, columnaVerDetalles)) return;
@@ -103,6 +150,10 @@ public class DialogHistorialCompras extends JDialog {
       evento.actionPerformed(new ActionEvent(this, 0, Evento.EVENTO.MOSTRAR_DETALLES_COMPRA.name()));
    }
 
+   /**
+    * Establece la compra seleccionada basada en la fila del evento.
+    * @param filaEvento fila donde ocurrió el evento
+    */
    private void setCompraSeleccionada (int filaEvento) {
       compraSeleccionada = new Compra();
       compraSeleccionada.setIDcompra((long) model.getValueAt(filaEvento, NOMBRE_COLUMNAS.ID_COMPRA.getIndex()));
@@ -121,6 +172,9 @@ public class DialogHistorialCompras extends JDialog {
       ventanaPrincipal.setCompraSeleccionada(compraSeleccionada);
    }
 
+   /**
+    * Refresca la lista de compras en el diálogo.
+    */
    public void refrescarLista () {
       rellenarTablaCompras();
    }

@@ -1,12 +1,33 @@
 package co.edu.uptc.entity;
 
+/**
+ * Entidad que representa el detalle de un libro comprado en una compra.
+ */
 public class DetalleCompra {
-   private long   IDdetalle;
-   private long   IDcompra;
+   /**
+    * ID único del detalle de compra.
+    */
+   private long IDdetalle;
+   /**
+    * ID de la compra asociada.
+    */
+   private long IDcompra;
+   /**
+    * Título del libro comprado.
+    */
    private String titulo;
-   private int    cantidad;
+   /**
+    * Cantidad de unidades compradas de este libro.
+    */
+   private int cantidad;
+   /**
+    * Valor unitario del libro al momento de la compra.
+    */
    private double valorUnitario;
-   private long   ISBNasociado;
+   /**
+    * ISBN del libro asociado a este detalle.
+    */
+   private long ISBNasociado;
 
    public DetalleCompra () {}
 

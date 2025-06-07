@@ -5,15 +5,26 @@ import co.edu.uptc.entity.Libro;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Diálogo para actualizar la información de un libro existente.
+ * Permite modificar los campos del libro y actualizar los datos en el sistema.
+ */
 public class DialogActualizarLibro extends JDialog {
+   // Referencia al manejador de eventos
    private final Evento            evento;
+   // Botón para actualizar el libro
    private final JButton           botonActualizar = new JButtonAzul("Actualizar Libro");
+   // Fuentes para los componentes
    private final Font              fuenteLabel     = new Font("Lucida Sans Unicode", Font.PLAIN, 20);
    private final Font              fuenteTextField = new Font("Times New Roman", Font.PLAIN, 20);
    private final Font              fuenteBoton     = new Font("Lucida Sans Unicode", Font.BOLD, 20);
+   // ComboBox para seleccionar el formato del libro
    private final JComboBox<String> comboBoxFormato = new JComboBox<>(new String[] {"DIGITAL", "IMPRESO"});
+   // Etiqueta para mostrar mensajes de error
    private final JLabel            mensajeDeError  = new JLabel(" ", SwingConstants.CENTER);
+   // Libro a actualizar
    private final Libro             libro;
+   // Paneles y campos de texto
    private       JPanel            panelCampos;
    private       JPanel            panelFooter;
    private       JTextField        boxISBN;
@@ -26,6 +37,12 @@ public class DialogActualizarLibro extends JDialog {
    private       JTextField        boxPrecioVenta;
    private       JTextField        boxCantidadInventario;
 
+   /**
+    * Constructor del diálogo de actualización de libro.
+    *
+    * @param evento manejador de eventos
+    * @param libro  libro a actualizar
+    */
    public DialogActualizarLibro (Evento evento, Libro libro) {
       super(new JFrame(), "Actualizar Libro", true);
       this.evento = evento;
@@ -39,6 +56,9 @@ public class DialogActualizarLibro extends JDialog {
       actualizarDatosLibro();
    }
 
+   /**
+    * Inicializa los paneles principales del diálogo.
+    */
    private void inicializarPanel () {
       inicializarPanelCampos();
       inicializarPanelFooter();
@@ -46,6 +66,9 @@ public class DialogActualizarLibro extends JDialog {
       add(panelFooter, BorderLayout.SOUTH);
    }
 
+   /**
+    * Inicializa el panel de campos de texto para editar los datos del libro.
+    */
    private void inicializarPanelCampos () {
       panelCampos = new JPanel(new GridBagLayout());
       //Creacion de Labels y centrado de cada uno
@@ -184,6 +207,9 @@ public class DialogActualizarLibro extends JDialog {
       panelCampos.add(comboBoxFormato, gbc);
    }
 
+   /**
+    * Inicializa el panel inferior con el botón de actualizar y el mensaje de error.
+    */
    private void inicializarPanelFooter () {
       panelFooter = new JPanel(new GridLayout(2, 1));
       mensajeDeError.setForeground(Color.RED);
@@ -197,6 +223,11 @@ public class DialogActualizarLibro extends JDialog {
       getRootPane().setDefaultButton(botonActualizar);
    }
 
+   /**
+    * Valida los campos del formulario y retorna un mensaje de error si hay algún problema.
+    *
+    * @return mensaje de error o cadena vacía si no hay errores
+    */
    public String obtenerMensajeDeError () {
       //Validacion de Campos Vacios
       {
@@ -275,6 +306,11 @@ public class DialogActualizarLibro extends JDialog {
       return "";
    }
 
+   /**
+    * Obtiene los datos del libro modificados a partir de los campos del formulario.
+    *
+    * @return objeto Libro con los datos actualizados
+    */
    public Libro getDatosLibro () {
       Libro libroModificado = new Libro();
       libroModificado.setISBN(Long.parseLong(boxISBN.getText()));
@@ -290,6 +326,9 @@ public class DialogActualizarLibro extends JDialog {
       return libroModificado;
    }
 
+   /**
+    * Actualiza los campos del formulario con los datos actuales del libro.
+    */
    private void actualizarDatosLibro () {
       boxISBN.setText(String.valueOf(libro.getISBN()));
       boxISBN.setEditable(false); // El ISBN no se puede editar
@@ -304,6 +343,11 @@ public class DialogActualizarLibro extends JDialog {
       comboBoxFormato.setSelectedItem(libro.getFORMATO());
    }
 
+   /**
+    * Establece el mensaje de error en la interfaz.
+    *
+    * @param mensaje texto del mensaje de error
+    */
    public void setMensajeDeError (String mensaje) {
       mensajeDeError.setText(mensaje);
    }
