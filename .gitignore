@@ -2,7 +2,7 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-
+!**/data/operacion.log
 ### IntelliJ IDEA ###
 .idea/modules.xml
 .idea/jarRepositories.xml
@@ -36,6 +36,3 @@ build/
 
 ### Mac OS ###
 .DS_Store
-data/operacion.log
-data/operacion.log
-data/operacion.log
