@@ -29,15 +29,15 @@ public class DialogEliminarLibro extends JDialog {
    /**
     * Fuente utilizada para el botón de eliminar.
     */
-   private final Font       fuenteBoton     = new Font("Lucida Sans Unicode", Font.BOLD, 20);
+   private final Font   fuenteBoton     = new Font("Lucida Sans Unicode", Font.BOLD, 20);
    /**
     * Libro que se va a eliminar.
     */
-   private       Libro      libro;
+   private final Libro  libro;
    /**
     * Panel que contiene los campos de información del libro.
     */
-   private       JPanel     panelCampos;
+   private       JPanel panelCampos;
    /**
     * Panel que contiene el botón de eliminar.
     */

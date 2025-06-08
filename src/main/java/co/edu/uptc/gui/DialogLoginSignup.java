@@ -118,8 +118,8 @@ public class DialogLoginSignup extends JDialog {
       //Asignacion de fuente a cada label
       labelUsuario.setFont(fuenteLabel);
       labelContrasena.setFont(fuenteLabel);
-      boxCorreoLogin     = new JTextField("regular1@gmail.com");
-      boxContrasenaLogin = new JPasswordField("regular1");
+      boxCorreoLogin     = new JTextField("stiven.rico@gmail.com");
+      boxContrasenaLogin = new JPasswordField("12345678");
       //Asignacion de fuente a cada text field
       boxCorreoLogin.setFont(fuenteTextField);
       boxContrasenaLogin.setFont(fuenteTextField);

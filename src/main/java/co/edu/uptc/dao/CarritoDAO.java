@@ -68,4 +68,44 @@ public class CarritoDAO {
       Connection connection = ConnectionToDB.getInstance().getConnection();
       return connection.prepareStatement(consultaSQL);
    }
+
+   public void actualizarCarrito (HashMap<Long, Integer> carritoActual, long ID) {
+      HashMap<Long, Integer> carritoEnDB = obtenerCarritoPorID(ID);
+      if (carritoEnDB == null) carritoEnDB = new HashMap<>();
+      try {
+         for (Long ISBN : carritoActual.keySet()) {
+            int cantidadActual = carritoActual.get(ISBN);
+            if (!carritoEnDB.containsKey(ISBN)) {
+               String insertSQL = "INSERT INTO carrito (ID, ISBN, cantidad) VALUES (?, ?, ?)";
+               try (PreparedStatement preparedStatement = getPreparedStatement(insertSQL)) {
+                  preparedStatement.setLong(1, ID);
+                  preparedStatement.setLong(2, ISBN);
+                  preparedStatement.setInt(3, cantidadActual);
+                  preparedStatement.executeUpdate();
+               }
+            } else if (carritoEnDB.get(ISBN) != cantidadActual) {
+               String updateSQL = "UPDATE carrito SET cantidad = ? WHERE ID = ? AND ISBN = ?";
+               try (PreparedStatement ps = getPreparedStatement(updateSQL)) {
+                  ps.setInt(1, cantidadActual);
+                  ps.setLong(2, ID);
+                  ps.setLong(3, ISBN);
+                  ps.executeUpdate();
+               }
+            }
+         }
+
+         for (Long ISBN : carritoEnDB.keySet()) {
+            if (!carritoActual.containsKey(ISBN)) {
+               String deleteSQL = "DELETE FROM carrito WHERE ID = ? AND ISBN = ?";
+               try (PreparedStatement ps = getPreparedStatement(deleteSQL)) {
+                  ps.setLong(1, ID);
+                  ps.setLong(2, ISBN);
+                  ps.executeUpdate();
+               }
+            }
+         }
+      } catch (Exception e) {
+         Tienda.agregarLog("Error al actualizar el carrito de " + ID + ": " + e.getMessage());
+      }
+   }
 }

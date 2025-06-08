@@ -7,11 +7,11 @@ public class DetalleCompra {
    /**
     * ID único del detalle de compra.
     */
-   private long IDdetalle;
+   private long   IDdetalle;
    /**
     * ID de la compra asociada.
     */
-   private long IDcompra;
+   private long   IDcompra;
    /**
     * Título del libro comprado.
     */
@@ -19,7 +19,7 @@ public class DetalleCompra {
    /**
     * Cantidad de unidades compradas de este libro.
     */
-   private int cantidad;
+   private int    cantidad;
    /**
     * Valor unitario del libro al momento de la compra.
     */
@@ -27,7 +27,7 @@ public class DetalleCompra {
    /**
     * ISBN del libro asociado a este detalle.
     */
-   private long ISBNasociado;
+   private long   ISBNasociado;
 
    public DetalleCompra () {}
 

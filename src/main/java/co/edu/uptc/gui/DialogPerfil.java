@@ -70,7 +70,8 @@ public class DialogPerfil extends JDialog {
 
    /**
     * Constructor del diálogo de perfil de usuario.
-    * @param evento manejador de eventos
+    *
+    * @param evento       manejador de eventos
     * @param datosUsuario datos actuales del usuario
     */
    public DialogPerfil (Evento evento, Usuario datosUsuario) {
@@ -155,6 +156,7 @@ public class DialogPerfil extends JDialog {
 
    /**
     * Crea y retorna el checkbox para mostrar/ocultar la contraseña nueva.
+    *
     * @return JCheckBox configurado
     */
    private JCheckBox getCheckBoxMostrarContrasena () {
@@ -195,6 +197,7 @@ public class DialogPerfil extends JDialog {
 
    /**
     * Valida los campos del formulario y retorna un mensaje de error si hay algún problema.
+    *
     * @return mensaje de error o cadena vacía si no hay errores
     */
    public String obtenerMensajeDeError () {
@@ -265,6 +268,7 @@ public class DialogPerfil extends JDialog {
 
    /**
     * Retorna el objeto Usuario con los nuevos datos ingresados.
+    *
     * @return Usuario actualizado
     */
    public Usuario getNuevosDatosUsuario () {
@@ -274,6 +278,7 @@ public class DialogPerfil extends JDialog {
 
    /**
     * Refresca los datos mostrados en el formulario con los datos actualizados del usuario.
+    *
     * @param usuarioActualizado usuario actualizado
     */
    public void refrescarDatosUsuario (Usuario usuarioActualizado) {

@@ -26,6 +26,7 @@ public class CartBooksButton extends JButton {
 
    /**
     * Establece la cantidad de libros en el carrito.
+    *
     * @param cantidad número de libros
     */
    public static void setCount (int cantidad) {
@@ -58,6 +59,7 @@ public class CartBooksButton extends JButton {
    /**
     * Cambia el texto del botón según la cantidad de libros en el carrito.
     * Si la cantidad es 0, muestra solo "Carrito".
+    *
     * @param text texto a mostrar (debe ser un número)
     */
    @Override public void setText (String text) {

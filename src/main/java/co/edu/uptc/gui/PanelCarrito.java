@@ -25,6 +25,7 @@ public class PanelCarrito extends JPanel {
    private final Font                   fuenteBoton            = new Font("Lucida Sans Unicode", Font.BOLD, 20);
    private final int                    cantidadMaximaTotal    = 20;
    private final int                    cantidadMaximaPorLibro = 10;
+   private final HashMap<Long, Integer> carritoDeCompras;
    public        DefaultTableModel      model;
    private       int                    cantidadLibros         = 0;
    private final JLabel                 labelCantidad          = new JLabel(String.format("Cantidad de libros: %d", cantidadLibros));
@@ -35,7 +36,6 @@ public class PanelCarrito extends JPanel {
    private       double                 total                  = 0;
    private final JLabel                 labelTotal             = new JLabel(String.format("$%f", total));
    private       GridBagConstraints     gbc;
-   private final HashMap<Long, Integer> carritoDeCompras;
 
    /**
     * Constructor del panel de carrito.

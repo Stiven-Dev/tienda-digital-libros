@@ -66,27 +66,27 @@ public class PantallaPrincipal extends JPanel {
    /**
     * Panel del carrito de compras (solo para usuarios).
     */
-   private       PanelCarrito           panelCarrito; //Solo para Usuarios
+   private       PanelCarrito  panelCarrito; //Solo para Usuarios
    /**
     * Botón de perfil de usuario.
     */
-   private       ProfileButton          profileButton;
+   private final ProfileButton profileButton;
    /**
     * Diálogo de perfil de usuario (solo para usuarios).
     */
-   private       DialogPerfil           dialogPerfil; //Solo para Usuarios
+   private       DialogPerfil  dialogPerfil; //Solo para Usuarios
    /**
     * Indica si el carrito está visible.
     */
-   private       boolean                isCartVisible   = false;
+   private       boolean         isCartVisible   = false;
    /**
     * Botón para mostrar el carrito de compras.
     */
-   private       CartBooksButton        cartBooksButton;
+   private final CartBooksButton cartBooksButton;
    /**
     * Compra actualmente seleccionada.
     */
-   private       Compra                 compraSeleccionada;
+   private       Compra          compraSeleccionada;
    /**
     * Indica si la sesión está iniciada.
     */
@@ -340,11 +340,15 @@ public class PantallaPrincipal extends JPanel {
     * Refresca la interfaz gráfica y actualiza la cantidad de libros en el carrito.
     */
    public void refrescarInterfaz () {
+      if (usuarioActual.getTipoUsuario() == Usuario.ROLES.ADMIN) {
+         return;
+      }
       int cantidadLibros = ventanaPrincipal.obtenerCantidadLibrosEnCarrito();
       CartBooksButton.setCount(cantidadLibros);
       if (!isCartVisible) {
          cartBooksButton.setText(String.valueOf(cantidadLibros));
       }
+
       panelCarrito.actualizarDatosCompra();
       revalidate();
       repaint();

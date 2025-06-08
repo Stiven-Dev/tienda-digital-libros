@@ -45,6 +45,14 @@ public class DialogAdministrarCuentas extends JDialog {
     */
    private final JLabel                   mensajeDeError        = new JLabel(" ", JLabel.CENTER);
    /**
+    * ComboBox para seleccionar el tipo de usuario (REGULAR, PREMIUM o ADMIN).
+    */
+   private final JComboBox<Usuario.ROLES> comboBoxTipoUsuario   = new JComboBox<>(Usuario.ROLES.values());
+   /**
+    * Restricciones de diseño para los componentes del panel.
+    */
+   private final GridBagConstraints       gbc                   = new GridBagConstraints();
+   /**
     * Campo de texto para el correo electrónico.
     */
    private       JTextField               boxCorreo;
@@ -65,18 +73,10 @@ public class DialogAdministrarCuentas extends JDialog {
     */
    private       JTextField               boxTelefono;
    /**
-    * ComboBox para seleccionar el tipo de usuario (REGULAR, PREMIUM o ADMIN).
-    */
-   private final JComboBox<Usuario.ROLES> comboBoxTipoUsuario   = new JComboBox<>(Usuario.ROLES.values());
-   /**
     * Usuario obtenido para editar sus datos.
     * Este campo se utiliza para almacenar los datos de un usuario existente cuando se edita su cuenta.
     */
    private       Usuario                  usuarioObtenido;
-   /**
-    * Restricciones de diseño para los componentes del panel.
-    */
-   private final GridBagConstraints       gbc                   = new GridBagConstraints();
 
    /**
     * Constructor del panel de creación de cuentas.
@@ -93,7 +93,7 @@ public class DialogAdministrarCuentas extends JDialog {
       gbc.weightx = 1;
       gbc.gridx   = 0;
       inicializarPanel();
-      setSize(600, 1000);
+      setSize(600, 800);
       setLocationRelativeTo(null);
       setDefaultCloseOperation(DISPOSE_ON_CLOSE);
    }
@@ -168,66 +168,53 @@ public class DialogAdministrarCuentas extends JDialog {
     */
    private void inicializarPanelFooter () {
       JPanel             panelFooter = new JPanel(new GridBagLayout());
-      GridBagConstraints gbc         = new GridBagConstraints();
-      gbc.insets = new Insets(5, 5, 0, 5);
-      gbc.fill   = GridBagConstraints.BOTH;
+      GridBagConstraints gbcFooter   = new GridBagConstraints();
+      gbcFooter.insets = new Insets(5, 10, 5, 10);
+      gbcFooter.fill   = GridBagConstraints.BOTH;
       final float pesoXBotones = 0.5f;
       final float pesoYBotones = 0.25f;
       final float pesoXMensaje = 1;
-      final float pesoYMensaje = 0.2f;
-      gbc.gridx   = 0;
-      gbc.gridy   = 0;
-      gbc.weightx = pesoXBotones;
-      gbc.weighty = pesoYBotones;
-      botonValidarCorreo.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+      final float pesoYMensaje = 0.1f;
+      gbcFooter.gridx   = 0;
+      gbcFooter.gridy   = 0;
+      gbcFooter.weightx = pesoXBotones;
+      gbcFooter.weighty = pesoYBotones;
+      botonValidarCorreo.setAlignmentX(JButton.CENTER);
       botonValidarCorreo.setActionCommand(Evento.EVENTO.VALIDAR_CORREO.name());
-      //TODO: Cambiar el evento de validación de correo para que no se repita al hacer clic
-      botonValidarCorreo.addActionListener(_ -> {
-         if (!boxCorreo.getText().isBlank()) {
-            botonValidarCorreo.removeActionListener(evento);
-            botonValidarCorreo.addActionListener(evento);
-         }
-      });
+      botonValidarCorreo.addActionListener(evento);
 
-      panelFooter.add(botonValidarCorreo, gbc);
-      gbc.gridy++;
-      botonActualizarCuenta.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+      panelFooter.add(botonValidarCorreo, gbcFooter);
+      gbcFooter.gridy++;
+      botonActualizarCuenta.setAlignmentX(JButton.CENTER);
       botonActualizarCuenta.setActionCommand(Evento.EVENTO.ACTUALIZAR_CLIENTE_ADMIN.name());
-      //TODO: Cambiar el evento de actualización de cuenta para que no se repita al hacer clic
-      botonActualizarCuenta.addActionListener(_ -> {
-         mensajeDeError.setText(obtenerMensajeDeError());
-         if (mensajeDeError.getText().isBlank()) {
-            botonActualizarCuenta.removeActionListener(evento);
-            botonActualizarCuenta.addActionListener(evento);
-         }
-      });
-      panelFooter.add(botonActualizarCuenta, gbc);
-      gbc.gridy++;
+      botonActualizarCuenta.addActionListener(evento);
+      panelFooter.add(botonActualizarCuenta, gbcFooter);
+      gbcFooter.gridy++;
 
-      botonCrearCuenta.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+      botonCrearCuenta.setAlignmentX(JButton.CENTER);
       botonCrearCuenta.setActionCommand(Evento.EVENTO.CREAR_CUENTA.name());
-      //TODO: Cambiar el evento de creación de cuenta para que no se repita al hacer clic
-      botonCrearCuenta.addActionListener(_ -> {
-         mensajeDeError.setText(obtenerMensajeDeError());
-         if (mensajeDeError.getText().isBlank()) {
-            botonCrearCuenta.removeActionListener(evento);
-            botonCrearCuenta.addActionListener(evento);
-         }
-      });
+      botonCrearCuenta.addActionListener(evento);
+
       //Asignacion de fuente al boton
       botonValidarCorreo.setFont(fuenteBoton);
       botonCrearCuenta.setFont(fuenteBoton);
       botonActualizarCuenta.setFont(fuenteBoton);
-      panelFooter.add(botonCrearCuenta, gbc);
-      gbc.gridy++;
+      panelFooter.add(botonCrearCuenta, gbcFooter);
+      gbcFooter.gridy++;
 
-      gbc.weightx = pesoXMensaje;
-      gbc.weighty = pesoYMensaje;
+      gbcFooter.weightx = pesoXMensaje;
+      gbcFooter.weighty = pesoYMensaje;
       mensajeDeError.setForeground(Color.RED);
-      mensajeDeError.setFont(new Font("Arial", Font.BOLD, 20));
-      panelFooter.add(mensajeDeError, gbc);
-      gbc.weighty = 0.3;
-      gbc.gridy   = 1;
+      mensajeDeError.setFont(new Font("Arial", Font.BOLD, 16));
+      panelFooter.add(mensajeDeError, gbcFooter);
+      gbcFooter.gridy++;
+
+      final JLabel labelAviso = new JLabel("*La contraseña no será mostrada por seguridad*", JLabel.CENTER);
+      labelAviso.setForeground(Color.ORANGE);
+      labelAviso.setFont(new Font("Arial", Font.ITALIC, 12));
+      panelFooter.add(labelAviso, gbcFooter);
+      gbc.weighty = 0.3f;
+      gbc.gridy++;
       add(panelFooter, gbc);
    }
 
@@ -277,10 +264,15 @@ public class DialogAdministrarCuentas extends JDialog {
    /**
     * Obtiene el correo electrónico ingresado en el formulario.
     *
-    * @return correo electrónico o cadena vacía si está en blanco
+    * @return correo electrónico o cadena vacía si está en blanco o si está en formato inválido
     */
    public String getCorreo () {
       if (boxCorreo.getText().isBlank()) {
+         return "";
+      }
+      final String regexCorreo = "^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$";
+      if (!boxCorreo.getText().matches(regexCorreo)) {
+         setMensajeDeError("El campo Correo Electronico tiene un formato inválido");
          return "";
       }
       return boxCorreo.getText();
@@ -301,7 +293,7 @@ public class DialogAdministrarCuentas extends JDialog {
     */
    public void setMensajeDisponible () {
       mensajeDeError.setForeground(Color.GREEN);
-      mensajeDeError.setText("Usuario Disponible");
+      mensajeDeError.setText("Correo Disponible");
    }
 
    /**
@@ -317,7 +309,12 @@ public class DialogAdministrarCuentas extends JDialog {
       usuario.setCorreoElectronico(boxCorreo.getText());
       usuario.setNombreCompleto(boxNombre.getText());
       usuario.setDireccionEnvio(boxDireccion.getText());
-      usuario.setTelefonoContacto(Long.parseLong(boxTelefono.getText()));
+      String stringTelefonoContacto = boxTelefono.getText();
+      if (stringTelefonoContacto.isBlank()) {
+         usuario.setTelefonoContacto(0);
+      } else {
+         usuario.setTelefonoContacto(Long.parseLong(stringTelefonoContacto));
+      }
       usuario.setClaveAcceso(boxClave.getText().toCharArray());
       usuario.setTipoUsuario((Usuario.ROLES) comboBoxTipoUsuario.getSelectedItem());
       return usuario;
@@ -337,5 +334,13 @@ public class DialogAdministrarCuentas extends JDialog {
       boxTelefono.setText(String.valueOf(usuario.getTelefonoContacto()));
       boxClave.setText(String.valueOf(usuario.getClaveAcceso()));
       comboBoxTipoUsuario.setSelectedItem(usuario.getTipoUsuario());
+   }
+
+   public void limpiarCampos () {
+      boxNombre.setText("");
+      boxTelefono.setText("");
+      boxClave.setText("");
+      boxDireccion.setText("");
+      comboBoxTipoUsuario.setSelectedItem(Usuario.ROLES.REGULAR);
    }
 }

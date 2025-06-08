@@ -140,7 +140,7 @@ public class VentanaPrincipal extends JFrame {
     * Cierra la aplicación de forma segura, guardando datos y cerrando la conexión a la base de datos.
     */
    private void salirFormaSegura () {
-      tienda.guardarDatosLocales();
+      tienda.actualizarCarrito();
       dispose();
       try {
          ConnectionToDB.getInstance().closeConnection();
@@ -262,7 +262,13 @@ public class VentanaPrincipal extends JFrame {
     * Crea una cuenta de usuario con los datos proporcionados.
     */
    void crearCuenta () {
-      Usuario datosUsuario = pantallaPrincipal.getDialogAdministrarCuentas().getDatosUsuario();
+      DialogAdministrarCuentas dialogAdministrarCuentas = pantallaPrincipal.getDialogAdministrarCuentas();
+      String                   mensajeDeError           = dialogAdministrarCuentas.obtenerMensajeDeError();
+      if (!mensajeDeError.isBlank()) {
+         dialogAdministrarCuentas.setMensajeDeError(mensajeDeError);
+         return;
+      }
+      Usuario datosUsuario = dialogAdministrarCuentas.getDatosUsuario();
       if (tienda.registrarUsuario(datosUsuario)) {
          JOptionPane.showMessageDialog(this, "Cuenta creada correctamente", "Información", JOptionPane.INFORMATION_MESSAGE);
       } else {
@@ -274,18 +280,22 @@ public class VentanaPrincipal extends JFrame {
     * Valida si el correo electrónico proporcionado está disponible para registro.
     */
    void validarCorreoDisponible () {
-      String correo = pantallaPrincipal.getDialogAdministrarCuentas().getCorreo();
+      DialogAdministrarCuentas dialogAdministrarCuentas = pantallaPrincipal.getDialogAdministrarCuentas();
+      String                   correo                   = dialogAdministrarCuentas.getCorreo();
       if (correo.isBlank()) {
-         pantallaPrincipal.getDialogAdministrarCuentas().setMensajeDeError("Debe rellenar el campo Correo Electronico");
+         String mensajeDeError = "Correo incompleto o inválido";
+         dialogAdministrarCuentas.setMensajeDeError(mensajeDeError);
+         dialogAdministrarCuentas.limpiarCampos();
          return;
       }
       Usuario usuario = tienda.obtenerUsuarioMedianteCorreo(correo);
       if (usuario != null) {
-         pantallaPrincipal.getDialogAdministrarCuentas().setMensajeDeError("Ya hay un usuario con ese correo");
-         pantallaPrincipal.getDialogAdministrarCuentas().setDatosUsuario(usuario);
+         dialogAdministrarCuentas.setMensajeDeError("Ya hay un usuario con ese correo");
+         dialogAdministrarCuentas.setDatosUsuario(usuario);
          return;
       }
-      pantallaPrincipal.getDialogAdministrarCuentas().setMensajeDisponible();
+      dialogAdministrarCuentas.limpiarCampos();
+      dialogAdministrarCuentas.setMensajeDisponible();
    }
 
    /**
@@ -440,6 +450,7 @@ public class VentanaPrincipal extends JFrame {
     */
    void cerrarSesion () {
       dispose();
+      tienda.actualizarCarrito();
       new VentanaPrincipal();
       revalidate();
       repaint();
@@ -579,16 +590,16 @@ public class VentanaPrincipal extends JFrame {
     * Valida los datos y actualiza el usuario en la tienda.
     */
    public void actualizarDatosClienteAdmin () {
-      String mensajeError = pantallaPrincipal.getDialogAdministrarCuentas().obtenerMensajeDeError();
-      pantallaPrincipal.getDialogAdministrarCuentas().setMensajeDeError(mensajeError);
+      DialogAdministrarCuentas dialogAdministrarCuentas = pantallaPrincipal.getDialogAdministrarCuentas();
+      String                   mensajeError             = dialogAdministrarCuentas.obtenerMensajeDeError();
       if (!mensajeError.isBlank()) {
+         dialogAdministrarCuentas.setMensajeDeError(mensajeError);
          return;
       }
-      Usuario usuarioAValidar = pantallaPrincipal.getDialogAdministrarCuentas().getDatosUsuario();
+      Usuario usuarioAValidar = dialogAdministrarCuentas.getDatosUsuario();
       if (tienda.actualizarDatosUsuario(usuarioAValidar) != null) {
          JOptionPane.showMessageDialog(this, "Datos actualizados correctamente", "Información", JOptionPane.INFORMATION_MESSAGE);
-         pantallaPrincipal.getDialogAdministrarCuentas().dispose();
-         refrescar();
+         dialogAdministrarCuentas.dispose();
       }
    }
 }

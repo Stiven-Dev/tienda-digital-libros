@@ -38,6 +38,7 @@ public class DialogAgregarLibro extends JDialog {
 
    /**
     * Constructor del diálogo para agregar un libro.
+    *
     * @param evento manejador de eventos
     */
    public DialogAgregarLibro (Evento evento) {
@@ -237,6 +238,7 @@ public class DialogAgregarLibro extends JDialog {
 
    /**
     * Crea y retorna el botón para registrar el libro.
+    *
     * @return JButton configurado para registrar el libro
     */
    private JButton getJButtonRegistrar () {
@@ -249,6 +251,7 @@ public class DialogAgregarLibro extends JDialog {
 
    /**
     * Valida los campos del formulario y retorna un mensaje de error si hay algún problema.
+    *
     * @return mensaje de error o cadena vacía si no hay errores
     */
    public String obtenerMensajeDeError () {
@@ -331,6 +334,7 @@ public class DialogAgregarLibro extends JDialog {
 
    /**
     * Obtiene los datos del libro a partir de los campos del formulario.
+    *
     * @return objeto Libro con los datos ingresados
     */
    public Libro getDatosLibro () {

@@ -14,6 +14,7 @@ public class DialogFacturaCompra extends JDialog {
 
    /**
     * Constructor del diálogo de factura de compra.
+    *
     * @param evento manejador de eventos
     */
    public DialogFacturaCompra (Evento evento) {

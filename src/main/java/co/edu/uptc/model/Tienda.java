@@ -15,6 +15,7 @@ import java.util.Map;
 
 public class Tienda {
    private static final String                 rutaLog  = "data/operacion.log";
+   private static       Tienda                 instance = null;
    private final        LibroDAO               libroDAO;
    private final        UsuarioDAO             usuarioDAO;
    private final        CarritoDAO             carritoDAO;
@@ -24,7 +25,6 @@ public class Tienda {
    private final        HashMap<Long, Integer> carritoActual;
    private final        ArrayList<Compra>      compraLocales;
    private final        Usuario                usuarioActual;
-   private static       Tienda                 instance = null;
 
    private Tienda () {
       this.libroDAO         = new LibroDAO();
@@ -49,20 +49,56 @@ public class Tienda {
       instance = null;
    }
 
+   public static void agregarLog (String mensaje) {
+      try (FileWriter writer = new FileWriter(rutaLog, true)) {
+         // Se añade una nueva línea antes de la nueva línea
+         LocalDateTime fechaHoraActual     = LocalDateTime.now();
+         String        fechaHoraFormateada = String.format("-%d/%d/%d %d:%d > ", fechaHoraActual.getDayOfMonth(), fechaHoraActual.getMonthValue(), fechaHoraActual.getYear(), fechaHoraActual.getHour(), fechaHoraActual.getMinute());
+         writer.write(System.lineSeparator() + fechaHoraFormateada + mensaje);
+      } catch (IOException e) {
+         System.err.println("Error al escribir en el log: " + e.getMessage());
+      }
+   }
+
    public ArrayList<Libro> getLibrosLocales () {
       return librosLocales;
+   }
+
+   public void setLibrosLocales (ArrayList<Libro> librosLocales) {
+      this.librosLocales.clear();
+      this.librosLocales.addAll(librosLocales);
    }
 
    public Usuario getUsuarioActual () {
       return usuarioActual;
    }
 
+   public void setUsuarioActual (Usuario usuario) {
+      this.usuarioActual.setID(usuario.getID());
+      this.usuarioActual.setNombreCompleto(usuario.getNombreCompleto());
+      this.usuarioActual.setCorreoElectronico(usuario.getCorreoElectronico());
+      this.usuarioActual.setDireccionEnvio(usuario.getDireccionEnvio());
+      this.usuarioActual.setTelefonoContacto(usuario.getTelefonoContacto());
+      this.usuarioActual.setTipoUsuario(usuario.getTipoUsuario());
+      this.usuarioActual.setClaveAcceso(usuario.getClaveAcceso());
+   }
+
    public ArrayList<Compra> getComprasLocales () {
       return compraLocales;
    }
 
+   public void setComprasLocales (ArrayList<Compra> compraLocales) {
+      this.compraLocales.clear();
+      this.compraLocales.addAll(compraLocales);
+   }
+
    public HashMap<Long, Integer> getCarritoActual () {
       return carritoActual;
+   }
+
+   public void setCarritoActual (HashMap<Long, Integer> carritoActual) {
+      this.carritoActual.clear();
+      this.carritoActual.putAll(carritoActual);
    }
 
    private void refrescarUsuarioActual () {
@@ -97,30 +133,12 @@ public class Tienda {
       librosLocales.addAll(libroDAO.obtenerListaLibros());
    }
 
-   public void setLibrosLocales (ArrayList<Libro> librosLocales) {
-      this.librosLocales.clear();
-      this.librosLocales.addAll(librosLocales);
-   }
-
-   public void setUsuarioActual (Usuario usuario) {
-      this.usuarioActual.setID(usuario.getID());
-      this.usuarioActual.setNombreCompleto(usuario.getNombreCompleto());
-      this.usuarioActual.setCorreoElectronico(usuario.getCorreoElectronico());
-      this.usuarioActual.setDireccionEnvio(usuario.getDireccionEnvio());
-      this.usuarioActual.setTelefonoContacto(usuario.getTelefonoContacto());
-      this.usuarioActual.setTipoUsuario(usuario.getTipoUsuario());
-      this.usuarioActual.setClaveAcceso(usuario.getClaveAcceso());
-   }
-
-   public void setComprasLocales (ArrayList<Compra> compraLocales) {
-      this.compraLocales.clear();
-      this.compraLocales.addAll(compraLocales);
-   }
-
-   public void setCarritoActual (HashMap<Long, Integer> carritoActual) {
-      this.carritoActual.clear();
-      this.carritoActual.putAll(carritoActual);
-   }
+   //██╗░░░░░██╗██████╗░██████╗░░█████╗░░██████╗
+   //██║░░░░░██║██╔══██╗██╔══██╗██╔══██╗██╔════╝
+   //██║░░░░░██║██████╦╝██████╔╝██║░░██║╚█████╗░
+   //██║░░░░░██║██╔══██╗██╔══██╗██║░░██║░╚═══██╗
+   //███████╗██║██████╦╝██║░░██║╚█████╔╝██████╔╝
+   //╚══════╝╚═╝╚═════╝░╚═╝░░╚═╝░╚════╝░╚═════╝░
 
    public void refrescarDatosLocales () {
       refrescarLibrosLocales();
@@ -133,13 +151,6 @@ public class Tienda {
       }
       refrescarUsuarioActual();
    }
-
-   //██╗░░░░░██╗██████╗░██████╗░░█████╗░░██████╗
-   //██║░░░░░██║██╔══██╗██╔══██╗██╔══██╗██╔════╝
-   //██║░░░░░██║██████╦╝██████╔╝██║░░██║╚█████╗░
-   //██║░░░░░██║██╔══██╗██╔══██╗██║░░██║░╚═══██╗
-   //███████╗██║██████╦╝██║░░██║╚█████╔╝██████╔╝
-   //╚══════╝╚═╝╚═════╝░╚═╝░░╚═╝░╚════╝░╚═════╝░
 
    // Métodos relacionados con LIBRO DAO
    public Libro buscarLibro (long ISBN) {
@@ -158,16 +169,16 @@ public class Tienda {
       return libroDAO.agregarLibro(datosLibro);
    }
 
-   public int unidadesDisponibles (long ISBN) {
-      return libroDAO.obtenerUnidadesDisponibles(ISBN);
-   }
-
    //██╗░░░██╗░██████╗██╗░░░██╗░█████╗░██████╗░██╗░█████╗░
    //██║░░░██║██╔════╝██║░░░██║██╔══██╗██╔══██╗██║██╔══██╗
    //██║░░░██║╚█████╗░██║░░░██║███████║██████╔╝██║██║░░██║
    //██║░░░██║░╚═══██╗██║░░░██║██╔══██║██╔══██╗██║██║░░██║
    //╚██████╔╝██████╔╝╚██████╔╝██║░░██║██║░░██║██║╚█████╔╝
    //░╚═════╝░╚═════╝░░╚═════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░╚════╝░
+
+   public int unidadesDisponibles (long ISBN) {
+      return libroDAO.obtenerUnidadesDisponibles(ISBN);
+   }
 
    //Métodos relacionados con Usuario DAO
    public boolean registrarUsuario (Usuario usuarioARegistrar) {
@@ -182,6 +193,13 @@ public class Tienda {
       return usuarioDAO.obtenerDescuentoTipoUsuario(rol);
    }
 
+   //░█████╗░░█████╗░██████╗░██████╗░██╗████████╗░█████╗░
+   //██╔══██╗██╔══██╗██╔══██╗██╔══██╗██║╚══██╔══╝██╔══██╗
+   //██║░░╚═╝███████║██████╔╝██████╔╝██║░░░██║░░░██║░░██║
+   //██║░░██╗██╔══██║██╔══██╗██╔══██╗██║░░░██║░░░██║░░██║
+   //╚█████╔╝██║░░██║██║░░██║██║░░██║██║░░░██║░░░╚█████╔╝
+   //░╚════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░░╚═╝░░░░╚════╝░
+
    public Usuario actualizarDatosUsuario (Usuario nuevosDatosUsuario) {
       if (nuevosDatosUsuario == null || nuevosDatosUsuario.getID() < 1) {
          return null;
@@ -191,13 +209,6 @@ public class Tienda {
       }
       return null;
    }
-
-   //░█████╗░░█████╗░██████╗░██████╗░██╗████████╗░█████╗░
-   //██╔══██╗██╔══██╗██╔══██╗██╔══██╗██║╚══██╔══╝██╔══██╗
-   //██║░░╚═╝███████║██████╔╝██████╔╝██║░░░██║░░░██║░░██║
-   //██║░░██╗██╔══██║██╔══██╗██╔══██╗██║░░░██║░░░██║░░██║
-   //╚█████╔╝██║░░██║██║░░██║██║░░██║██║░░░██║░░░╚█████╔╝
-   //░╚════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░░╚═╝░░░░╚════╝░
 
    //Métodos relacionados con Carrito DAO
    public double calcularValorTotalImpuesto () {
@@ -253,6 +264,13 @@ public class Tienda {
       }
    }
 
+   //░█████╗░░█████╗░███╗░░░███╗██████╗░██████╗░░█████╗░
+   //██╔══██╗██╔══██╗████╗░████║██╔══██╗██╔══██╗██╔══██╗
+   //██║░░╚═╝██║░░██║██╔████╔██║██████╔╝██████╔╝███████║
+   //██║░░██╗██║░░██║██║╚██╔╝██║██╔═══╝░██╔══██╗██╔══██║
+   //╚█████╔╝╚█████╔╝██║░╚═╝░██║██║░░░░░██║░░██║██║░░██║
+   //░╚════╝░░╚════╝░╚═╝░░░░░╚═╝╚═╝░░░░░╚═╝░░╚═╝╚═╝░░╚═╝
+
    public double calcularPorcentajeImpuesto (double valorUnitarioConIVA) {
       //Si el valor unitario (con IVA incluido) es menor a 50.000, quiere decir que fue aplicado un impuesto del 5%, no es necesario calcularlo
       if (valorUnitarioConIVA < 50000) {
@@ -276,20 +294,9 @@ public class Tienda {
       }
    }
 
-   //░█████╗░░█████╗░███╗░░░███╗██████╗░██████╗░░█████╗░
-   //██╔══██╗██╔══██╗████╗░████║██╔══██╗██╔══██╗██╔══██╗
-   //██║░░╚═╝██║░░██║██╔████╔██║██████╔╝██████╔╝███████║
-   //██║░░██╗██║░░██║██║╚██╔╝██║██╔═══╝░██╔══██╗██╔══██║
-   //╚█████╔╝╚█████╔╝██║░╚═╝░██║██║░░░░░██║░░██║██║░░██║
-   //░╚════╝░░╚════╝░╚═╝░░░░░╚═╝╚═╝░░░░░╚═╝░░╚═╝╚═╝░░╚═╝
-
    //Métodos relacionados con Compra DAO
    public boolean comprasAsociadas (long ISBN) {
       return libroDAO.isVentasAsociadas(ISBN);
-   }
-
-   public ArrayList<DetalleCompra> obtenerDetallesCompraPorID (long IDcompra) {
-      return detalleCompraDAO.obtenerDetallesCompraPorID(IDcompra);
    }
 
    //██████╗░░█████╗░░█████╗░██╗░██████╗
@@ -298,6 +305,10 @@ public class Tienda {
    //██║░░██║██╔══██║██║░░██║░░░░╚═══██╗
    //██████╔╝██║░░██║╚█████╔╝░░░██████╔╝
    //╚═════╝░╚═╝░░╚═╝░╚════╝░░░░╚═════╝░
+
+   public ArrayList<DetalleCompra> obtenerDetallesCompraPorID (long IDcompra) {
+      return detalleCompraDAO.obtenerDetallesCompraPorID(IDcompra);
+   }
 
    //Métodos relacionados con multiples relaciones con DAO's
    public double calcularTotalVenta () {
@@ -352,17 +363,6 @@ public class Tienda {
       facturaDAO.setVisible(true);
    }
 
-   public static void agregarLog (String mensaje) {
-      try (FileWriter writer = new FileWriter(rutaLog, true)) {
-         // Se añade una nueva línea antes de la nueva línea
-         LocalDateTime fechaHoraActual     = LocalDateTime.now();
-         String        fechaHoraFormateada = String.format("-%d/%d/%d %d:%d > ", fechaHoraActual.getDayOfMonth(), fechaHoraActual.getMonthValue(), fechaHoraActual.getYear(), fechaHoraActual.getHour(), fechaHoraActual.getMinute());
-         writer.write(System.lineSeparator() + fechaHoraFormateada + mensaje);
-      } catch (IOException e) {
-         System.err.println("Error al escribir en el log: " + e.getMessage());
-      }
-   }
-
    public void eliminarLibroDelCarrito (long ISBN, long ID) {
       carritoDAO.eliminarLibroDelCarrito(ISBN, ID);
    }
@@ -410,7 +410,10 @@ public class Tienda {
       return listaArticulos;
    }
 
-   public void guardarDatosLocales () {
-      //TODO: Implementar la lógica para guardar los datos locales
+   public void actualizarCarrito () {
+      if (usuarioActual.getID() < 1) {
+         return;
+      }
+      carritoDAO.actualizarCarrito(carritoActual, usuarioActual.getID());
    }
 }

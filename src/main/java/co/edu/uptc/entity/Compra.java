@@ -11,39 +11,39 @@ public class Compra {
    /**
     * Formato estándar para mostrar la fecha de la compra.
     */
-   public static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MMMM/yyyy HH:mm");
+   public static final DateTimeFormatter        FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MMMM/yyyy HH:mm");
    /**
     * ID único de la compra. PK (Primary Key).
     */
-   private long IDcompra;
+   private             long                     IDcompra;
    /**
     * ID del usuario asociado a la compra (FK).
     */
-   private long IDasociado;
+   private             long                     IDasociado;
    /**
     * Fecha y hora en que se realizó la compra.
     */
-   private LocalDateTime fechaCompra;
+   private             LocalDateTime            fechaCompra;
    /**
     * Porcentaje de descuento aplicado a la compra.
     */
-   private double porcentajeDescuento;
+   private             double                   porcentajeDescuento;
    /**
-    * Método de pago utilizado en la compra.
+    * Metodo de pago utilizado en la compra.
     */
-   private METODO_PAGO metodoPago;
+   private             METODO_PAGO              metodoPago;
    /**
     * Valor total de la compra (calculado en código, no en BD).
     */
-   private double valorCompra;
+   private             double                   valorCompra;
    /**
     * Cantidad total de libros comprados (calculado en código, no en BD).
     */
-   private int cantidadCompra;
+   private             int                      cantidadCompra;
    /**
     * Lista de detalles de los libros comprados.
     */
-   private ArrayList<DetalleCompra> librosComprados;
+   private             ArrayList<DetalleCompra> librosComprados;
 
    public Compra () {}
 

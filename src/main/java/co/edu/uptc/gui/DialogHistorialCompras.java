@@ -46,8 +46,9 @@ public class DialogHistorialCompras extends JDialog {
 
    /**
     * Constructor del diálogo de historial de compras.
+    *
     * @param ventanaPrincipal referencia a la ventana principal
-    * @param evento manejador de eventos
+    * @param evento           manejador de eventos
     */
    public DialogHistorialCompras (VentanaPrincipal ventanaPrincipal, Evento evento) {
       super(new Frame(), "Historial de Compras", true);
@@ -78,6 +79,7 @@ public class DialogHistorialCompras extends JDialog {
 
    /**
     * Crea y retorna el modelo de tabla para las compras.
+    *
     * @return DefaultTableModel configurado
     */
    private DefaultTableModel getDefaultTableModel () {
@@ -140,6 +142,7 @@ public class DialogHistorialCompras extends JDialog {
 
    /**
     * Muestra los detalles de la compra seleccionada en la fila del evento.
+    *
     * @param filaEvento fila donde ocurrió el evento
     */
    private void verDetalles (int filaEvento) {
@@ -152,6 +155,7 @@ public class DialogHistorialCompras extends JDialog {
 
    /**
     * Establece la compra seleccionada basada en la fila del evento.
+    *
     * @param filaEvento fila donde ocurrió el evento
     */
    private void setCompraSeleccionada (int filaEvento) {

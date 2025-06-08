@@ -4,7 +4,6 @@ import co.edu.uptc.entity.Usuario;
 import co.edu.uptc.model.Tienda;
 import co.edu.uptc.util.ConnectionToDB;
 
-import javax.swing.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -49,12 +48,11 @@ public class UsuarioDAO {
     */
    public boolean registrarUsuario (Usuario usuario) {
       String consultaSQL = "INSERT INTO USUARIO (nombre_Completo, correo_Electronico, direccion_Envio, telefono_Contacto, clave_Acceso, tipoUsuario) VALUES (?, ?, ?, ?, ?, ?)";
-      try {
-         PreparedStatement preparedStatement = getPreparedStatement(consultaSQL);
+      try (PreparedStatement preparedStatement = getPreparedStatement(consultaSQL)) {
          preparedStatement.setString(1, usuario.getNombreCompleto());
          preparedStatement.setString(2, usuario.getCorreoElectronico());
          if (usuario.getDireccionEnvio() == null || usuario.getDireccionEnvio().isBlank()) {
-            usuario.setDireccionEnvio("No especificada");
+            usuario.setDireccionEnvio("NULL");
          }
          preparedStatement.setString(3, usuario.getDireccionEnvio());
          if (usuario.getTelefonoContacto() < 3000000000L) {
@@ -64,7 +62,6 @@ public class UsuarioDAO {
          preparedStatement.setString(5, new String(usuario.getClaveAcceso()));
          preparedStatement.setString(6, usuario.getTipoUsuario().name());
          preparedStatement.executeUpdate();
-         preparedStatement.close();
       } catch (Exception e) {
          Tienda.agregarLog(e.getMessage());
          return false;
@@ -82,8 +79,7 @@ public class UsuarioDAO {
    public Usuario obtenerUsuarioMedianteCorreo (String correoElectronico) {
       Usuario usuario     = null;
       String  consultaSQL = "SELECT * FROM USUARIO WHERE correo_Electronico = ?";
-      try {
-         PreparedStatement preparedStatement = getPreparedStatement(consultaSQL);
+      try (PreparedStatement preparedStatement = getPreparedStatement(consultaSQL)) {
          preparedStatement.setString(1, correoElectronico);
          try (ResultSet resultSet = preparedStatement.executeQuery()) {
             if (resultSet.next()) {
@@ -97,7 +93,6 @@ public class UsuarioDAO {
                usuario.setTipoUsuario(Usuario.ROLES.valueOf(resultSet.getString("tipo_Usuario")));
             }
          }
-         preparedStatement.close();
       } catch (Exception e) {
          Tienda.agregarLog(e.getMessage());
       }
@@ -113,7 +108,6 @@ public class UsuarioDAO {
     */
    public boolean validarRegistro (Usuario usuario) {
       if (obtenerUsuarioMedianteCorreo(usuario.getCorreoElectronico()) != null) {
-         JOptionPane.showMessageDialog(null, "El correo electrónico ya está registrado.", "Error de registro", JOptionPane.ERROR_MESSAGE);
          return false;
       }
       return registrarUsuario(usuario);
@@ -140,9 +134,8 @@ public class UsuarioDAO {
       if (actualizarClave) {
          consultaSQL.append(", clave_Acceso = ?");
       }
-      consultaSQL.append(" WHERE ID = ?");
-      try {
-         PreparedStatement preparedStatement = getPreparedStatement(consultaSQL.toString());
+      consultaSQL.append(", tipo_Usuario = ? WHERE ID = ?");
+      try (PreparedStatement preparedStatement = getPreparedStatement(consultaSQL.toString())) {
          preparedStatement.setString(1, nuevosDatosUsuario.getNombreCompleto());
          preparedStatement.setString(2, nuevosDatosUsuario.getCorreoElectronico());
          int parametroIndex = 3;
@@ -158,10 +151,10 @@ public class UsuarioDAO {
             preparedStatement.setString(parametroIndex, new String(nuevosDatosUsuario.getClaveAcceso()));
             parametroIndex++;
          }
+         preparedStatement.setString(parametroIndex, nuevosDatosUsuario.getTipoUsuario().name());
+         parametroIndex++;
          preparedStatement.setLong(parametroIndex, nuevosDatosUsuario.getID());
-         int filasActualizadas = preparedStatement.executeUpdate();
-         preparedStatement.close();
-         return filasActualizadas > 0;
+         return preparedStatement.executeUpdate() > 0; //Retorna true si la cantidad de filas actualizadas es mayor a 0
       } catch (SQLException e) {
          Tienda.agregarLog(e.getMessage());
       }
