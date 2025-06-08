@@ -14,28 +14,33 @@ public class ProfileButton extends JButton {
    /**
     * Referencia al manejador de eventos de la aplicación.
     */
-   private final Evento                 evento;
+   private final Evento                   evento;
    /**
     * Referencia a la ventana principal.
     */
-   private final VentanaPrincipal       ventanaPrincipal;
+   private final VentanaPrincipal         ventanaPrincipal;
    /**
     * Iniciales del usuario mostradas en el botón.
     */
-   private       String                 initials = "N/R";
+   private       String                   initials = "N/R";
    /**
     * Diálogo para visualizar y actualizar el perfil.
     */
-   private       DialogPerfil           dialogPerfil;
+   private       DialogPerfil             dialogPerfil;
    /**
     * Diálogo para mostrar el historial de compras.
     */
-   private       DialogHistorialCompras dialogHistorialCompras;
+   private       DialogHistorialCompras   dialogHistorialCompras;
+   /**
+    * Diálogo para crear, modificar y validar cuentas de usuario (Solo ADMIN).
+    */
+   private       DialogAdministrarCuentas dialogAdministrarCuentas;
 
    /**
     * Constructor del botón de perfil.
+    *
     * @param ventanaPrincipal referencia a la ventana principal
-    * @param evento manejador de eventos
+    * @param evento           manejador de eventos
     */
    public ProfileButton (VentanaPrincipal ventanaPrincipal, Evento evento) {
       this.evento           = evento;
@@ -52,6 +57,7 @@ public class ProfileButton extends JButton {
 
    /**
     * Dibuja el botón con las iniciales del usuario y el color personalizado.
+    *
     * @param g contexto gráfico
     */
    @Override protected void paintComponent (Graphics g) {
@@ -74,6 +80,7 @@ public class ProfileButton extends JButton {
 
    /**
     * Inicia la sesión del usuario, muestra las iniciales y habilita el menú de opciones.
+    *
     * @param usuario usuario autenticado
     */
    public void iniciarSesion (Usuario usuario) {
@@ -97,6 +104,11 @@ public class ProfileButton extends JButton {
          }
       }
 
+      JPopupMenu popupMenu = getJPopupMenu(usuario);
+      this.addActionListener(_ -> popupMenu.show(this, 0, this.getHeight()));
+   }
+
+   private JPopupMenu getJPopupMenu (Usuario usuario) {
       JPopupMenu popupMenu       = new JPopupMenu();
       JMenuItem  modificarPerfil = new JMenuItem("Ver Perfil");
       JMenuItem  cerrarSesion    = new JMenuItem("LogOut");
@@ -108,12 +120,12 @@ public class ProfileButton extends JButton {
       popupMenu.add(modificarPerfil);
 
       if (usuario.getTipoUsuario() == Usuario.ROLES.ADMIN) {
-         JMenuItem crearCuenta = new JMenuItem("Crear Cuenta");
-         crearCuenta.addActionListener(_ -> {
-            //TODO Implementar la funcionalidad de crear cuenta para el administrador
-            //ventanaPrincipal.crearCuenta();
+         JMenuItem administrarCuentas = new JMenuItem("Administrar Cuentas");
+         administrarCuentas.addActionListener(_ -> {
+            dialogAdministrarCuentas = new DialogAdministrarCuentas(evento);
+            dialogAdministrarCuentas.setVisible(true);
          });
-         popupMenu.add(crearCuenta);
+         popupMenu.add(administrarCuentas);
       } else {
          JMenuItem historialDeCompras = new JMenuItem("Ver Compras");
          historialDeCompras.addActionListener(_ -> {
@@ -125,7 +137,7 @@ public class ProfileButton extends JButton {
       }
       cerrarSesion.addActionListener(_ -> mostrarDialogoCerrarSesion());
       popupMenu.add(cerrarSesion);
-      this.addActionListener(_ -> popupMenu.show(this, 0, this.getHeight()));
+      return popupMenu;
    }
 
    /**
@@ -176,9 +188,19 @@ public class ProfileButton extends JButton {
 
    /**
     * Retorna el diálogo de perfil asociado al botón.
+    *
     * @return diálogo de perfil
     */
    public DialogPerfil getDialogPerfil () {
       return dialogPerfil;
+   }
+
+   /**
+    * Retorna el diálogo de historial de compras asociado al botón.
+    *
+    * @return diálogo de historial de compras
+    */
+   public DialogAdministrarCuentas getDialogAdministrarCuentas () {
+      return dialogAdministrarCuentas;
    }
 }

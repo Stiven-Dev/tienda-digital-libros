@@ -147,7 +147,7 @@ public class PanelCarrito extends JPanel {
       panelDescripcionCompra.add(labelImpuesto);
       panelDescripcionCompra.add(labelSubTotal);
 
-      gbc.gridy   = 1;
+      gbc.gridy++;
       gbc.weighty = 0.15f;
       add(panelDescripcionCompra, gbc);
 
@@ -193,15 +193,21 @@ public class PanelCarrito extends JPanel {
       botonPagarTarjetaDebito.setFont(fuenteBoton);
       botonPagarTarjetaCredito.setFont(fuenteBoton);
 
-      gbc.weightx = 0.1f;
-      gbc.gridy   = 2;
       gbc.gridx   = 0;
+      gbc.weightx = 1;
+      gbc.gridy++;
+
       add(panelFooter, gbc);
-      gbc.gridy   = 3;
+      gbc.gridy++;
       gbc.weighty = 0.05f;
-      JLabel labelAviso = new JLabel("**Los descuentos serán calculados al momento de finalizar la compra**", SwingConstants.CENTER);
-      labelAviso.setFont(new Font("Lucida Sans Typewriter", Font.ITALIC, 10));
-      add(labelAviso, gbc);
+
+      JLabel avisoDiferenciaDeStock = new JLabel("*Puede tener diferencias en el carrito de compras*", JLabel.CENTER);
+      JLabel labelAvisoDescuento    = new JLabel("**Los descuentos serán calculados al momento de finalizar la compra**", JLabel.CENTER);
+      avisoDiferenciaDeStock.setFont(new Font("Lucida Sans Typewriter", Font.ITALIC, 10));
+      labelAvisoDescuento.setFont(new Font("Lucida Sans Typewriter", Font.ITALIC, 10));
+      add(avisoDiferenciaDeStock, gbc);
+      gbc.gridy++;
+      add(labelAvisoDescuento, gbc);
 
       actualizarLabelsCompra();
    }

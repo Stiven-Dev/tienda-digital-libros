@@ -52,7 +52,7 @@ public class VentanaPrincipal extends JFrame {
     */
    private       PantallaPrincipal      pantallaPrincipal;
    /**
-    * Método de pago seleccionado.
+    * Metodo de pago seleccionado.
     */
    private       Compra.METODO_PAGO     metodoPago;
    /**
@@ -163,7 +163,6 @@ public class VentanaPrincipal extends JFrame {
     * Actualiza los datos de un libro en el sistema.
     */
    void actualizarLibro () {
-      System.out.println("Actualizando libro...");
       final DialogActualizarLibro dialogActualizarLibro = pantallaPrincipal.getPanelLibros().getDialogActualizarLibro();
       final String                mensajeError          = dialogActualizarLibro.obtenerMensajeDeError();
       if (!mensajeError.isBlank()) {
@@ -263,7 +262,7 @@ public class VentanaPrincipal extends JFrame {
     * Crea una cuenta de usuario con los datos proporcionados.
     */
    void crearCuenta () {
-      Usuario datosUsuario = pantallaPrincipal.getPanelCrearCuentas().getDatosUsuario();
+      Usuario datosUsuario = pantallaPrincipal.getDialogAdministrarCuentas().getDatosUsuario();
       if (tienda.registrarUsuario(datosUsuario)) {
          JOptionPane.showMessageDialog(this, "Cuenta creada correctamente", "Información", JOptionPane.INFORMATION_MESSAGE);
       } else {
@@ -275,16 +274,18 @@ public class VentanaPrincipal extends JFrame {
     * Valida si el correo electrónico proporcionado está disponible para registro.
     */
    void validarCorreoDisponible () {
-      String correo = pantallaPrincipal.getPanelCrearCuentas().getCorreo();
+      String correo = pantallaPrincipal.getDialogAdministrarCuentas().getCorreo();
       if (correo.isBlank()) {
-         pantallaPrincipal.getPanelCrearCuentas().setMensajeDeError("Debe rellenar el campo Correo Electronico");
+         pantallaPrincipal.getDialogAdministrarCuentas().setMensajeDeError("Debe rellenar el campo Correo Electronico");
          return;
       }
-      if (tienda.obtenerUsuarioMedianteCorreo(correo) != null) {
-         pantallaPrincipal.getPanelCrearCuentas().setMensajeDeError("Ya hay un usuario con ese correo");
+      Usuario usuario = tienda.obtenerUsuarioMedianteCorreo(correo);
+      if (usuario != null) {
+         pantallaPrincipal.getDialogAdministrarCuentas().setMensajeDeError("Ya hay un usuario con ese correo");
+         pantallaPrincipal.getDialogAdministrarCuentas().setDatosUsuario(usuario);
          return;
       }
-      pantallaPrincipal.getPanelCrearCuentas().setMensajeDisponible();
+      pantallaPrincipal.getDialogAdministrarCuentas().setMensajeDisponible();
    }
 
    /**
@@ -300,6 +301,7 @@ public class VentanaPrincipal extends JFrame {
       if (respuesta) {
          if (tienda.efectuarCompra(metodoPago)) {
             pantallaPrincipal.getPanelCarrito().vaciarCarrito();
+            JOptionPane.showMessageDialog(this, "Compra realizada correctamente, puedes ver el detalle en tu historial de Compras", "Información", JOptionPane.INFORMATION_MESSAGE);
          }
          respuesta = false;
       }
@@ -400,7 +402,7 @@ public class VentanaPrincipal extends JFrame {
    /**
     * Muestra el diálogo para agregar un nuevo libro.
     */
-   void dialogAgregarLibro () {
+   void agregarLibro () {
       pantallaPrincipal.mostrarDialogAgregarLibro();
    }
 
@@ -570,5 +572,23 @@ public class VentanaPrincipal extends JFrame {
     */
    public void setRespuesta (boolean respuesta) {
       this.respuesta = respuesta;
+   }
+
+   /**
+    * Actualiza los datos del cliente desde el panel de administración.
+    * Valida los datos y actualiza el usuario en la tienda.
+    */
+   public void actualizarDatosClienteAdmin () {
+      String mensajeError = pantallaPrincipal.getDialogAdministrarCuentas().obtenerMensajeDeError();
+      pantallaPrincipal.getDialogAdministrarCuentas().setMensajeDeError(mensajeError);
+      if (!mensajeError.isBlank()) {
+         return;
+      }
+      Usuario usuarioAValidar = pantallaPrincipal.getDialogAdministrarCuentas().getDatosUsuario();
+      if (tienda.actualizarDatosUsuario(usuarioAValidar) != null) {
+         JOptionPane.showMessageDialog(this, "Datos actualizados correctamente", "Información", JOptionPane.INFORMATION_MESSAGE);
+         pantallaPrincipal.getDialogAdministrarCuentas().dispose();
+         refrescar();
+      }
    }
 }

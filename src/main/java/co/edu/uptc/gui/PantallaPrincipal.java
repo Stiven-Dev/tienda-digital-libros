@@ -72,14 +72,6 @@ public class PantallaPrincipal extends JPanel {
     */
    private       ProfileButton          profileButton;
    /**
-    * Panel para crear cuentas (solo para administradores).
-    */
-   private       PanelCrearCuentas      panelCrearCuentas; //Solo para los administradores
-   /**
-    * Diálogo de historial de compras (solo para usuarios).
-    */
-   private       DialogHistorialCompras dialogHistorialCompras; //Solo para Usuarios
-   /**
     * Diálogo de perfil de usuario (solo para usuarios).
     */
    private       DialogPerfil           dialogPerfil; //Solo para Usuarios
@@ -219,10 +211,9 @@ public class PantallaPrincipal extends JPanel {
    private void funcionesAdministrador () {
       CardLayout cardLayout = (CardLayout) panelCentral.getLayout();
       cardLayout.show(panelCentral, "LIBROS");
-      panelHeader.remove(cartBooksButton);
       cardLayout.removeLayoutComponent(panelCarrito);
+      panelHeader.remove(cartBooksButton);
       panelLibros.reasignarFuncionalidadAdmin();
-      panelCrearCuentas = new PanelCrearCuentas(evento);
       revalidate();
       repaint();
    }
@@ -232,22 +223,6 @@ public class PantallaPrincipal extends JPanel {
     */
    private void activarFuncionesPerfil () {
       profileButton.iniciarSesion(usuarioActual);
-   }
-
-   /**
-    * Inicializa el diálogo de historial de compras.
-    */
-   private void inicializarPanelHistorialCompras () {
-      dialogHistorialCompras = new DialogHistorialCompras(ventanaPrincipal, evento);
-   }
-
-   /**
-    * Retorna el diálogo de historial de compras.
-    *
-    * @return diálogo de historial de compras
-    */
-   public DialogHistorialCompras getDialogHistorialCompras () {
-      return dialogHistorialCompras;
    }
 
    /**
@@ -276,9 +251,6 @@ public class PantallaPrincipal extends JPanel {
    private void agregarFuncionalidadSegunRol () {
       if (Usuario.ROLES.ADMIN.equals(usuarioActual.getTipoUsuario())) {
          funcionesAdministrador();
-         //TODO Crear panel de crear cuentas
-      } else {
-         inicializarPanelHistorialCompras();
       }
       activarFuncionesPerfil();
       panelCarrito.refrescarLista(usuarioActual);
@@ -294,21 +266,21 @@ public class PantallaPrincipal extends JPanel {
    }
 
    /**
-    * Retorna el panel para crear cuentas.
-    *
-    * @return panel de creación de cuentas
-    */
-   PanelCrearCuentas getPanelCrearCuentas () {
-      return panelCrearCuentas;
-   }
-
-   /**
     * Retorna el diálogo de perfil de usuario.
     *
     * @return diálogo de perfil
     */
    DialogPerfil getDialogPerfil () {
       return profileButton.getDialogPerfil();
+   }
+
+   /**
+    * Retorna el diálogo para administrar cuentas de usuario.
+    *
+    * @return diálogo de administración de cuentas
+    */
+   DialogAdministrarCuentas getDialogAdministrarCuentas () {
+      return profileButton.getDialogAdministrarCuentas();
    }
 
    /**

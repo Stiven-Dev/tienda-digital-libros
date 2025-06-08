@@ -15,7 +15,7 @@ import java.util.Map;
 
 /**
  * Diálogo para confirmar la compra de los libros seleccionados en el carrito.
- * Muestra el resumen de la compra, permite confirmar o cancelar y aplica descuentos según el método de pago.
+ * Muestra el resumen de la compra, permite confirmar o cancelar y aplica descuentos según el metodo de pago.
  */
 public class DialogConfirmarCompra extends JDialog {
    // Referencia a la ventana principal
@@ -37,7 +37,7 @@ public class DialogConfirmarCompra extends JDialog {
     *
     * @param ventanaPrincipal    ventana principal de la aplicación
     * @param itemsCarrito        artículos seleccionados en el carrito
-    * @param metodoPago          método de pago elegido
+    * @param metodoPago          metodo de pago elegido
     * @param porcentajeDescuento descuento aplicado según el usuario
     */
    public DialogConfirmarCompra (VentanaPrincipal ventanaPrincipal, HashMap<Long, Integer> itemsCarrito, Compra.METODO_PAGO metodoPago, double porcentajeDescuento) {

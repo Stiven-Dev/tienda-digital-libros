@@ -17,6 +17,7 @@ public class Evento implements ActionListener {
 
    /**
     * Constructor que recibe la ventana principal para delegar acciones.
+    *
     * @param ventanaPrincipal ventana principal de la aplicación
     */
    public Evento (VentanaPrincipal ventanaPrincipal) {
@@ -25,6 +26,7 @@ public class Evento implements ActionListener {
 
    /**
     * Maneja los eventos de acción generados por la interfaz gráfica.
+    *
     * @param e evento de acción
     */
    @Override public void actionPerformed (ActionEvent e) {
@@ -32,8 +34,9 @@ public class Evento implements ActionListener {
       EVENTO nombreEvento  = EVENTO.valueOf(actionCommand);
       switch (nombreEvento) {
          //Eventos para Administradores
-         case MOSTRAR_DIALOG_AGREGAR_LIBRO -> ventanaPrincipal.dialogAgregarLibro();
+         case MOSTRAR_DIALOG_AGREGAR_LIBRO -> ventanaPrincipal.agregarLibro();
          case ACTUALIZAR_LIBRO -> ventanaPrincipal.actualizarLibro();
+         case ACTUALIZAR_CLIENTE_ADMIN -> ventanaPrincipal.actualizarDatosClienteAdmin();
          case CREAR_CUENTA -> ventanaPrincipal.crearCuenta();
          case ELIMINAR_LIBRO -> ventanaPrincipal.eliminarLibro();
          case REGISTRAR_LIBRO -> ventanaPrincipal.registrarLibro();
@@ -60,6 +63,7 @@ public class Evento implements ActionListener {
    public enum EVENTO {
       ACTUALIZAR_LIBRO,           // Actualizar información de un libro
       ACTUALIZAR_CLIENTE,         // Actualizar datos de un cliente
+      ACTUALIZAR_CLIENTE_ADMIN,   // Actualizar datos de un cliente desde el panel de administrador
       MOSTRAR_DIALOG_AGREGAR_LIBRO, // Mostrar diálogo para agregar libro
       CERRAR_SESION,              // Cerrar sesión de usuario
       CREAR_CUENTA,               // Crear una nueva cuenta
