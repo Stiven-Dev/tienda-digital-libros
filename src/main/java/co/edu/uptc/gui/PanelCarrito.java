@@ -35,7 +35,7 @@ public class PanelCarrito extends JPanel {
    private       double                 total                  = 0;
    private final JLabel                 labelTotal             = new JLabel(String.format("$%f", total));
    private       GridBagConstraints     gbc;
-   private       HashMap<Long, Integer> carritoDeCompras;
+   private final HashMap<Long, Integer> carritoDeCompras;
 
    /**
     * Constructor del panel de carrito.
@@ -196,8 +196,12 @@ public class PanelCarrito extends JPanel {
       gbc.weightx = 0.1f;
       gbc.gridy   = 2;
       gbc.gridx   = 0;
-
       add(panelFooter, gbc);
+      gbc.gridy   = 3;
+      gbc.weighty = 0.05f;
+      JLabel labelAviso = new JLabel("**Los descuentos serán calculados al momento de finalizar la compra**", SwingConstants.CENTER);
+      labelAviso.setFont(new Font("Lucida Sans Typewriter", Font.ITALIC, 10));
+      add(labelAviso, gbc);
 
       actualizarLabelsCompra();
    }
@@ -327,7 +331,6 @@ public class PanelCarrito extends JPanel {
     * @param ISBN identificador del libro
     */
    void agregarArticulo (long ISBN) {
-      actualizarDatosCompra();
       if (cantidadLibros >= cantidadMaximaTotal) {
          String mensaje = String.format("No se pueden agregar mas de %d libros al carrito", cantidadMaximaTotal);
          JOptionPane.showMessageDialog(null, mensaje, "Alerta", JOptionPane.INFORMATION_MESSAGE);
@@ -341,11 +344,13 @@ public class PanelCarrito extends JPanel {
          carritoDeCompras.put(ISBN, 1);
          int cantidad = 1;
          rellenarDatosFilaLibro(libro, cantidad);
-         actualizarDatosCompra();
+
          CartBooksButton.setCount(cantidadLibros);
          return;
+      } else {
+         aumentarCantidad(ISBN);
       }
-      aumentarCantidad(ISBN);
+      actualizarDatosCompra();
    }
 
    /**
@@ -355,6 +360,11 @@ public class PanelCarrito extends JPanel {
     * @param cantidad cantidad seleccionada
     */
    private void rellenarDatosFilaLibro (Libro libro, int cantidad) {
+      for (int i = 0; i < model.getRowCount(); i++) {
+         if ((long) model.getValueAt(i, NOMBRE_COLUMNAS.ISBN.getIndex()) == libro.getISBN()) {
+            return;
+         }
+      }
       Object[] datosFila = new Object[NOMBRE_COLUMNAS.values().length];
       long     ISBN      = libro.getISBN();
       datosFila[NOMBRE_COLUMNAS.ISBN.getIndex()]    = ISBN;
@@ -430,15 +440,16 @@ public class PanelCarrito extends JPanel {
     * @return valor del impuesto
     */
    private double obtenerValorImpuesto (long ISBN) {
-      double valorUnitario = ventanaPrincipal.obtenerLibroMedianteISBN(ISBN).getPrecioVenta();
-      return ventanaPrincipal.obtenerPrecioImpuesto(valorUnitario);
+      double valorBaseConIVA = ventanaPrincipal.obtenerLibroMedianteISBN(ISBN).getPrecioVenta();
+      double valorBase       = valorBaseConIVA / (1 + ventanaPrincipal.obtenerPorcentajeImpuesto(valorBaseConIVA));
+      return ventanaPrincipal.obtenerPrecioImpuesto(valorBase);
    }
 
    /**
     * Actualiza los datos de la compra (cantidad, subtotal, total, etc.).
     */
-   private void actualizarDatosCompra () {
-      cantidadLibros     = ventanaPrincipal.obtenerCantidadLibros();
+   void actualizarDatosCompra () {
+      cantidadLibros     = ventanaPrincipal.obtenerCantidadLibrosEnCarrito();
       valorTotalImpuesto = ventanaPrincipal.obtenerValorTotalImpuesto();
       subTotal           = ventanaPrincipal.obtenerSubTotalVenta();
       if (ventanaPrincipal.usuarioRegistrado()) {
@@ -472,7 +483,6 @@ public class PanelCarrito extends JPanel {
          return;
       }
       model.setRowCount(0);
-      carritoDeCompras = ventanaPrincipal.getCarritoActual();
       for (HashMap.Entry<Long, Integer> entry : carritoDeCompras.entrySet()) {
          long ISBN                = entry.getKey();
          int  cantidadEnCarrito   = entry.getValue();
@@ -485,9 +495,10 @@ public class PanelCarrito extends JPanel {
             continue;
          }
          if (unidadesDisponibles < cantidadEnCarrito) {
-            carritoDeCompras.replace(entry.getKey(), unidadesDisponibles);
+            carritoDeCompras.replace(ISBN, unidadesDisponibles);
             String mensaje = String.format("El libro con ISBN %d solo cuenta con %d unidades disponibles", ISBN, unidadesDisponibles);
             JOptionPane.showMessageDialog(null, mensaje, "Información", JOptionPane.INFORMATION_MESSAGE);
+            refrescarLista(usuario);
             continue;
          }
          agregarLibroAlCarrito(ISBN);

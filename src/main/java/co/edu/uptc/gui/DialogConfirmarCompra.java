@@ -23,7 +23,7 @@ public class DialogConfirmarCompra extends JDialog {
    private final VentanaPrincipal       ventanaPrincipal;
    // Lista de artículos (ISBN y cantidad)
    private final HashMap<Long, Integer> listaArticulos;
-   // Método de pago seleccionado
+   // Metodo de pago seleccionado
    private final Compra.METODO_PAGO     metodoPago;
    // Porcentaje de descuento aplicado
    private final double                 porcentajeDescuento;
@@ -35,9 +35,10 @@ public class DialogConfirmarCompra extends JDialog {
 
    /**
     * Constructor del diálogo de confirmación de compra.
-    * @param ventanaPrincipal ventana principal de la aplicación
-    * @param itemsCarrito artículos seleccionados en el carrito
-    * @param metodoPago método de pago elegido
+    *
+    * @param ventanaPrincipal    ventana principal de la aplicación
+    * @param itemsCarrito        artículos seleccionados en el carrito
+    * @param metodoPago          método de pago elegido
     * @param porcentajeDescuento descuento aplicado según el usuario
     */
    public DialogConfirmarCompra (VentanaPrincipal ventanaPrincipal, HashMap<Long, Integer> itemsCarrito, Compra.METODO_PAGO metodoPago, double porcentajeDescuento) {
@@ -166,6 +167,7 @@ public class DialogConfirmarCompra extends JDialog {
 
    /**
     * Crea y retorna el modelo de tabla por defecto para los artículos de la compra.
+    *
     * @return DefaultTableModel configurado para la tabla de artículos
     */
    private DefaultTableModel getDefaultTableModel () {
@@ -186,6 +188,7 @@ public class DialogConfirmarCompra extends JDialog {
 
    /**
     * Crea y retorna un renderizador de celdas para formatear los valores double como moneda.
+    *
     * @return DefaultTableCellRenderer personalizado
     */
    private DefaultTableCellRenderer celdasDoubleFormateadas () {

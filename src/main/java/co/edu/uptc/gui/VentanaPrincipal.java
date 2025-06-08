@@ -96,6 +96,7 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Obtiene el diálogo de login y registro.
+    *
     * @return Diálogo de login y registro.
     */
    public DialogLoginSignup getDialogLoginSignUp () {
@@ -118,6 +119,7 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Obtiene los datos de registro del usuario desde el diálogo.
+    *
     * @return Usuario con los datos de registro.
     */
    private Usuario getDatosSignUp () {
@@ -181,6 +183,7 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Obtiene el subtotal de la venta actual.
+    *
     * @return Subtotal de la venta.
     */
    double obtenerSubTotalVenta () {
@@ -189,6 +192,7 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Obtiene el total de la venta actual, incluyendo impuestos y descuentos.
+    *
     * @return Total de la venta.
     */
    double obtenerTotalVenta () {
@@ -197,8 +201,10 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Calcula el precio total de un producto, incluyendo impuestos y descuentos.
+    *
     * @param valorUnitario Precio unitario del producto.
-    * @param cantidad Cantidad de productos.
+    * @param cantidad      Cantidad de productos.
+    *
     * @return Precio total del producto.
     */
    double obtenerPrecioTotalProducto (double valorUnitario, int cantidad) {
@@ -207,16 +213,20 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Calcula el valor del impuesto para un precio dado.
-    * @param valorUnitario Precio del producto.
+    *
+    * @param valorBase Precio del producto sin IVA.
+    *
     * @return Valor del impuesto.
     */
-   double obtenerPrecioImpuesto (double valorUnitario) {
-      return tienda.calcularValorImpuesto(valorUnitario);
+   double obtenerPrecioImpuesto (double valorBase) {
+      return tienda.calcularValorImpuesto(valorBase);
    }
 
    /**
     * Calcula el porcentaje de impuesto para un precio dado.
+    *
     * @param valorUnitario Precio del producto.
+    *
     * @return Porcentaje de impuesto.
     */
    double obtenerPorcentajeImpuesto (double valorUnitario) {
@@ -299,8 +309,10 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Calcula el valor con descuento sin incluir IVA.
-    * @param valorBase Valor base del producto.
+    *
+    * @param valorBase           Valor base del producto.
     * @param porcentajeDescuento Porcentaje de descuento a aplicar.
+    *
     * @return Valor con descuento sin IVA.
     */
    double obtenerValorConDescuentoSinIva (double valorBase, double porcentajeDescuento) {
@@ -309,6 +321,7 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Obtiene la lista de compras realizadas.
+    *
     * @return Lista de compras.
     */
    ArrayList<Compra> obtenerListaCompras () {
@@ -335,7 +348,9 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Valida las credenciales de inicio de sesión proporcionadas.
+    *
     * @param datosLogin Datos de inicio de sesión.
+    *
     * @return Usuario validado o null si las credenciales son incorrectas.
     */
    private Usuario validarLogin (Usuario datosLogin) {
@@ -344,6 +359,7 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Obtiene el valor total de impuestos para la venta actual.
+    *
     * @return Valor total de impuestos.
     */
    double obtenerValorTotalImpuesto () {
@@ -352,15 +368,18 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Obtiene la cantidad total de libros en el carrito.
+    *
     * @return Cantidad de libros.
     */
-   int obtenerCantidadLibros () {
-      return tienda.obtenerCantidadLibros();
+   int obtenerCantidadLibrosEnCarrito () {
+      return tienda.obtenerCantidadLibrosEnCarrito();
    }
 
    /**
     * Busca y devuelve un libro mediante su ISBN.
+    *
     * @param ISBN ISBN del libro a buscar.
+    *
     * @return Libro encontrado o null si no existe.
     */
    Libro obtenerLibroMedianteISBN (long ISBN) {
@@ -369,6 +388,7 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Verifica si el usuario actual está registrado en el sistema.
+    *
     * @return Verdadero si el usuario está registrado, falso en caso contrario.
     */
    boolean usuarioRegistrado () {
@@ -454,6 +474,7 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Obtiene la lista de libros disponibles en la tienda.
+    *
     * @return Lista de libros.
     */
    ArrayList<Libro> getLibrosLocales () {
@@ -462,6 +483,7 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Obtiene el usuario actualmente autenticado.
+    *
     * @return Usuario actual.
     */
    Usuario getUsuarioActual () {
@@ -470,6 +492,7 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Obtiene la lista de compras realizadas por el usuario.
+    *
     * @return Lista de compras.
     */
    ArrayList<Compra> getComprasLocales () {
@@ -478,6 +501,7 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Obtiene el carrito de compras actual del usuario.
+    *
     * @return Carrito de compras.
     */
    HashMap<Long, Integer> getCarritoActual () {
@@ -493,6 +517,7 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Establece la compra seleccionada para ver detalles.
+    *
     * @param compraSeleccionada Compra a establecer como seleccionada.
     */
    public void setCompraSeleccionada (Compra compraSeleccionada) {
@@ -501,7 +526,9 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Obtiene la lista de detalles de una compra mediante su ID.
+    *
     * @param IDcompra ID de la compra.
+    *
     * @return Lista de detalles de la compra.
     */
    public ArrayList<DetalleCompra> obtenerListaDetallesCompraPorID (long IDcompra) {
@@ -510,7 +537,9 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Obtiene la cantidad de unidades disponibles de un libro mediante su ISBN.
+    *
     * @param ISBN ISBN del libro.
+    *
     * @return Cantidad de unidades disponibles.
     */
    public int unidadesDisponibles (long ISBN) {
@@ -519,8 +548,9 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Elimina un libro del carrito de compras.
+    *
     * @param ISBN ISBN del libro a eliminar.
-    * @param ID ID del detalle de compra asociado.
+    * @param ID   ID del detalle de compra asociado.
     */
    public void eliminarLibroDelCarrito (long ISBN, long ID) {
       tienda.eliminarLibroDelCarrito(ISBN, ID);
@@ -528,6 +558,7 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Establece el metodo de pago para la compra actual.
+    *
     * @param metodoPago Metodo de pago a establecer.
     */
    public void setMetodoPago (Compra.METODO_PAGO metodoPago) {
@@ -536,6 +567,7 @@ public class VentanaPrincipal extends JFrame {
 
    /**
     * Establece la respuesta de confirmación para acciones como pago.
+    *
     * @param respuesta Respuesta de confirmación.
     */
    public void setRespuesta (boolean respuesta) {

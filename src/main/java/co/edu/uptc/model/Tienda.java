@@ -205,14 +205,16 @@ public class Tienda {
       for (Map.Entry<Long, Integer> entry : carritoActual.entrySet()) {
          long   ISBN                = entry.getKey();
          int    cantidadLibro       = entry.getValue();
-         double valorImpuestoUnidad = calcularValorImpuesto(buscarLibro(ISBN).getPrecioVenta());
+         double valorUnitario       = buscarLibro(ISBN).getPrecioVenta();
+         double valorBase           = valorUnitario / (1 + calcularPorcentajeImpuesto(valorUnitario));
+         double valorImpuestoUnidad = calcularValorImpuesto(valorBase);
          double valorImpuestoLibro  = valorImpuestoUnidad * cantidadLibro;
          valorTotalImpuesto += valorImpuestoLibro;
       }
       return valorTotalImpuesto;
    }
 
-   public int obtenerCantidadLibros () {
+   public int obtenerCantidadLibrosEnCarrito () {
       int cantidadTotalLibros = 0;
       for (Map.Entry<Long, Integer> entry : carritoActual.entrySet()) {
          cantidadTotalLibros += entry.getValue();
@@ -235,11 +237,11 @@ public class Tienda {
       return valorUnitario * cantidad;
    }
 
-   public double calcularValorImpuesto (double valorUnitario) {
-      if (valorUnitario >= 50000) {
-         return valorUnitario * 0.19;
+   public double calcularValorImpuesto (double valorBase) {
+      if (valorBase >= 50000) {
+         return valorBase * 0.19;
       } else {
-         return valorUnitario * 0.05;
+         return valorBase * 0.05;
       }
    }
 
@@ -360,34 +362,43 @@ public class Tienda {
    public boolean efectuarCompra (Compra.METODO_PAGO metodoPago) {
       Compra compra = new Compra();
       compra.setIDasociado(usuarioActual.getID());
-      ArrayList<DetalleCompra> listaArticulos = getListaArticulos(carritoActual);
+      ArrayList<DetalleCompra> listaArticulos = getListaArticulos();
       compra.setLibrosComprados(listaArticulos);
       compra.setValorCompra(calcularTotalVenta());
       compra.setMetodoPago(metodoPago);
       double porcentajeDescuento = obtenerDescuentoTipoUsuario(usuarioActual.getTipoUsuario());
       long   IDcompra            = comprasDAO.registrarCompra(compra, porcentajeDescuento);
-      if (IDcompra < 0) {
+      if (IDcompra < 1) {
+         libroDAO.reintegrarUnidadesLibro(carritoActual);
          return false;
       }
       detalleCompraDAO.registrarDetallesCompra(listaArticulos, compra.getIDasociado(), IDcompra);
       return true;
    }
 
-   private ArrayList<DetalleCompra> getListaArticulos (HashMap<Long, Integer> carrito) {
+   private ArrayList<DetalleCompra> getListaArticulos () {
       ArrayList<DetalleCompra> listaArticulos = new ArrayList<>();
-      for (Map.Entry<Long, Integer> entry : carrito.entrySet()) {
-         long          ISBN                = entry.getKey();
-         int           cantidadLibro       = entry.getValue();
-         Libro         libro               = buscarLibro(ISBN);
-         double        valorUnitario       = libro.getPrecioVenta();
-         double        valorImpuestoUnidad = calcularValorImpuesto(valorUnitario);
-         DetalleCompra detalleCompra       = new DetalleCompra();
+      for (Map.Entry<Long, Integer> entry : carritoActual.entrySet()) {
+         long ISBN          = entry.getKey();
+         int  cantidadLibro = entry.getValue();
+         if (cantidadLibro < 1) {
+            continue;
+         }
+         int cantidadDisponibles = unidadesDisponibles(ISBN);
+         if (cantidadLibro > cantidadDisponibles) {
+            cantidadLibro = cantidadDisponibles;
+            carritoActual.replace(ISBN, cantidadLibro);
+         }
+         Libro         libro         = buscarLibro(ISBN);
+         double        valorUnitario = libro.getPrecioVenta();
+         DetalleCompra detalleCompra = new DetalleCompra();
          detalleCompra.setTitulo(libro.getTitulo());
          detalleCompra.setCantidad(cantidadLibro);
-         detalleCompra.setValorUnitario(valorUnitario + valorImpuestoUnidad);
+         detalleCompra.setValorUnitario(valorUnitario);
          detalleCompra.setISBNasociado(ISBN);
          listaArticulos.add(detalleCompra);
       }
+      libroDAO.descontarUnidades(carritoActual);
       return listaArticulos;
    }
 

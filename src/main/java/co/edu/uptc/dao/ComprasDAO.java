@@ -145,13 +145,13 @@ public class ComprasDAO {
     */
    public long registrarCompra (Compra compra, double porcentajeDescuento) {
       if (compra.getLibrosComprados().isEmpty()) {
-         Tienda.agregarLog("No se puede registrar una compra sin libros");
          return -1;
       }
-      String consultaSQL = "INSERT INTO COMPRAS (ID_asociado, porcentaje_Descuento) VALUES (?, ?)";
-      try (PreparedStatement preparedStatement = getPreparedStatement(consultaSQL)) {
+      String consultaSQL = "INSERT INTO COMPRAS (ID_asociado, porcentaje_Descuento, metodo_Pago) VALUES (?, ?, ?)";
+      try (PreparedStatement preparedStatement = ConnectionToDB.getInstance().getConnection().prepareStatement(consultaSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
          preparedStatement.setLong(1, compra.getIDasociado());
          preparedStatement.setDouble(2, porcentajeDescuento);
+         preparedStatement.setString(3, compra.getMetodoPago().name());
          preparedStatement.executeUpdate();
          try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
             if (generatedKeys.next()) {

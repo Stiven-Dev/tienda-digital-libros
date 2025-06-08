@@ -143,6 +143,7 @@ public class PantallaPrincipal extends JPanel {
       botonRefrescar.addActionListener(_ -> {
          ventanaPrincipal.refrescar();
          panelLibros.refrescarLista(ventanaPrincipal);
+         panelCarrito.refrescarLista(usuarioActual);
          refrescarInterfaz();
       });
       panelHeader.add(botonRefrescar, gbcHeader);
@@ -367,9 +368,12 @@ public class PantallaPrincipal extends JPanel {
     * Refresca la interfaz gráfica y actualiza la cantidad de libros en el carrito.
     */
    public void refrescarInterfaz () {
-      int cantidadLibros = ventanaPrincipal.obtenerCantidadLibros();
+      int cantidadLibros = ventanaPrincipal.obtenerCantidadLibrosEnCarrito();
       CartBooksButton.setCount(cantidadLibros);
-      cartBooksButton.setText(String.valueOf(cantidadLibros));
+      if (!isCartVisible) {
+         cartBooksButton.setText(String.valueOf(cantidadLibros));
+      }
+      panelCarrito.actualizarDatosCompra();
       revalidate();
       repaint();
    }

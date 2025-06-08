@@ -20,7 +20,7 @@ public class PanelLibros extends JPanel {
    private final Font                  fuenteCabecera     = new Font("Arial", Font.BOLD, 15);
    private final Font                  fuenteCelda        = new Font("Lucida Sans Unicode", Font.PLAIN, 12);
    private final JPanel                panelBotones       = new JPanel(new GridBagLayout());
-   private       ArrayList<Libro>      listaLibros;
+   private final ArrayList<Libro>      listaLibros;
    private       DefaultTableModel     model;
    private       JTable                tableLibros;
    private       Libro                 libroSeleccionado;
@@ -30,8 +30,9 @@ public class PanelLibros extends JPanel {
 
    /**
     * Constructor del panel de libros.
+    *
     * @param pantallaPrincipal referencia a la pantalla principal
-    * @param evento manejador de eventos
+    * @param evento            manejador de eventos
     */
    public PanelLibros (PantallaPrincipal pantallaPrincipal, Evento evento) {
       this.evento      = evento;
@@ -41,6 +42,7 @@ public class PanelLibros extends JPanel {
 
    /**
     * Crea y retorna el modelo de tabla para los libros.
+    *
     * @return DefaultTableModel configurado
     */
    private DefaultTableModel getDefaultTableModel () {
@@ -63,6 +65,7 @@ public class PanelLibros extends JPanel {
 
    /**
     * Renderizador personalizado para formatear celdas de tipo double como moneda.
+    *
     * @return DefaultTableCellRenderer personalizado
     */
    private DefaultTableCellRenderer celdasDoubleFormateadas () {
@@ -95,6 +98,7 @@ public class PanelLibros extends JPanel {
 
    /**
     * Aplica el renderizador personalizado a las columnas de la tabla.
+    *
     * @param tableLibros tabla a formatear
     */
    private void formatearColumnas (JTable tableLibros) {
@@ -103,11 +107,11 @@ public class PanelLibros extends JPanel {
 
    /**
     * Refresca la lista de libros mostrados en la tabla.
+    *
     * @param ventanaPrincipal referencia a la ventana principal
     */
    void refrescarLista (VentanaPrincipal ventanaPrincipal) {
       ventanaPrincipal.refrescar();
-      listaLibros = ventanaPrincipal.getLibrosLocales();
       if (listaLibros.isEmpty()) return;
       model.setRowCount(0); // Limpiar el modelo antes de agregar nuevos datos
       for (Libro libro : listaLibros) {
@@ -142,6 +146,7 @@ public class PanelLibros extends JPanel {
 
    /**
     * Agrega el libro seleccionado al carrito.
+    *
     * @param filaEvento fila seleccionada en la tabla
     */
    private void agregarAlCarrito (int filaEvento) {
@@ -200,9 +205,10 @@ public class PanelLibros extends JPanel {
 
    /**
     * Asigna la funcionalidad a los botones de gestión de libros.
-    * @param botonAgregar botón para agregar libro
+    *
+    * @param botonAgregar    botón para agregar libro
     * @param botonActualizar botón para actualizar libro
-    * @param botonEliminar botón para eliminar libro
+    * @param botonEliminar   botón para eliminar libro
     */
    private void agregarFuncionalidadBotones (JButton botonAgregar, JButton botonActualizar, JButton botonEliminar) {
       //Boton Agregar
@@ -234,7 +240,9 @@ public class PanelLibros extends JPanel {
 
    /**
     * Obtiene el objeto Libro correspondiente a una fila de la tabla.
+    *
     * @param filaSeleccionada fila seleccionada
+    *
     * @return objeto Libro correspondiente
     */
    private Libro getLibroFila (int filaSeleccionada) {
@@ -254,6 +262,7 @@ public class PanelLibros extends JPanel {
 
    /**
     * Retorna el libro actualmente seleccionado en la tabla.
+    *
     * @return libro seleccionado
     */
    public Libro getLibroSeleccionado () {
@@ -262,6 +271,7 @@ public class PanelLibros extends JPanel {
 
    /**
     * Retorna el diálogo para actualizar libro.
+    *
     * @return DialogActualizarLibro
     */
    public DialogActualizarLibro getDialogActualizarLibro () {
@@ -270,6 +280,7 @@ public class PanelLibros extends JPanel {
 
    /**
     * Retorna el diálogo para eliminar libro.
+    *
     * @return DialogEliminarLibro
     */
    public DialogEliminarLibro getDialogEliminarLibro () {
@@ -278,6 +289,7 @@ public class PanelLibros extends JPanel {
 
    /**
     * Retorna el diálogo para agregar libro.
+    *
     * @return DialogAgregarLibro
     */
    public DialogAgregarLibro getDialogAgregarLibro () {
