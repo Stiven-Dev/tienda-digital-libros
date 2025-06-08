@@ -20,7 +20,9 @@ public class DetalleCompraDAO {
 
    /**
     * Metodo que obtiene los detalles de una compra por su ID.
+    *
     * @param IDcompra ID de la compra.
+    *
     * @return ArrayList de objetos DetalleCompra, o null si hay error.
     */
    public ArrayList<DetalleCompra> obtenerDetallesCompraPorID (long IDcompra) {
@@ -39,7 +41,6 @@ public class DetalleCompraDAO {
             detalleCompra.setISBNasociado(resultSet.getLong("ISBN_asociado"));
             detallesCompra.add(detalleCompra);
          }
-         Tienda.agregarLog("Detalles de compra obtenidos para ID: " + IDcompra);
          return detallesCompra;
       } catch (Exception e) {
          Tienda.agregarLog("Error al obtener detalles de compra para ID: " + IDcompra);
@@ -49,9 +50,10 @@ public class DetalleCompraDAO {
 
    /**
     * Metodo que registra los detalles de una compra en la base de datos.
+    *
     * @param listaArticulos Lista de detalles de compra a registrar.
-    * @param IDasociado ID del usuario asociado a la compra.
-    * @param IDcompra ID de la compra.
+    * @param IDasociado     ID del usuario asociado a la compra.
+    * @param IDcompra       ID de la compra.
     */
    public void registrarDetallesCompra (ArrayList<DetalleCompra> listaArticulos, long IDasociado, long IDcompra) {
       String consultaSQL = "INSERT INTO DETALLE_COMPRA (ID_compra, ISBN_asociado, titulo, cantidad, valor_unitario) VALUES (?, ?, ?, ?, ?)";
@@ -64,7 +66,6 @@ public class DetalleCompraDAO {
             preparedStatement.setDouble(5, detalleCompra.getValorUnitario());
             preparedStatement.executeUpdate();
          }
-         Tienda.agregarLog(String.format("ID_compra %d registrada para ID_asociado %d", IDcompra, IDasociado));
       } catch (Exception e) {
          Tienda.agregarLog("Error al registrar detalles de compra para ID_asociado: " + IDasociado);
       }
@@ -72,8 +73,11 @@ public class DetalleCompraDAO {
 
    /**
     * Metodo privado para obtener un PreparedStatement a partir de una consulta SQL.
+    *
     * @param consultaSQL Consulta SQL a preparar.
+    *
     * @return PreparedStatement listo para usar.
+    *
     * @throws Exception Si ocurre un error de conexión o SQL.
     */
    private PreparedStatement getPreparedStatement (String consultaSQL) throws Exception {

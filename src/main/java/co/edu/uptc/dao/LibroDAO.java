@@ -64,7 +64,6 @@ public class LibroDAO {
             preparedStatement.addBatch();
          }
          preparedStatement.executeBatch();
-         Tienda.agregarLog("Unidades reintegradas correctamente");
       } catch (SQLException e) {
          Tienda.agregarLog(e.getMessage());
       }
@@ -91,7 +90,6 @@ public class LibroDAO {
          preparedStatement.setInt(9, libro.getCantidadDisponible());
          preparedStatement.setString(10, libro.getFORMATO().name());
          preparedStatement.executeUpdate();
-         Tienda.agregarLog("Libro agregado correctamente: " + libro.getTitulo());
          return true;
       } catch (Exception e) {
          Tienda.agregarLog(e.getMessage());
@@ -120,13 +118,7 @@ public class LibroDAO {
          preparedStatement.setString(9, datosLibro.getFORMATO().name());
          preparedStatement.setLong(10, datosLibro.getISBN());
          int filasAfectadas = preparedStatement.executeUpdate();
-         if (filasAfectadas > 0) {
-            Tienda.agregarLog("Libro actualizado correctamente: " + datosLibro.getTitulo());
-            return true;
-         } else {
-            Tienda.agregarLog("No se actualizó el libro con ISBN: " + datosLibro.getISBN());
-            return false;
-         }
+         return filasAfectadas > 0;
       } catch (Exception e) {
          Tienda.agregarLog(e.getMessage());
       }
@@ -177,13 +169,7 @@ public class LibroDAO {
       try (PreparedStatement preparedStatement = getPreparedStatement(consultaSQL)) {
          preparedStatement.setLong(1, ISBN);
          int filasAfectadas = preparedStatement.executeUpdate();
-         if (filasAfectadas > 0) {
-            Tienda.agregarLog("Libro eliminado correctamente con ISBN: " + ISBN);
-            return true;
-         } else {
-            Tienda.agregarLog("No se eliminó el libro con ISBN: " + ISBN);
-            return false;
-         }
+         return filasAfectadas > 0;
       } catch (Exception e) {
          Tienda.agregarLog(e.getMessage());
       }
@@ -216,7 +202,6 @@ public class LibroDAO {
             listaLibros.add(libro);
          }
          resultSet.close();
-         Tienda.agregarLog("Lista de libros obtenida correctamente");
       } catch (Exception e) {
          Tienda.agregarLog(e.getMessage());
       }
@@ -231,22 +216,17 @@ public class LibroDAO {
     * @return true si existen ventas asociadas, false en caso contrario.
     */
    public boolean isVentasAsociadas (long IBSN) {
-      boolean compraAsociada = false;
-      String  consultaSQL    = "SELECT EXISTS(SELECT 1 FROM compras WHERE ISBN_asociado = ? LIMIT 1) AS compra_asociada";
+      String consultaSQL = "SELECT EXISTS(SELECT 1 FROM compras WHERE ISBN_asociado = ? LIMIT 1) AS compra_asociada";
       try (PreparedStatement preparedStatement = getPreparedStatement(consultaSQL)) {
          preparedStatement.setLong(1, IBSN);
          ResultSet resultSet = preparedStatement.executeQuery();
          if (resultSet.next()) {
-            compraAsociada = resultSet.getBoolean("compra_asociada");
-            if (compraAsociada) {
-               Tienda.agregarLog("Compra Asociada a ISBN: " + IBSN);
-            }
-            return compraAsociada;
+            return resultSet.getBoolean("compra_asociada");
          }
       } catch (SQLException e) {
          Tienda.agregarLog(e.getMessage());
       }
-      return compraAsociada;
+      return false;
    }
 
    /**

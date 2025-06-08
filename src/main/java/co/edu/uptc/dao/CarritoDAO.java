@@ -14,7 +14,9 @@ import java.util.HashMap;
 public class CarritoDAO {
    /**
     * Metodo que obtiene el carrito de compras de un usuario por su ID.
+    *
     * @param ID ID del usuario asociado al carrito.
+    *
     * @return HashMap con ISBN como clave y cantidad como valor, o null si hay error.
     */
    public HashMap<Long, Integer> obtenerCarritoPorID (long ID) {
@@ -38,8 +40,9 @@ public class CarritoDAO {
 
    /**
     * Metodo que elimina un libro del carrito de un usuario en la base de datos.
+    *
     * @param ISBN ISBN del libro a eliminar.
-    * @param ID ID del usuario asociado al carrito.
+    * @param ID   ID del usuario asociado al carrito.
     */
    public void eliminarLibroDelCarrito (long ISBN, long ID) {
       String consultaSQL = "DELETE FROM carrito USE INDEX (ID_doble) WHERE ISBN = ? AND ID = ?";
@@ -47,7 +50,6 @@ public class CarritoDAO {
          preparedStatement.setLong(1, ISBN);
          preparedStatement.setLong(2, ID);
          preparedStatement.executeUpdate();
-         Tienda.agregarLog(String.format("Libro %d eliminado del carrito %d ", ISBN, ID));
       } catch (Exception e) {
          Tienda.agregarLog(String.format("Error al eliminar %d del carrito %d: %s", ISBN, ID, e.getMessage()));
       }
@@ -55,8 +57,11 @@ public class CarritoDAO {
 
    /**
     * Metodo privado para obtener un PreparedStatement a partir de una consulta SQL.
+    *
     * @param consultaSQL Consulta SQL a preparar.
+    *
     * @return PreparedStatement listo para usar.
+    *
     * @throws Exception Si ocurre un error de conexión o SQL.
     */
    private PreparedStatement getPreparedStatement (String consultaSQL) throws Exception {

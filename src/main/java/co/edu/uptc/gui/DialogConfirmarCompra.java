@@ -2,7 +2,6 @@ package co.edu.uptc.gui;
 
 import co.edu.uptc.entity.Compra;
 import co.edu.uptc.entity.Libro;
-import co.edu.uptc.model.Tienda;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -144,7 +143,6 @@ public class DialogConfirmarCompra extends JDialog {
          Libro    libro      = ventanaPrincipal.obtenerLibroMedianteISBN(ISBN);
          Object[] itemCompra = new Object[NOMBRE_COLUMNAS.values().length];
          if (libro == null) {
-            Tienda.agregarLog("Libro no encontrado en la tienda: " + ISBN);
             continue;
          }
          double valorUnitario           = libro.getPrecioVenta();

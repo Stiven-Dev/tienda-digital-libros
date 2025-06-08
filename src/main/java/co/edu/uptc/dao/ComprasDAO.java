@@ -51,7 +51,6 @@ public class ComprasDAO {
             compra.setCantidadCompra(sumatoriaCompra.getCantidadCompra());
             compras.add(compra);
          }
-         Tienda.agregarLog("Compras obtenidas para el ID: " + IDasociado);
          return compras;
       } catch (Exception e) {
          Tienda.agregarLog("Error al obtener compras ID: " + IDasociado);
@@ -155,9 +154,7 @@ public class ComprasDAO {
          preparedStatement.executeUpdate();
          try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
             if (generatedKeys.next()) {
-               long IDcompra = generatedKeys.getLong(1);
-               Tienda.agregarLog(String.format("Compra registrada para el ID %d (ID_compra %d)", compra.getIDasociado(), IDcompra));
-               return IDcompra;
+               return generatedKeys.getLong(1);
             }
          }
       } catch (Exception e) {

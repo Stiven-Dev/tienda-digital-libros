@@ -40,9 +40,6 @@ public class ConnectionToDB {
       try {
          Class.forName("org.mariadb.jdbc.Driver");
          connection = DriverManager.getConnection(URL, USER, PASS);
-         if (connection != null) {
-            Tienda.agregarLog("Conexión a base de datos " + DB + " OK");
-         }
       } catch (SQLException | ClassNotFoundException e) {
          Tienda.agregarLog(e.getMessage());
       }
@@ -77,9 +74,6 @@ public class ConnectionToDB {
    public void closeConnection () throws SQLException {
       if (connection != null && !connection.isClosed()) {
          connection.close();
-         Tienda.agregarLog("Conexión cerrada correctamente");
-      } else {
-         Tienda.agregarLog("La conexión ya está cerrada o es nula");
       }
    }
 }

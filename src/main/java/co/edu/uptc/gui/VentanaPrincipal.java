@@ -144,7 +144,6 @@ public class VentanaPrincipal extends JFrame {
       dispose();
       try {
          ConnectionToDB.getInstance().closeConnection();
-         Tienda.agregarLog("Conexión a la base de datos cerrada correctamente");
       } catch (SQLException e) {
          Tienda.agregarLog("Error al cerrar la conexión a la base de datos");
       }
@@ -247,7 +246,6 @@ public class VentanaPrincipal extends JFrame {
       DialogEliminarLibro dialogEliminarLibro = pantallaPrincipal.getPanelLibros().getDialogEliminarLibro();
       long                ISBN                = dialogEliminarLibro.getLibroAEliminar().getISBN();
       if (tienda.comprasAsociadas(ISBN)) {
-         Tienda.agregarLog("Intento de eliminar libro con ventas asociadas: " + ISBN);
          JOptionPane.showMessageDialog(this, "No es posible eliminar el libro, tiene ventas asociadas", "Alerta", JOptionPane.INFORMATION_MESSAGE);
          dialogEliminarLibro.dispose();
          return;

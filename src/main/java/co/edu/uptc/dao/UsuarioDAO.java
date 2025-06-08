@@ -17,8 +17,11 @@ import java.util.Arrays;
 public class UsuarioDAO {
    /**
     * Metodo privado para obtener un PreparedStatement a partir de una consulta SQL.
+    *
     * @param consultaSQL Consulta SQL a preparar.
+    *
     * @return PreparedStatement listo para usar.
+    *
     * @throws SQLException Si ocurre un error de conexión o SQL.
     */
    private static PreparedStatement getPreparedStatement (String consultaSQL) throws SQLException {
@@ -28,7 +31,9 @@ public class UsuarioDAO {
 
    /**
     * Metodo que obtiene el porcentaje de descuento según el rol del usuario.
+    *
     * @param rol Rol del usuario.
+    *
     * @return Porcentaje de descuento (0.15 para PREMIUM, 0 para otros).
     */
    public float obtenerDescuentoTipoUsuario (Usuario.ROLES rol) {
@@ -37,7 +42,9 @@ public class UsuarioDAO {
 
    /**
     * Metodo que registra un usuario en la base de datos.
+    *
     * @param usuario Objeto Usuario a registrar.
+    *
     * @return true si el usuario fue registrado correctamente, false en caso contrario.
     */
    public boolean registrarUsuario (Usuario usuario) {
@@ -58,7 +65,6 @@ public class UsuarioDAO {
          preparedStatement.setString(6, usuario.getTipoUsuario().name());
          preparedStatement.executeUpdate();
          preparedStatement.close();
-         Tienda.agregarLog("Usuario registrado: " + usuario.getCorreoElectronico());
       } catch (Exception e) {
          Tienda.agregarLog(e.getMessage());
          return false;
@@ -68,7 +74,9 @@ public class UsuarioDAO {
 
    /**
     * Metodo que obtiene un usuario mediante su correo electrónico.
+    *
     * @param correoElectronico Correo electrónico del usuario.
+    *
     * @return Objeto Usuario si se encuentra, null en caso contrario.
     */
    public Usuario obtenerUsuarioMedianteCorreo (String correoElectronico) {
@@ -98,12 +106,13 @@ public class UsuarioDAO {
 
    /**
     * Metodo que valida si un usuario puede ser registrado (correo no repetido) y lo registra si es válido.
+    *
     * @param usuario Objeto Usuario a validar y registrar.
+    *
     * @return true si el usuario fue registrado correctamente, false en caso contrario.
     */
    public boolean validarRegistro (Usuario usuario) {
       if (obtenerUsuarioMedianteCorreo(usuario.getCorreoElectronico()) != null) {
-         Tienda.agregarLog("Registro fallido: " + usuario.getCorreoElectronico() + " ya está registrado.");
          JOptionPane.showMessageDialog(null, "El correo electrónico ya está registrado.", "Error de registro", JOptionPane.ERROR_MESSAGE);
          return false;
       }
@@ -112,7 +121,9 @@ public class UsuarioDAO {
 
    /**
     * Metodo que actualiza los datos de un usuario en la base de datos.
+    *
     * @param nuevosDatosUsuario Objeto Usuario con los nuevos datos.
+    *
     * @return true si los datos fueron actualizados correctamente, false en caso contrario.
     */
    public boolean actualizarDatosUsuario (Usuario nuevosDatosUsuario) {
@@ -150,13 +161,7 @@ public class UsuarioDAO {
          preparedStatement.setLong(parametroIndex, nuevosDatosUsuario.getID());
          int filasActualizadas = preparedStatement.executeUpdate();
          preparedStatement.close();
-         if (filasActualizadas > 0) {
-            Tienda.agregarLog("Se actualiza el usuario: " + nuevosDatosUsuario.getCorreoElectronico());
-            if (actualizarClave) {
-               Tienda.agregarLog("Contraseña actualizada para: " + nuevosDatosUsuario.getCorreoElectronico());
-            }
-            return true;
-         }
+         return filasActualizadas > 0;
       } catch (SQLException e) {
          Tienda.agregarLog(e.getMessage());
       }
@@ -165,7 +170,9 @@ public class UsuarioDAO {
 
    /**
     * Metodo que valida las credenciales de login de un usuario.
+    *
     * @param datosUsuario Objeto Usuario con los datos de login.
+    *
     * @return Objeto Usuario si las credenciales son correctas, null en caso contrario.
     */
    public Usuario validarCredencialesLogin (Usuario datosUsuario) {

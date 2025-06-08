@@ -217,7 +217,15 @@ public class Tienda {
    public int obtenerCantidadLibrosEnCarrito () {
       int cantidadTotalLibros = 0;
       for (Map.Entry<Long, Integer> entry : carritoActual.entrySet()) {
-         cantidadTotalLibros += entry.getValue();
+         long ISBN               = entry.getKey();
+         int  cantidadEnCarrito  = entry.getValue();
+         int  cantidadDisponible = unidadesDisponibles(ISBN);
+         if (cantidadEnCarrito <= cantidadDisponible) {
+            cantidadTotalLibros += cantidadEnCarrito;
+         } else {
+            carritoActual.replace(ISBN, cantidadDisponible);
+            cantidadTotalLibros += cantidadDisponible;
+         }
       }
       return cantidadTotalLibros;
    }
