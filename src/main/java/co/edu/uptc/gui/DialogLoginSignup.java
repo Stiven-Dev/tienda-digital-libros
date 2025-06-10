@@ -100,6 +100,7 @@ public class DialogLoginSignup extends JDialog {
       panelCentral.add(panelRegistro, "REGISTRO");
       add(panelCentral);
       pack();
+      setSize(500, 400);
       setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
       setLocationRelativeTo(this);
       setResizable(false);
@@ -167,7 +168,6 @@ public class DialogLoginSignup extends JDialog {
             CardLayout cardLayout = (CardLayout) panelCentral.getLayout();
             cardLayout.show(panelCentral, "REGISTRO");
             getRootPane().setDefaultButton(botonRegistrar);
-            pack();
             revalidate();
             repaint();
          }
@@ -319,7 +319,6 @@ public class DialogLoginSignup extends JDialog {
             CardLayout cardLayout = (CardLayout) panelCentral.getLayout();
             cardLayout.show(panelCentral, "LOGIN");
             getRootPane().setDefaultButton(botonIniciarSesion);
-            pack();
             revalidate();
             repaint();
          }
@@ -368,7 +367,7 @@ public class DialogLoginSignup extends JDialog {
          }
       }
 
-      return "";
+      return " ";
    }
 
    /**

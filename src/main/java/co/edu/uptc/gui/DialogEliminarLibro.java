@@ -29,15 +29,15 @@ public class DialogEliminarLibro extends JDialog {
    /**
     * Fuente utilizada para el botón de eliminar.
     */
-   private final Font   fuenteBoton     = new Font("Lucida Sans Unicode", Font.BOLD, 20);
+   private final Font       fuenteBoton     = new Font("Lucida Sans Unicode", Font.BOLD, 20);
    /**
     * Libro que se va a eliminar.
     */
-   private final Libro  libro;
+   private final Libro      libro;
    /**
     * Panel que contiene los campos de información del libro.
     */
-   private       JPanel panelCampos;
+   private       JPanel     panelCampos;
    /**
     * Panel que contiene el botón de eliminar.
     */
@@ -79,11 +79,11 @@ public class DialogEliminarLibro extends JDialog {
       this.libro  = libroSeleccionado;
       setLayout(new BorderLayout());
       inicializarPanel();
+      setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+      actualizadDatosLibro();
       pack();
       setResizable(false);
       setLocationRelativeTo(null);
-      setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-      actualizadDatosLibro();
    }
 
    /**
@@ -118,12 +118,12 @@ public class DialogEliminarLibro extends JDialog {
       labelEditorial.setFont(fuenteLabel);
 
       //Text Fields
-      boxISBN            = new JTextField();
-      boxTitulo          = new JTextField();
-      boxAutor           = new JTextField();
-      boxAnioPublicacion = new JTextField();
-      boxCategoria       = new JTextField();
-      boxEditorial       = new JTextField();
+      boxISBN            = new JTextField(" ", JTextField.CENTER);
+      boxTitulo          = new JTextField(" ", JTextField.CENTER);
+      boxAutor           = new JTextField(" ", JTextField.CENTER);
+      boxAnioPublicacion = new JTextField(" ", JTextField.CENTER);
+      boxCategoria       = new JTextField(" ", JTextField.CENTER);
+      boxEditorial       = new JTextField(" ", JTextField.CENTER);
 
       //Asignacion de fuente a cada text field
       boxISBN.setFont(fuenteTextField);
@@ -148,54 +148,54 @@ public class DialogEliminarLibro extends JDialog {
       boxCategoria.setHorizontalAlignment(JTextField.CENTER);
       boxEditorial.setHorizontalAlignment(JTextField.CENTER);
 
-      GridBagConstraints gbc = new GridBagConstraints();
-      gbc.insets = new Insets(5, 5, 10, 5);
-      gbc.fill   = GridBagConstraints.BOTH;
+      GridBagConstraints gbcCampos = new GridBagConstraints();
+      gbcCampos.insets = new Insets(5, 5, 10, 5);
+      gbcCampos.fill   = GridBagConstraints.BOTH;
 
       //Peso Componente
-      gbc.weightx = 0.45f; //Esta asignación hace que todos los layouts tengan este peso, hasta que se cambie
+      gbcCampos.weightx = 0.45f; //Esta asignación hace que todos los layouts tengan este peso, hasta que se cambie
 
       //Fila 0, Columnas 0 y 1 ⇒ Labels ISBN y Titulo
-      gbc.gridy = 0;
-      gbc.gridx = 0;
-      panelCampos.add(labelISBN, gbc);
-      gbc.gridx = 1;
-      panelCampos.add(labelTitulo, gbc);
+      gbcCampos.gridy = 0;
+      gbcCampos.gridx = 0;
+      panelCampos.add(labelISBN, gbcCampos);
+      gbcCampos.gridx = 1;
+      panelCampos.add(labelTitulo, gbcCampos);
 
       //Fila 1, Columna 0 y 1 ⇒ Box ISBN y Titulo
-      gbc.gridy = 1;
-      gbc.gridx = 0;
-      panelCampos.add(boxISBN, gbc);
-      gbc.gridx = 1;
-      panelCampos.add(boxTitulo, gbc);
+      gbcCampos.gridy = 1;
+      gbcCampos.gridx = 0;
+      panelCampos.add(boxISBN, gbcCampos);
+      gbcCampos.gridx = 1;
+      panelCampos.add(boxTitulo, gbcCampos);
 
       //Fila 2, Columna 0 y 1 => Labels Autor y Año de Publicación
-      gbc.gridy = 2;
-      gbc.gridx = 0;
-      panelCampos.add(labelAutor, gbc);
-      gbc.gridx = 1;
-      panelCampos.add(labelAnioPublicacion, gbc);
+      gbcCampos.gridy = 2;
+      gbcCampos.gridx = 0;
+      panelCampos.add(labelAutor, gbcCampos);
+      gbcCampos.gridx = 1;
+      panelCampos.add(labelAnioPublicacion, gbcCampos);
 
       //Fila 3, Columna 0 y 1 => Box Autor y Año de Publicación
-      gbc.gridy = 3;
-      gbc.gridx = 0;
-      panelCampos.add(boxAutor, gbc);
-      gbc.gridx = 1;
-      panelCampos.add(boxAnioPublicacion, gbc);
+      gbcCampos.gridy = 3;
+      gbcCampos.gridx = 0;
+      panelCampos.add(boxAutor, gbcCampos);
+      gbcCampos.gridx = 1;
+      panelCampos.add(boxAnioPublicacion, gbcCampos);
 
       //Fila 4, Columna 0 y 1 => Labels Género y Editorial
-      gbc.gridy = 4;
-      gbc.gridx = 0;
-      panelCampos.add(labelCategoria, gbc);
-      gbc.gridx = 1;
-      panelCampos.add(labelEditorial, gbc);
+      gbcCampos.gridy = 4;
+      gbcCampos.gridx = 0;
+      panelCampos.add(labelCategoria, gbcCampos);
+      gbcCampos.gridx = 1;
+      panelCampos.add(labelEditorial, gbcCampos);
 
       //Fila 5, Columna 0 y 1 => Box Género y Editorial
-      gbc.gridy = 5;
-      gbc.gridx = 0;
-      panelCampos.add(boxCategoria, gbc);
-      gbc.gridx = 1;
-      panelCampos.add(boxEditorial, gbc);
+      gbcCampos.gridy = 5;
+      gbcCampos.gridx = 0;
+      panelCampos.add(boxCategoria, gbcCampos);
+      gbcCampos.gridx = 1;
+      panelCampos.add(boxEditorial, gbcCampos);
 
       add(panelCampos, BorderLayout.CENTER);
    }
@@ -204,7 +204,7 @@ public class DialogEliminarLibro extends JDialog {
     * Inicializa el panel inferior con el botón de eliminar.
     */
    private void inicializarPanelFooter () {
-      panelFooter = new JPanel(new GridLayout(1, 1));
+      panelFooter = new JPanel(new GridLayout(1, 1, 10, 5));
       botonEliminar.setActionCommand(Evento.EVENTO.ELIMINAR_LIBRO.name());
       botonEliminar.addActionListener(evento);
       //Asignacion de fuente al boton

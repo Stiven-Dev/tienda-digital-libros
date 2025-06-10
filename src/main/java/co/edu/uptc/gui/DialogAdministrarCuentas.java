@@ -216,6 +216,7 @@ public class DialogAdministrarCuentas extends JDialog {
       gbc.weighty = 0.3f;
       gbc.gridy++;
       add(panelFooter, gbc);
+      getRootPane().setDefaultButton(botonValidarCorreo);
    }
 
    /**
