@@ -154,11 +154,25 @@ public class UsuarioDAO {
          preparedStatement.setString(parametroIndex, nuevosDatosUsuario.getTipoUsuario().name());
          parametroIndex++;
          preparedStatement.setLong(parametroIndex, nuevosDatosUsuario.getID());
+         eliminarCarritoAdmin(nuevosDatosUsuario);
          return preparedStatement.executeUpdate() > 0; //Retorna true si la cantidad de filas actualizadas es mayor a 0
       } catch (SQLException e) {
          Tienda.agregarLog(e.getMessage());
       }
       return false;
+   }
+
+   private void eliminarCarritoAdmin (Usuario nuevosDatosUsuario) {
+      if (nuevosDatosUsuario.getTipoUsuario() != Usuario.ROLES.ADMIN) {
+         return;
+      }
+      String consultaSQL = "DELETE FROM CARRITO WHERE ID = ?";
+      try (PreparedStatement preparedStatement = getPreparedStatement(consultaSQL)) {
+         preparedStatement.setLong(1, nuevosDatosUsuario.getID());
+         preparedStatement.executeUpdate();
+      } catch (SQLException e) {
+         Tienda.agregarLog(e.getMessage());
+      }
    }
 
    /**
