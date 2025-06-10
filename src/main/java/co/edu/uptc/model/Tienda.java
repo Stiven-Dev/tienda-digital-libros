@@ -145,7 +145,10 @@ public class Tienda {
       if (usuarioActual.getID() < 1) {
          return;
       }
-      if (usuarioActual.getTipoUsuario() != Usuario.ROLES.ADMIN) {
+      if (usuarioActual.getTipoUsuario() == Usuario.ROLES.ADMIN) {
+         carritoActual.clear();
+         compraLocales.clear();
+      } else {
          refrescarCarritoActual();
          refrescarComprasLocales();
       }
@@ -262,6 +265,16 @@ public class Tienda {
       } else {
          return valorBase * 0.05;
       }
+   }
+
+   public void actualizarCarrito () {
+      if (usuarioActual.getID() < 1) {
+         return;
+      }
+      if (usuarioActual.getTipoUsuario() == Usuario.ROLES.ADMIN) {
+         return;
+      }
+      carritoDAO.actualizarCarrito(carritoActual, usuarioActual.getID());
    }
 
    //░█████╗░░█████╗░███╗░░░███╗██████╗░██████╗░░█████╗░
@@ -408,12 +421,5 @@ public class Tienda {
       }
       libroDAO.descontarUnidades(carritoActual);
       return listaArticulos;
-   }
-
-   public void actualizarCarrito () {
-      if (usuarioActual.getID() < 1) {
-         return;
-      }
-      carritoDAO.actualizarCarrito(carritoActual, usuarioActual.getID());
    }
 }
